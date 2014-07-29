@@ -25,6 +25,7 @@ file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX})
 file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin)
 
 set(HDRS
+	${PROJECT_SOURCE_DIR}/ui/Observable.hpp
 	)
 
 set(SRCS
@@ -32,12 +33,14 @@ set(SRCS
 	)
 
 PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+FIND_PACKAGE(Boost 1.55 REQUIRED)
 
 include_directories(
 	${SDL2_INCLUDE_DIRS}
+	${Boost_INCLUDE_DIR}
 	)
 
-set(LIBS ${LIBS} ${SDL2_LIBRARIES})
+set(LIBS ${LIBS} ${SDL2_LIBRARIES} ${Boost_LIBRARIES})
 
 link_libraries(${LIBS})
 
