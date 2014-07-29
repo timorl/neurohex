@@ -26,6 +26,7 @@ file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin)
 
 set(HDRS
 	${PROJECT_SOURCE_DIR}/ui/Observable.hpp
+	${PROJECT_SOURCE_DIR}/neuro/Tile.hpp
 	)
 
 set(SRCS
