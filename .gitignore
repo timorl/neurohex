@@ -1,3 +1,5 @@
+# swapfiles
+.*.swp
 # cmake generated files
 CMakeCache.txt
 CMakeFiles/
