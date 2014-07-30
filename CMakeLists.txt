@@ -31,10 +31,12 @@ file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin)
 set(HDRS
 	${PROJECT_SOURCE_DIR}/ui/Observable.hpp
 	${PROJECT_SOURCE_DIR}/neuro/Tile.hpp
+	${PROJECT_SOURCE_DIR}/neuro/Board.hpp
 	)
 
 set(SRCS
 	${PROJECT_SOURCE_DIR}/Main.cpp
+	${PROJECT_SOURCE_DIR}/neuro/Board.cpp
 	)
 
 pkg_search_module(SDL2 REQUIRED sdl2)
@@ -43,6 +45,7 @@ find_package(Boost 1.55 REQUIRED)
 include_directories(
 	${SDL2_INCLUDE_DIRS}
 	${Boost_INCLUDE_DIR}
+	${PROJECT_SOURCE_DIR}
 	)
 
 set(LIBS ${LIBS} ${SDL2_LIBRARIES} ${Boost_LIBRARIES})
