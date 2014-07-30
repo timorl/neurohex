@@ -1,6 +1,8 @@
 #ifndef NEURO_TILE_HPP
 #define NEURO_TILE_HPP
 
+#include"ui/Observable.hpp"
+
 namespace neuro {
 
 using Player=int;
@@ -118,9 +120,9 @@ using Orientation=int;
 			TileType type;
 			Player owner;
 			Player controller;
-			Orientation orientation; // An integer between 0 and 5.
 			int health;
 			int initiative;
+			Orientation orientation; // An integer between 0 and 5.
 	};
 
 }
