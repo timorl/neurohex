@@ -39,18 +39,22 @@ using Orientation=int;
 
 			void rotate(Orientation orient) {
 				orientation = orient;
+				sigModified(*this);
 			}
 
 			void changeController(Player player) {
 				controller = player;
+				sigModified(*this);
 			}
 
 			void modifyHealth(int mod) {
 				health += mod;
+				sigModified(*this);
 			}
 
 			void modifyInitiative(int mod) {
 				initiative += mod;
+				sigModified(*this);
 			}
 		private:
 			TileType type;
