@@ -31,11 +31,14 @@ set(HDRS
 	${PROJECT_SOURCE_DIR}/ui/Observable.hpp
 	${PROJECT_SOURCE_DIR}/neuro/Tile.hpp
 	${PROJECT_SOURCE_DIR}/neuro/Board.hpp
+	${PROJECT_SOURCE_DIR}/neuro/Army.hpp
+	${PROJECT_SOURCE_DIR}/neuro/Hand.hpp
 	)
 
 set(SRCS
 	${PROJECT_SOURCE_DIR}/Main.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Board.cpp
+	${PROJECT_SOURCE_DIR}/neuro/Army.cpp
 	)
 
 pkg_search_module(SDL2 REQUIRED sdl2)
