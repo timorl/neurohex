@@ -9,10 +9,10 @@ namespace neuro {
 			~TileTest() {}
 	};
 
-	TEST_F(TileTest, createInstantActionTileTest) {
+	TEST_F(TileTest, createInstantActionTile) {
 		Tile * tile = new Tile(TileType::INSTANT_ACTION);
 		EXPECT_EQ( TileType::INSTANT_ACTION, tile->getType() );
-		EXPECT_EQ( true, tile->isSolid() );
+		EXPECT_EQ( false, tile->isSolid() );
 	}
 
 }

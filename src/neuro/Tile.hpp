@@ -70,7 +70,7 @@ using Orientation=int;
 			/**
 				* @brief Tells whether the tile is considered a solid object.
 				*/
-			bool isSolid() const { return (type == TileType::INSTANT_ACTION) || (type == TileType::FOUNDATION); }
+			bool isSolid() const { return !( (type == TileType::INSTANT_ACTION) || (type == TileType::FOUNDATION) ); }
 
 			/**
 				* @brief Sets the owner and original controller of the tile.
