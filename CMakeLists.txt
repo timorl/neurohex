@@ -69,6 +69,7 @@ if(GTEST_FOUND)
 	set(NEURO_TEST_SRCS
 		${PROJECT_SOURCE_DIR}/neuro/Board.cpp
 		${NEURO_TEST_DIR}/BoardTest.cpp
+		${NEURO_TEST_DIR}/TileTest.cpp
 		)
 	add_executable(neuroTest ${NEURO_TEST_SRCS})
 	target_link_libraries(neuroTest
