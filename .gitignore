@@ -2,6 +2,7 @@
 .*.swp
 # cmake generated files
 CMakeCache.txt
+CTestTestfile.cmake
 CMakeFiles/
 Makefile
 cmake_install.cmake
@@ -10,3 +11,4 @@ Doxyfile
 #output directories
 bin/
 doc/
+Testing/

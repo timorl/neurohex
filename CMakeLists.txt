@@ -23,7 +23,6 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/dist")
 
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR})
-file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR})
 file(MAKE_DIRECTORY ${PROJECT_DOC_DIR})
 file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX})
 file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin)
@@ -59,6 +58,25 @@ install(TARGETS Neurohex
 	CONFIGURATIONS Relase
 	)
 
+# Use gtest for testing.
+
+find_package(GTest REQUIRED)
+if(GTEST_FOUND)
+	enable_testing()
+	include_directories(${GTEST_INCLUDE_DIR})
+	
+	set(NEURO_TEST_DIR ${PROJECT_SOURCE_DIR}/neuro/test)
+	set(NEURO_TEST_SRCS
+		${PROJECT_SOURCE_DIR}/neuro/Board.cpp
+		${NEURO_TEST_DIR}/BoardTest.cpp
+		)
+	add_executable(neuroTest ${NEURO_TEST_SRCS})
+	target_link_libraries(neuroTest
+		${GTEST_LIBRARY}	${GTEST_MAIN_LIBRARY})
+	add_test(NAME neuroTest
+		COMMAND neuroTest)
+	
+endif()
 # Use doxygen for documentation.
 
 find_package(Doxygen)
