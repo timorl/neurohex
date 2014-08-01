@@ -22,7 +22,7 @@ namespace neuro {
 			/**
 				* @brief Returns a std::list of pointers to tiles contained in the hand.
 				*/
-			std::list< TileP > const & getContents() const {	return tiles;	}
+			const std::list< TileP > & getContents() const {	return tiles;	}
 
 			/**
 				* @brief Adds a tile to the hand.
