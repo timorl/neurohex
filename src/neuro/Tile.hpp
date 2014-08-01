@@ -5,9 +5,6 @@
 
 namespace neuro {
 
-using Player=int;
-using Orientation=int;
-
 	/**
 		* @brief All the possible types of tiles.
 		*/
@@ -45,17 +42,17 @@ using Orientation=int;
 			/**
 				* @brief Returns the owner of the tile.
 				*/
-			Player getOwner() const { return owner; }
+			int getOwner() const { return owner; }
 
 			/**
 				* @brief Returns the current controller of the tile.
 				*/
-			Player getController() const { return controller; }
+			int getController() const { return controller; }
 
 			/**
 				* @brief Returns the current orientation of the tile.
 				*/
-			Orientation getOrientation() const { return orientation; }
+			int getOrientation() const { return orientation; }
 
 			/**
 				* @brief Returns the current health of the tile.
@@ -76,7 +73,7 @@ using Orientation=int;
 				* @brief Sets the owner and original controller of the tile.
 				* @param[in] player The player to become the owner.
 				*/
-			void setOwner(Player player) {
+			void setOwner(int player) {
 				owner = player;
 				controller = player;
 			}
@@ -85,7 +82,7 @@ using Orientation=int;
 				* @brief Changes the orientation of the tile.
 				* @param[in] orient The new orientation of the tile.
 				*/
-			void rotate(Orientation orient) {
+			void rotate(int orient) {
 				orientation = orient;
 				sigModified(*this);
 			}
@@ -94,7 +91,7 @@ using Orientation=int;
 				* @brief Changes the controller of the tile.
 				* @param[in] player The new controller of the tile.
 				*/
-			void changeController(Player player) {
+			void changeController(int player) {
 				controller = player;
 				sigModified(*this);
 			}
@@ -118,11 +115,11 @@ using Orientation=int;
 			}
 		private:
 			TileType type;
-			Player owner;
-			Player controller;
+			int owner;
+			int controller;
 			int health;
 			int initiative;
-			Orientation orientation; // An integer between 0 and 5.
+			int orientation; // An integer between 0 and 5.
 	};
 
 }

@@ -27,6 +27,11 @@ namespace neuro {
 			int tilesLeft() const { return tiles.size(); }
 
 			/**
+				* @brief Returns the id of the player owning the army.
+				*/
+			int getOwner() const { return owner; }
+
+			/**
 				* @brief Whether the army is empty.
 				*/
 			bool isEmpty() const { return tiles.empty(); }
@@ -37,12 +42,19 @@ namespace neuro {
 			void shuffle();
 
 			/**
+				* @brief Sets the owner of the army.
+				* @param[in] player The id of the player to own the army.
+				*/
+			void setOwner(int player);
+
+			/**
 				* @brief Draw one tile from the army.
 				* @returns A std::shared_ptr to the Tile drawn. It is empty if the army was
 				* empty.
 				*/
 			TileP drawTile();
 		private:
+			int owner;
 			std::vector< TileP > tiles;
 	};
 

@@ -33,12 +33,14 @@ set(HDRS
 	${PROJECT_SOURCE_DIR}/neuro/Board.hpp
 	${PROJECT_SOURCE_DIR}/neuro/Army.hpp
 	${PROJECT_SOURCE_DIR}/neuro/Hand.hpp
+	${PROJECT_SOURCE_DIR}/neuro/Player.hpp
 	)
 
 set(SRCS
 	${PROJECT_SOURCE_DIR}/Main.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Board.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Army.cpp
+	${PROJECT_SOURCE_DIR}/neuro/Player.cpp
 	)
 
 pkg_search_module(SDL2 REQUIRED sdl2)
