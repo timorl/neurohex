@@ -30,6 +30,12 @@ namespace neuro {
 			int getNumberOfTiles() const { return tiles.size(); }
 
 			/**
+				* @brief Returns whether the hand contains the specified tile
+				* @param[in] tile A pointer the a tile the hand might contain.
+				*/
+			bool containsTile( TileP tile ) const;
+
+			/**
 				* @brief Adds a tile to the hand.
 				* @param[in] tile The tile to add.
 				*/
