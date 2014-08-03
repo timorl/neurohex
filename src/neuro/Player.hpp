@@ -46,6 +46,21 @@ namespace neuro {
 			int getHealth() const { return health; }
 
 			/**
+				* @brief Returns the number of tiles in the players hand.
+				*/
+			int getNumberOfTilesInHand() const { return hand.getNumberOfTiles(); }
+
+			/**
+				* @brief Returns the number of tiles left in the players army.
+				*/
+			int getNumberOfTilesInArmy() const { return army->tilesLeft(); }
+
+			/**
+				* @brief Whether the players army is empty.
+				*/
+			bool armyEmpty() const { return army->isEmpty(); }
+
+			/**
 				* @brief Modifies health by the specified amount.
 				* @param[in] mod The amount to be added to health.
 				*/

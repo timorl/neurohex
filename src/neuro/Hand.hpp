@@ -25,6 +25,11 @@ namespace neuro {
 			const std::list< TileP > & getContents() const {	return tiles;	}
 
 			/**
+				* @brief Returns the number of tiles currently held in the hand.
+				*/
+			int getNumberOfTiles() const { return tiles.size(); }
+
+			/**
 				* @brief Adds a tile to the hand.
 				* @param[in] tile The tile to add.
 				*/
