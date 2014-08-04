@@ -6,11 +6,11 @@ namespace neuro {
 		switch ( dir ) {
 			case 0:
 			case 2:
-				coord.first += (coord.second % 2 == 0) : 0 ? 1;
+				coord.first += (coord.second % 2 == 0) ? 0 : 1;
 				break;
 			case 3:
 			case 5:
-				coord.first += (coord.second % 2 == 0) : -1 ? 0;
+				coord.first += (coord.second % 2 == 0) ? -1 : 0;
 				break;
 			case 1:
 				coord.first += 1;
@@ -78,9 +78,7 @@ namespace neuro {
 
 	std::list<TileP> Board::getSolidTilesInDirection(Coordinates coord, int dir) const {
 		std::list<TileP> result;
-		int xMod, yMod;
-		coord.first += xMod;
-		coord.second += yMod;
+		advanceInDirection(coord, dir);
 		while ( insideBoard(coord) ) {
 			for ( TileP tp : tiles[coord.first][coord.second] ) {
 				if ( tp->isSolid() ) {
