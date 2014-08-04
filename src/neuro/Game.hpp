@@ -12,8 +12,6 @@
 
 namespace neuro {
 
-	using ContestantP = std::shared_ptr<Contestant>;
-	using PlayerP = std::shared_ptr<Player>;
 	using Players = std::vector<PlayerP>;
 	using Arbiters = std::vector<Arbiter>;
 	using Contestants = std::vector<ContestantP>;
@@ -63,6 +61,8 @@ namespace neuro {
 			bool noArmy;
 			bool finished;
 	};
+
+	using GameP = std::shared_ptr< Game >;
 
 }
 

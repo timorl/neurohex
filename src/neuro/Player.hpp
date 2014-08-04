@@ -8,9 +8,6 @@
 
 namespace neuro {
 
-	using TileP = std::shared_ptr<Tile>;
-	using ArmyP = std::shared_ptr<Army>;
-
 	/**
 		* @brief A player with his Hand, Army and amount of health.
 		*/
@@ -83,6 +80,8 @@ namespace neuro {
 			ArmyP army;
 			int health;
 	};
+
+	using PlayerP = std::shared_ptr< Player >;
 
 }
 

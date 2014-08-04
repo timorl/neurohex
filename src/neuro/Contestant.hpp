@@ -4,11 +4,10 @@
 #include<memory>
 #include<vector>
 #include"neuro/Board.hpp"
+#include"neuro/Player.hpp"
 
 namespace neuro {
 
-	using TileP = std::shared_ptr< Tile >;
-	using PlayerP = std::shared_ptr< Player >;
 	using Players = std::vector< PlayerP >;
 
 	/**
@@ -52,6 +51,8 @@ namespace neuro {
 		public:
 			virtual Move getMove(int playerId, const Players & players, const Board & board, bool noArmy) = 0;
 	};
+
+	using ContestantP = std::shared_ptr< Contestant >;
 
 }
 

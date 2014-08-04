@@ -6,8 +6,6 @@
 
 namespace neuro {
 
-	using ArmyP = std::shared_ptr< Army >;
-
 	/**
 		* @brief A class for loading files with army descriptions.
 		* @todo This is mostly a stub.

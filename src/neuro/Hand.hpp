@@ -7,8 +7,6 @@
 
 namespace neuro {
 
-	using TileP = std::shared_ptr< Tile >;
-
 	/**
 		* @brief A container for tiles being held in the hand of the player.
 		*/
@@ -50,6 +48,8 @@ namespace neuro {
 		private:
 			std::list< TileP > tiles;
 	};
+
+	using HandP = std::shared_ptr< Hand >;
 
 }
 

@@ -9,7 +9,6 @@
 
 namespace neuro {
 
-	using TileP = std::shared_ptr<Tile>;
 	using Tiles = std::vector< std::vector< std::list< TileP > > >;
 	using Coordinates = std::pair<int, int>;
 

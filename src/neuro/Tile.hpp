@@ -1,6 +1,7 @@
 #ifndef NEURO_TILE_HPP
 #define NEURO_TILE_HPP
 
+#include<memory>
 #include"ui/Observable.hpp"
 
 namespace neuro {
@@ -121,6 +122,8 @@ namespace neuro {
 			int initiative;
 			int orientation; // An integer between 0 and 5.
 	};
+
+	using TileP = std::shared_ptr< Tile >;
 
 }
 

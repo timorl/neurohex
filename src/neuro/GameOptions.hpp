@@ -9,7 +9,6 @@
 
 namespace neuro {
 
-	using ContestantP = std::shared_ptr<Contestant>;
 	using Contestants = std::vector<ContestantP>;
 
 	/**

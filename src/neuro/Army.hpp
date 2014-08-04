@@ -8,8 +8,6 @@
 
 namespace neuro {
 
-	using TileP = std::shared_ptr< Tile >;
-
 	/**
 		* @brief A container for tiles, to be given to a player.
 		*/
@@ -57,6 +55,8 @@ namespace neuro {
 			int owner;
 			std::vector< TileP > tiles;
 	};
+
+	using ArmyP = std::shared_ptr< Army >;
 
 }
 
