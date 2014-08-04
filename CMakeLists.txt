@@ -34,6 +34,9 @@ set(HDRS
 	${PROJECT_SOURCE_DIR}/neuro/Army.hpp
 	${PROJECT_SOURCE_DIR}/neuro/Hand.hpp
 	${PROJECT_SOURCE_DIR}/neuro/Player.hpp
+	${PROJECT_SOURCE_DIR}/neuro/Contestant.hpp
+	${PROJECT_SOURCE_DIR}/neuro/Arbiter.hpp
+	${PROJECT_SOURCE_DIR}/neuro/Game.hpp
 	)
 
 set(SRCS
@@ -42,6 +45,8 @@ set(SRCS
 	${PROJECT_SOURCE_DIR}/neuro/Army.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Hand.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Player.cpp
+	${PROJECT_SOURCE_DIR}/neuro/Arbiter.cpp
+	${PROJECT_SOURCE_DIR}/neuro/Game.cpp
 	)
 
 pkg_search_module(SDL2 REQUIRED sdl2)
