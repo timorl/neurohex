@@ -43,7 +43,7 @@ namespace neuro {
 
 			/**
 				* @brief Removes the specified tile from the hand.
-				* @param[in] tilePos The position of the tile to remove.
+				* @param[in] tile The tile to remove.
 				*/
 			void removeTile(TileP tile) { tiles.remove(tile); sigModified(*this); }
 

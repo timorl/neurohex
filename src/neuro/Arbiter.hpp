@@ -21,7 +21,7 @@ namespace neuro {
 		public:
 			/**
 				* @brief Constructs an arbiter for the given contestant.
-				* @param[in] The contestant for which we need an arbiter.
+				* @param[in] contestant The contestant for which we need an arbiter.
 				*/
 			Arbiter(ContestantP contestant) : contestant(contestant) {}
 
