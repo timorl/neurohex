@@ -8,7 +8,7 @@ set(Neurohex_VERSION_MINOR 0)
 
 ADD_DEFINITIONS("-std=c++11")
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -O0 -g")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -O0 -g -lpthread")
 set(CMAKE_CXX_FLAGS_RELEASE"${CMAKE_CXX_FLAGS} -O2")
 
 set(CMAKE_BUILD_TYPE "Debug")
@@ -50,7 +50,8 @@ set(SRCS
 	)
 
 pkg_search_module(SDL2 REQUIRED sdl2)
-find_package(Boost 1.55 REQUIRED)
+find_package(Boost 1.54 REQUIRED)
+find_package(Threads)
 
 include_directories(
 	${SDL2_INCLUDE_DIRS}
@@ -60,7 +61,7 @@ include_directories(
 
 set(LIBS ${LIBS} ${SDL2_LIBRARIES} ${Boost_LIBRARIES})
 
-link_libraries(${LIBS})
+link_libraries(${LIBS} ${CMAKE_THREAD_LIBS_INIT})
 
 add_executable(Neurohex ${HDRS} ${SRCS})
 
