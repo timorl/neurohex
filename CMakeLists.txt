@@ -37,6 +37,7 @@ set(HDRS
 	${PROJECT_SOURCE_DIR}/neuro/Contestant.hpp
 	${PROJECT_SOURCE_DIR}/neuro/Arbiter.hpp
 	${PROJECT_SOURCE_DIR}/neuro/Game.hpp
+	${PROJECT_SOURCE_DIR}/neuro/GameOptions.hpp
 	)
 
 set(SRCS
