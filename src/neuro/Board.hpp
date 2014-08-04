@@ -72,7 +72,7 @@ namespace neuro {
 				* @brief Returns a list of tile pointers in a direction from a specified field.
 				* @param[in] coord Coordinates of the field as a std::pair<int, int>.
 				* @param[in] dir Direction in which to look for the tiles. Should be a
-				* value between 0 and 5, 0 meaning north and the next values being
+				* value between 0 and 5, 0 meaning north-east and the next values being
 				* consecutive clockwise directions.
 				* @return A list of pointers to tiles. The list has one entry for every
 				* field from the first neighbour up to the end of the board in the specified

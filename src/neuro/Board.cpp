@@ -2,6 +2,39 @@
 
 namespace neuro {
 
+	void advanceInDirection(Coordinates & coord, int dir) {
+		switch ( dir ) {
+			case 0:
+			case 2:
+				coord.first += (coord.second % 2 == 0) : 0 ? 1;
+				break;
+			case 3:
+			case 5:
+				coord.first += (coord.second % 2 == 0) : -1 ? 0;
+				break;
+			case 1:
+				coord.first += 1;
+				break;
+			case 4:
+				coord.first += -1;
+				break;
+		}
+		switch ( dir ) {
+			case 0:
+			case 5:
+				coord.second += -1;
+				break;
+			case 1:
+			case 4:
+				coord.second += 0;
+				break;
+			case 2:
+			case 3:
+				coord.second += 1;
+				break;
+		}
+	}
+
 	Board::Board( BoardDescription desc ) : fields(desc) {
 		width = fields.size();
 		if ( width == 0 ) {
@@ -46,32 +79,6 @@ namespace neuro {
 	std::list<TileP> Board::getSolidTilesInDirection(Coordinates coord, int dir) const {
 		std::list<TileP> result;
 		int xMod, yMod;
-		switch(dir) {
-			case 0:
-				xMod = 0;
-				yMod = -1;
-				break;
-			case 1:
-				xMod = 1;
-				yMod = 0;
-				break;
-			case 2:
-				xMod = 1;
-				yMod = 1;
-				break;
-			case 3:
-				xMod = 0;
-				yMod = 1;
-				break;
-			case 4:
-				xMod = -1;
-				yMod = 1;
-				break;
-			case 5:
-				xMod = -1;
-				yMod = 0;
-				break;
-		}
 		coord.first += xMod;
 		coord.second += yMod;
 		while ( insideBoard(coord) ) {
@@ -81,8 +88,7 @@ namespace neuro {
 					break;
 				}
 			}
-			coord.first += xMod;
-			coord.second += yMod;
+			advanceInDirection(coord, dir);
 		}
 		return result;
 	}
