@@ -38,6 +38,9 @@ set(HDRS
 	${PROJECT_SOURCE_DIR}/neuro/Arbiter.hpp
 	${PROJECT_SOURCE_DIR}/neuro/Game.hpp
 	${PROJECT_SOURCE_DIR}/neuro/GameOptions.hpp
+	${PROJECT_SOURCE_DIR}/neuro/Configurer.hpp
+	${PROJECT_SOURCE_DIR}/neuro/BoardLoader.hpp
+	${PROJECT_SOURCE_DIR}/neuro/ArmyLoader.hpp
 	)
 
 set(SRCS
@@ -48,6 +51,8 @@ set(SRCS
 	${PROJECT_SOURCE_DIR}/neuro/Player.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Arbiter.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Game.cpp
+	${PROJECT_SOURCE_DIR}/neuro/BoardLoader.cpp
+	${PROJECT_SOURCE_DIR}/neuro/ArmyLoader.cpp
 	)
 
 pkg_search_module(SDL2 REQUIRED sdl2)
