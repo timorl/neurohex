@@ -2,11 +2,11 @@
 
 namespace viewmodel {
 
-	void MainMenu::playGame() {
+	void MainMenu::createGame() {
 		if ( !configurer ) {
-			configurer = ConfigurerP( new Configurer() );
+			configurer = ConfigurerP( new Configurer( boardLoader, armyLoader ) );
 		}
-		event = MenuEvent::PLAY_GAME;
+		event = MenuEvent::CREATE_GAME;
 		sigModified(*this);
 	}
 

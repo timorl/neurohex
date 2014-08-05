@@ -38,10 +38,11 @@ set(HDRS
 	${PROJECT_SOURCE_DIR}/neuro/Arbiter.hpp
 	${PROJECT_SOURCE_DIR}/neuro/Game.hpp
 	${PROJECT_SOURCE_DIR}/neuro/GameOptions.hpp
-	${PROJECT_SOURCE_DIR}/neuro/BoardLoader.hpp
-	${PROJECT_SOURCE_DIR}/neuro/ArmyLoader.hpp
+	${PROJECT_SOURCE_DIR}/viewmodel/BoardLoader.hpp
+	${PROJECT_SOURCE_DIR}/viewmodel/ArmyLoader.hpp
 	${PROJECT_SOURCE_DIR}/viewmodel/Configurer.hpp
 	${PROJECT_SOURCE_DIR}/viewmodel/MainMenu.hpp
+	${PROJECT_SOURCE_DIR}/viewmodel/Application.hpp
 	)
 
 set(SRCS
@@ -52,9 +53,11 @@ set(SRCS
 	${PROJECT_SOURCE_DIR}/neuro/Player.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Arbiter.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Game.cpp
-	${PROJECT_SOURCE_DIR}/neuro/BoardLoader.cpp
-	${PROJECT_SOURCE_DIR}/neuro/ArmyLoader.cpp
+	${PROJECT_SOURCE_DIR}/viewmodel/BoardLoader.cpp
+	${PROJECT_SOURCE_DIR}/viewmodel/ArmyLoader.cpp
+	${PROJECT_SOURCE_DIR}/viewmodel/Configurer.cpp
 	${PROJECT_SOURCE_DIR}/viewmodel/MainMenu.cpp
+	${PROJECT_SOURCE_DIR}/viewmodel/Application.cpp
 	)
 
 pkg_search_module(SDL2 REQUIRED sdl2)

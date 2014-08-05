@@ -1,17 +1,18 @@
-#ifndef NEURO_ARMYLOADER_HPP
-#define NEURO_ARMYLOADER_HPP
+#ifndef VIEWMODEL_ARMYLOADER_HPP
+#define VIEWMODEL_ARMYLOADER_HPP
 
 #include<vector>
 #include"neuro/Army.hpp"
+#include"ui/Observable.hpp"
 
-namespace neuro {
+namespace viewmodel {
 
 	/**
 		* @brief A class for loading files with army descriptions.
 		* @todo This is mostly a stub.
 		* @todo Figure out how to handle the possibility of duplicate armies.
 		*/
-	class ArmyLoader {
+	class ArmyLoader : public ui::Observable< ArmyLoader > {
 		public:
 			/**
 				* @brief Load all army description files in the given directory.
@@ -32,11 +33,13 @@ namespace neuro {
 				* army has such name the pointer is empty.
 				* @todo For now this always returns a stub army.
 				*/
-			ArmyP	getArmy(std::string name) const;
+			neuro::ArmyP	getArmy(std::string name) const;
 		private:
-			std::map< std::string, ArmyP > armies;
+			std::map< std::string, neuro::ArmyP > armies;
 			std::map< std::string, std::string > descriptions;
 	};
+
+	using ArmyLoaderP = std::shared_ptr< ArmyLoader >;
 
 }
 

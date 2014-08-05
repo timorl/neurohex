@@ -1,16 +1,17 @@
-#ifndef NEURO_BOARDLOADER_HPP
-#define NEURO_BOARDLOADER_HPP
+#ifndef VIEWMODEL_BOARDLOADER_HPP
+#define VIEWMODEL_BOARDLOADER_HPP
 
 #include<vector>
+#include"ui/Observable.hpp"
 #include"neuro/Board.hpp"
 
-namespace neuro {
+namespace viewmodel {
 
 	/**
 		* @brief A class for loading files with board descriptions.
 		* @todo This is mostly a stub.
 		*/
-	class BoardLoader {
+	class BoardLoader : public ui::Observable<BoardLoader> {
 		public:
 			/**
 				* @brief Load all board description files in the given directory.
@@ -25,7 +26,7 @@ namespace neuro {
 				* @param[in] description A longer description of the board.
 				* @param[in] board The BoardDescription of the board being added.
 				*/
-			void addBoard(std::string name, std::string description, BoardDescription board);
+			void addBoard(std::string name, std::string description, neuro::BoardDescription board);
 
 			/**
 				* @brief Returns a std::map of names of loaded boards.
@@ -39,11 +40,13 @@ namespace neuro {
 				* board has such name the behaviour is undefined.
 				* @todo For now this always returns a default board.
 				*/
-			BoardDescription	getBoard(std::string name) const;
+			neuro::BoardDescription	getBoard(std::string name) const;
 		private:
-			std::map< std::string, BoardDescription > boards;
+			std::map< std::string, neuro::BoardDescription > boards;
 			std::map< std::string, std::string > descriptions;
 	};
+
+	using BoardLoaderP = std::shared_ptr< BoardLoader >;
 
 }
 

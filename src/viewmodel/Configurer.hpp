@@ -3,6 +3,8 @@
 
 #include<memory>
 #include<vector>
+#include"viewmodel/BoardLoader.hpp"
+#include"viewmodel/ArmyLoader.hpp"
 #include"neuro/GameOptions.hpp"
 #include"neuro/Game.hpp"
 
@@ -14,9 +16,26 @@ namespace viewmodel {
 	class Configurer : public ui::Observable<Configurer> {
 		public:
 			/**
-				* @brief Starts a game with the set options.
+				* @brief Create a configurer with the given resource loaders.
+				* @param[in] boardLoader A pointer to a BoardLoader which has already loaded
+				* boards.
+				* @param[in] armyLoader A pointer to an ArmyLoader which has already loaded
+				* armies.
 				*/
-			void startGame() {	game = neuro::GameP( new neuro::Game( config ) );	sigModified(*this); game->play(); game.reset();	}
+			Configurer( BoardLoaderP boardLoader, ArmyLoaderP armyLoader ) : boardLoader(boardLoader), armyLoader(armyLoader) {}
+
+			/**
+				* @brief Check whether the current settings are valid.
+				* @todo Actually verify something.
+				*/
+			bool verifySettings() const;
+
+			/**
+				* @brief Starts a game with the set options.
+				* @return true if successful, false if the specified configuration is not
+				* valid.
+				*/
+			bool startGame();
 
 			/**
 				* @brief Returns the created GameOptions.
@@ -24,12 +43,35 @@ namespace viewmodel {
 			neuro::GameOptions getConfiguration() const { return config; }
 
 			/**
+				* @brief Returns a list of available boards with short descriptions.
+				*/
+			const std::map< std::string, std::string > & getAvailableBoards() const { return boardLoader->getDescriptions(); }
+
+			/**
+				* @brief Returns a list of available armies with short descriptions.
+				*/
+			const std::map< std::string, std::string > & getAvailableArmies() const { return armyLoader->getDescriptions(); }
+
+			/**
 				* @brief Adds a contestant with an army.
 				* @param[in] contestant A pointer to the contestant to add.
-				* @param[in] army A pointer to the contestant's army.
 				* @return The contestants ID.
 				*/
-			int addContestant(neuro::ContestantP contestant, neuro::ArmyP army) { config.contestants.push_back(contestant), config.armies.push_back(army); return config.contestants.size() - 1; };
+			int addContestant(neuro::ContestantP contestant) { config.contestants.push_back(contestant), config.armies.push_back( neuro::ArmyP() ); sigModified(*this); return config.contestants.size() - 1; };
+
+			/**
+				* @brief Sets an army for the specified contestant.
+				* @param[in] contestantId The id of the contestant.
+				* @param[in] army A pointer to the army to set.
+				*/
+			void setArmy(int contestantId, neuro::ArmyP army); 
+
+			/**
+				* @brief Sets an army for the specified contestant.
+				* @param[in] contestantId The id of the contestant.
+				* @param[in] name A name of the army to set.
+				*/
+			void setArmy(int contestantId, std::string name) { setArmy(contestantId, armyLoader->getArmy(name) ); }
 
 			/**
 				* @brief Sets the initial health to use in the game.
@@ -41,8 +83,16 @@ namespace viewmodel {
 				* @brief Sets the board to use in the game.
 				* @param[in] board A BoardDescription describing the board.
 				*/
-			void setBoard(neuro::BoardDescription board) { config.board = board; };
+			void setBoard( neuro::BoardDescription board ) { config.board = board; };
+
+			/**
+				* @brief Sets the board to use in the game.
+				* @param[in] name The name of the board to set.
+				*/
+			void setBoard( std::string name ) { setBoard( boardLoader->getBoard( name ) ); }
 		private:
+			BoardLoaderP boardLoader;
+			ArmyLoaderP armyLoader;
 			neuro::GameOptions config;
 			neuro::GameP game;
 	};
