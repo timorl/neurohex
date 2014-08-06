@@ -38,6 +38,7 @@ set(HDRS
 	${PROJECT_SOURCE_DIR}/neuro/Arbiter.hpp
 	${PROJECT_SOURCE_DIR}/neuro/Game.hpp
 	${PROJECT_SOURCE_DIR}/neuro/GameOptions.hpp
+	${PROJECT_SOURCE_DIR}/utility/DFStyleParser.hpp
 	${PROJECT_SOURCE_DIR}/viewmodel/BoardLoader.hpp
 	${PROJECT_SOURCE_DIR}/viewmodel/ArmyLoader.hpp
 	${PROJECT_SOURCE_DIR}/viewmodel/Configurer.hpp
@@ -53,6 +54,7 @@ set(SRCS
 	${PROJECT_SOURCE_DIR}/neuro/Player.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Arbiter.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Game.cpp
+	${PROJECT_SOURCE_DIR}/utility/DFStyleParser.cpp
 	${PROJECT_SOURCE_DIR}/viewmodel/BoardLoader.cpp
 	${PROJECT_SOURCE_DIR}/viewmodel/ArmyLoader.cpp
 	${PROJECT_SOURCE_DIR}/viewmodel/Configurer.cpp
@@ -61,7 +63,7 @@ set(SRCS
 	)
 
 pkg_search_module(SDL2 REQUIRED sdl2)
-find_package(Boost 1.54 REQUIRED)
+find_package(Boost 1.54 COMPONENTS system filesystem REQUIRED)
 find_package(Threads)
 
 include_directories(

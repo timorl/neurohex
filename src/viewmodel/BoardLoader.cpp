@@ -2,8 +2,55 @@
 
 namespace viewmodel {
 
+	void BoardLoader::fillInBoardFields( neuro::BoardDescription & boardFields, int x, int y, std::string flds ) {
+		boardFields.resize(x);
+		for ( int i = 0; i < x; i++ ) {
+			boardFields[i].resize(y);
+		}
+		auto curChar = flds.begin();
+		for ( int i = 0; i < x; i++ ) {
+			for ( int j = 0; j < y; j++ ) {
+				while ( *curChar == ' ' || *curChar == '\n' ) {
+					curChar++;
+				}
+				switch ( *curChar ) {
+					case '0':
+						boardFields[i][j] = neuro::FieldType::NO_FIELD;
+						break;
+					case '1':
+						boardFields[i][j] = neuro::FieldType::NORMAL;
+						break;
+				}
+				curChar++;
+			}
+		}
+	}
+
 	void BoardLoader::loadBoards(std::string directory) {
-		//TODO: Actually load something.
+		utility::DFStyleParser parser(directory);
+		while ( parser.nextFile() ) {
+			std::string boardName;
+			std::string boardDescription;
+			int boardX, boardY;
+			std::string boardFieldsS;
+			neuro::BoardDescription boardFields;
+			while ( parser.hasNextToken() ) {
+				std::vector< std::string > boardInfo = parser.getNextToken();
+				std::string type = boardInfo[0];
+				if ( type == "NAME" ) {
+					boardName = boardInfo[1];
+				} else if ( type == "DESCRIPTION" ) {
+					boardDescription	= boardInfo[1];
+				} else if ( type == "DIMENSIONS" ) {
+					boardX = std::stoi( boardInfo[1] );
+					boardY = std::stoi( boardInfo[2] );
+				} else if ( type == "MAP" ) {
+					boardFieldsS	= boardInfo[1];
+				}
+			}
+			fillInBoardFields( boardFields, boardX, boardY, boardFieldsS );
+			addBoard( boardName, boardDescription, boardFields );
+		}
 	}
 
 	void BoardLoader::addBoard(std::string name, std::string description, neuro::BoardDescription board) {
@@ -14,38 +61,7 @@ namespace viewmodel {
 	}
 
 	neuro::BoardDescription	BoardLoader::getBoard(std::string name) const {
-		//FIXME: This just returns a default board always.
-		neuro::BoardDescription	board;
-		board.resize(5);
-		for ( int i = 0; i < 5; i++ ) {
-			board[i].resize(5);
-		}
-		board[0][0] = neuro::FieldType::NO_FIELD;
-		board[0][1] = neuro::FieldType::NORMAL;
-		board[0][2] = neuro::FieldType::NORMAL;
-		board[0][3] = neuro::FieldType::NORMAL;
-		board[0][4] = neuro::FieldType::NO_FIELD;
-		board[1][0] = neuro::FieldType::NORMAL;
-		board[1][1] = neuro::FieldType::NORMAL;
-		board[1][2] = neuro::FieldType::NORMAL;
-		board[1][3] = neuro::FieldType::NORMAL;
-		board[1][4] = neuro::FieldType::NO_FIELD;
-		board[2][0] = neuro::FieldType::NORMAL;
-		board[2][1] = neuro::FieldType::NORMAL;
-		board[2][2] = neuro::FieldType::NORMAL;
-		board[2][3] = neuro::FieldType::NORMAL;
-		board[2][4] = neuro::FieldType::NORMAL;
-		board[3][0] = neuro::FieldType::NORMAL;
-		board[3][1] = neuro::FieldType::NORMAL;
-		board[3][2] = neuro::FieldType::NORMAL;
-		board[3][3] = neuro::FieldType::NORMAL;
-		board[3][4] = neuro::FieldType::NO_FIELD;
-		board[4][0] = neuro::FieldType::NO_FIELD;
-		board[4][1] = neuro::FieldType::NORMAL;
-		board[4][2] = neuro::FieldType::NORMAL;
-		board[4][3] = neuro::FieldType::NORMAL;
-		board[4][4] = neuro::FieldType::NO_FIELD;
-		return board;
+		return boards.at(name);
 	}
 
 }

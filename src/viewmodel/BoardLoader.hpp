@@ -3,20 +3,19 @@
 
 #include<vector>
 #include"ui/Observable.hpp"
+#include"utility/DFStyleParser.hpp"
 #include"neuro/Board.hpp"
 
 namespace viewmodel {
 
 	/**
 		* @brief A class for loading files with board descriptions.
-		* @todo This is mostly a stub.
 		*/
 	class BoardLoader : public ui::Observable<BoardLoader> {
 		public:
 			/**
 				* @brief Load all board description files in the given directory.
 				* @param[in] directory The directory in which to look for the files.
-				* @todo This is a stub, does nothing.
 				*/
 			void loadBoards(std::string directory);
 
@@ -38,9 +37,16 @@ namespace viewmodel {
 				* @param[in] name The name of the board we are looking for.
 				* @return A BoardDescription of the board with the specified name. If no
 				* board has such name the behaviour is undefined.
-				* @todo For now this always returns a default board.
 				*/
 			neuro::BoardDescription	getBoard(std::string name) const;
+
+			/**
+				* @brief Fills in the specified BoardDescription using the provided string.
+				* @param[out] boardFields The BoardDescription to fill in.
+				* @param[in] x,y The dimensions of the BoardDescription to fill in.
+				* @param[in] flds The string describing the fields of the board.
+				*/
+			static void fillInBoardFields( neuro::BoardDescription & boardFields, int x, int y, std::string flds );
 		private:
 			std::map< std::string, neuro::BoardDescription > boards;
 			std::map< std::string, std::string > descriptions;
