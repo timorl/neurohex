@@ -1,0 +1,10 @@
+[NAME:Standard Board]
+Everything not between brackets is a comment.
+[DESCRIPTION:The standard 5 by 5 hex board. Usually the default for 2-4 players.]
+[DIMENSIONS:5:5]
+[MAP:
+0 1 1 1 0
+ 1 1 1 1 0
+1 1 1 1 1
+ 1 1 1 1 0
+0 1 1 1 0]

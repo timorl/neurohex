@@ -1,0 +1,12 @@
+[NAME:Standard Big Board]
+[DESCRIPTION:The bigger version of the standard hex board. Usually the default
+for 5-6 players.]
+[DIMENSIONS:7:7]
+[MAP:
+0 0 1 1 1 1 0
+ 0 1 1 1 1 1 0
+0 1 1 1 1 1 1
+	1 1 1 1 1 1 1
+0 1 1 1 1 1 1
+ 0 1 1 1 1 1 0
+0 0 1 1 1 1 0]
