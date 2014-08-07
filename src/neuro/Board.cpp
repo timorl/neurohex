@@ -52,11 +52,11 @@ namespace neuro {
 		}
 	}
 
-	std::list<TileP> Board::getTiles(Coordinates coord) const {
+	std::list< TileOnBoard > Board::getTiles(Coordinates coord) const {
 		if ( insideBoard(coord) ) {
 			return tiles[coord.first][coord.second];
 		} else {
-			return std::list<TileP>();
+			return std::list< TileOnBoard >();
 		}
 	}
 
@@ -64,8 +64,8 @@ namespace neuro {
 		Coordinates result(-1, -1);
 		for ( int x = 0; x < static_cast<int>( tiles.size() ); x++ ) {
 			for ( int y = 0; y < static_cast<int>( tiles[x].size() ); y++ ) {
-				for ( TileP tp : tiles[x][y] ) {
-					if ( tp == tile ) {
+				for ( TileOnBoard tob : tiles[x][y] ) {
+					if ( tob.first == tile ) {
 						result.first = x;
 						result.second = y;
 						return result;
@@ -76,22 +76,27 @@ namespace neuro {
 		return result;
 	}
 
-	std::list<TileP> Board::getSolidTilesInDirection(Coordinates coord, int dir) const {
-		std::list<TileP> result;
+	std::list< TileOnBoard > Board::getSolidTilesInDirection(Coordinates coord, int dir) const {
+		std::list< TileOnBoard > result;
 		advanceInDirection(coord, dir);
 		while ( insideBoard(coord) ) {
-			for ( TileP tp : tiles[coord.first][coord.second] ) {
-				if ( tp->isSolid() ) {
-					result.push_back( tp );
+			bool foundSolid = false;
+			for ( TileOnBoard tob : tiles[coord.first][coord.second] ) {
+				if ( tob.first->isSolid() ) {
+					result.push_back( tob );
+					foundSolid	= true;
 					break;
 				}
+			}
+			if ( !foundSolid ) {
+				result.push_back( TileOnBoard() );
 			}
 			advanceInDirection(coord, dir);
 		}
 		return result;
 	}
 
-	bool Board::placeTile( Coordinates coord, TileP tile ) {
+	bool Board::placeTile( Coordinates coord, TileOnBoard tile ) {
 		if ( insideBoard(coord) ) {
 			if ( getFieldDescription(coord) != FieldType::NO_FIELD ) {
 				// No more validation, assume the game validates; maybe validation later?
@@ -108,7 +113,9 @@ namespace neuro {
 		if ( toRem.first == -1 ) {
 			return false;
 		} else {
-			tiles[toRem.first][toRem.second].remove(tile);
+			tiles[toRem.first][toRem.second].remove_if( 
+					[tile]( const TileOnBoard & tob ) { return tob.first == tile; }
+					);
 			sigModified(*this);
 			return true;
 		}

@@ -33,7 +33,7 @@ namespace neuro {
 				* @param[in] health Health of the tile. Defaults to 0.
 				* @param[in] initiative Initiative of the tile. Defaults to 0.
 				*/
-			Tile(TileType type, int health = 0, int initiative = 0) : type(type), health(health), initiative(initiative), orientation(0) {}
+			Tile(TileType type, int health = 0, int initiative = 0) : type(type), health(health), initiative(initiative) {}
 
 			/**
 				* @brief Returns the type of the tile.
@@ -49,11 +49,6 @@ namespace neuro {
 				* @brief Returns the current controller of the tile.
 				*/
 			int getController() const { return controller; }
-
-			/**
-				* @brief Returns the current orientation of the tile.
-				*/
-			int getOrientation() const { return orientation; }
 
 			/**
 				* @brief Returns the current health of the tile.
@@ -77,15 +72,6 @@ namespace neuro {
 			void setOwner(int player) {
 				owner = player;
 				controller = player;
-			}
-
-			/**
-				* @brief Changes the orientation of the tile.
-				* @param[in] orient The new orientation of the tile.
-				*/
-			void rotate(int orient) {
-				orientation = orient;
-				sigModified(*this);
 			}
 
 			/**
@@ -120,7 +106,6 @@ namespace neuro {
 			int controller;
 			int health;
 			int initiative;
-			int orientation; // An integer between 0 and 5.
 	};
 
 	using TileP = std::shared_ptr< Tile >;

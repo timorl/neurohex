@@ -42,8 +42,7 @@ namespace neuro {
 								discardedTile = true;
 							} else {
 								//FIXME: This just places the tile at the first coordinate given.
-								board.placeTile( move.coords.front(), move.tile );
-								move.tile->rotate( move.orientation );
+								board.placeTile( move.coords.front(), make_pair( move.tile, move.orientation ) );
 								players[currentPlayer]->removeTile( move.tile );
 							}
 						} else { //Assume the tile is on the board.
