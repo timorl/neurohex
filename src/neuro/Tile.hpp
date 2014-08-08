@@ -26,6 +26,7 @@ namespace neuro {
 		* @brief The possible types of targetting.
 		*/
 	enum class TargettingType {
+		LOCAL,
 		FREE,
 		BLOB,
 		ADJECENT,
@@ -171,6 +172,46 @@ namespace neuro {
 	};
 
 	/**
+		* @brief A class representing an attack of a tile, usually in a direction.
+		*/
+	class Attack {
+		public:
+			/**
+				* @brief Get a description of the possible shape of the targetted fields.
+				* @return A std::pair of an integer equal to the number of fields that will
+				* be targetted and a TargettingType defining the shape the fields can be in.
+				*/
+			std::pair< int, TargettingType > getTargettingDescription() const { return std::make_pair( targetsNumber, targettingType ); }
+
+			/**
+				* @brief Whether the attack is melee.
+				*/
+			bool isMelee() const { return melee; }
+
+			/**
+				* @brief Whether the attack is ranged.
+				*/
+			bool isRanged() const { return ranged; }
+
+			/**
+				* @brief Execute the attack on the given tiles.
+				* @param[in] targets A std::list of affected tiles.
+				* @param[in] direction The direction in which the attack is executed.
+				* Important for some defensive abilities.
+				*/
+			void executeAttack( std::list< TileP > targets, int direction );
+		private:
+			TargettingType	targettingType;
+			int targetsNumber;
+			bool melee;
+			bool ranged;
+			int strength;
+			std::string attackActions;
+
+			void hit( TileP tile, int direction );
+	};
+
+	/**
 		* @brief A tile to be created in an army and later played.
 		* @todo Lists of abilities:
 		*  -playing
@@ -233,6 +274,8 @@ namespace neuro {
 			int owner;
 			int controller;
 			Placing placing;
+			std::array< std::list< Attack >, 6 > attacksInDirections;
+			std::list< Attack > otherAttacks;
 			Life life;
 			std::list< Ability > abilities;
 			std::set< int > initiative;
