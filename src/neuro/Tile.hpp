@@ -2,9 +2,13 @@
 #define NEURO_TILE_HPP
 
 #include<memory>
+#include<set>
 #include"ui/Observable.hpp"
 
 namespace neuro {
+
+	class Tile;
+	using TileP = std::shared_ptr< Tile >;
 
 	/**
 		* @brief All the possible types of tiles.
@@ -15,6 +19,59 @@ namespace neuro {
 		MODULE,
 		UNIT,
 		FOUNDATION
+	};
+
+	/**
+		* @brief A class controlling the placement of a tile.
+		*/
+	class Placing {
+		public:
+			/**
+				* @brief Whether the supplied list of arguments is suitable for this tile.
+				* @param[in] A std::list of pointers to tiles which should be affected by the
+				* placing.
+				* @return Whether the given arguments are acceptable for this tile's
+				* placing.
+				*/
+			bool verifyArguments( std::list< TileP > args );
+
+			/**
+				* @brief Place the Tile ad affect the provided targets.
+				* @param[in,out] targets The tiles that might be modified by the placed
+				* tile.
+				* @return Whether the tile should end up on the board after the actions have
+				* been performed.
+				*/
+			bool placeTile( std::list< TileP > targets );
+
+			/**
+				* @brief Returns the number of fields the tile should target.
+				*/
+			int getNumberOfTargets() const { return maxArgs; }
+
+			/**
+				* @brief Returns whether the tile targets blobs.
+				* @return true if all the targetted fields should be in one blob, false if
+				* they can be anywhere.
+				*/
+			bool blobTargetting() const { return blob; }
+
+			/**
+				* @brief The description of actions to take when placing the tile.
+				*/
+			std::string placeActions;
+		private:
+			int minArgs;
+			int maxArgs;
+			bool blob;
+			std::set< TileType > acceptableTargets;
+
+			void dealDamage(int amount, TileP target);
+			void destroyTile(TileP target);
+			void moveTile(TileP target);
+			void pushTile(TileP target);
+			void castleTiles(TileP first, TileP second);
+			void terrorize();
 	};
 
 	/**
@@ -33,7 +90,7 @@ namespace neuro {
 				* @param[in] health Health of the tile. Defaults to 0.
 				* @param[in] initiative Initiative of the tile. Defaults to 0.
 				*/
-			Tile(TileType type, int health = 0, int initiative = 0) : type(type), health(health), initiative(initiative) {}
+			Tile(TileType type, int health = 0) : type(type), health(health) {}
 
 			/**
 				* @brief Returns the type of the tile.
@@ -54,11 +111,6 @@ namespace neuro {
 				* @brief Returns the current health of the tile.
 				*/
 			int getHealth() const { return health; }
-
-			/**
-				* @brief Returns the current initiative of the tile if positive, else 0.
-				*/
-			int getInitiative() const { return (initiative > 0) ? initiative : 0; }
 
 			/**
 				* @brief Tells whether the tile is considered a solid object.
@@ -84,28 +136,16 @@ namespace neuro {
 			}
 
 			/**
-				* @brief Modifies the health of the tile.
-				* @param[in] mod The amount of health to be added.
+				* @brief At which player's turn should terror end. No terror if -1.
 				*/
-			void modifyHealth(int mod) {
-				health += mod;
-				sigModified(*this);
-			}
-
-			/**
-				* @brief Modifies the initiative of the tile.
-				* @param[in] mod The amount of initiative to be added.
-				*/
-			void modifyInitiative(int mod) {
-				initiative += mod;
-				sigModified(*this);
-			}
+			static int terrorEndOnPlayer;
 		private:
 			TileType type;
 			int owner;
 			int controller;
+			Placing placing;
 			int health;
-			int initiative;
+			std::set< int > initiative;
 	};
 
 	using TileP = std::shared_ptr< Tile >;
