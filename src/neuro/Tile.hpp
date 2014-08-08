@@ -23,6 +23,18 @@ namespace neuro {
 	};
 
 	/**
+		* @brief The possible types of targetting.
+		*/
+	enum class TargettingType {
+		FREE,
+		BLOB,
+		ADJECENT,
+		PATH,
+		AWAY,
+		HAND
+	};
+
+	/**
 		* @brief A class controlling the placement of a Tile.
 		*/
 	class Placing {
@@ -121,6 +133,55 @@ namespace neuro {
 	};
 
 	/**
+		* @brief A class representing an activated ability of a tile.
+		*/
+	class Ability {
+		public:
+			/**
+				* @brief Get the name of the ability.
+				* @return A std::string containing the name of the ability.
+				*/
+			std::string getName() const { return name; }
+
+			/**
+				* @brief Get a description of the ability.
+				* @return A std::string containing the description of the ability.
+				*/
+			std::string getDescription() const { return description; }
+
+			/**
+				* @brief Get a description of the possible shape of the targetted fields.
+				* @return A std::pair of an integer equal to the number of fields that will
+				* be targetted and a TargettingType defining the shape the fields can be in.
+				*/
+			std::pair< int, TargettingType > getTargettingDescription() const { return std::make_pair( targetsNumber, targettingType ); }
+
+			/**
+				* @brief Whether the supplied list of arguments is suitable for this ability.
+				* @param[in] args A std::list of pointers to tiles which should be affected by the
+				* abililty.
+				* @return Whether the given arguments are acceptable for this ability.
+				*/
+			bool verifyArguments( std::list< TileP > args );
+
+			/**
+				* @brief Use the ability on the specified tiles.
+				* @param[in] targets A std::list of pointers to tiles to be affected by the
+				* ability.
+				*/
+			void useAbility( std::list< TileP > targets );
+		private:
+			std::string name;
+			std::string description;
+			TargettingType	targettingType;
+			int targetsNumber;
+			std::string abilityActions;
+
+			void push( TileP tile );
+			void substitute( TileP tile );
+	}
+
+	/**
 		* @brief A tile to be created in an army and later played.
 		* @todo Lists of abilities:
 		*  -playing
@@ -186,6 +247,7 @@ namespace neuro {
 			int controller;
 			Placing placing;
 			Life life;
+			std::list< Ability > abilities;
 			std::set< int > initiative;
 	};
 
