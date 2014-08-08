@@ -3,6 +3,7 @@
 
 #include<memory>
 #include<set>
+#include<list>
 #include"ui/Observable.hpp"
 
 namespace neuro {
@@ -22,7 +23,7 @@ namespace neuro {
 	};
 
 	/**
-		* @brief A class controlling the placement of a tile.
+		* @brief A class controlling the placement of a Tile.
 		*/
 	class Placing {
 		public:
@@ -75,6 +76,51 @@ namespace neuro {
 	};
 
 	/**
+		* @brief A class controlling the health, damage and destruction of a Tile.
+		*/
+	class Life {
+		public:
+			/**
+				* @brief Whether the tile is still alive.
+				*/
+			bool isAlive() const;
+
+			/**
+				* @brief Returns the full health of the tile.
+				*/
+			int getHealth() const;
+
+			/**
+				* @brief Returns the amount of damage dealt to the tile.
+				*/
+			int getDamage() const;
+
+			/**
+				* @brief Tries to deal the specified amount of damage to the tile.
+				* @param[in] dmg The amount of damage to deal.
+				* @param[in] ignoreRedirect Whether to ignore redirections.
+				*/
+			void dealDamage(int dmg, bool ignoreRedirect = false);
+
+			/**
+				* @brief Tries to destroy the tile.
+				* @param[in] ignoreRedirect Whether to ignore redirections.
+				*/
+			void destroy( bool ignoreRedirect = false );
+
+			/**
+				* @brief Registers an entity to which to redirect incoming attacks.
+				* @param[in] redir A pointer to the tile handling the damage.
+				*/
+			void registerRedirectior( TileP redir );
+		private:
+			bool alive;
+			int health;
+			int damage;
+			std::list< TileP > redirectors;
+	};
+
+	/**
 		* @brief A tile to be created in an army and later played.
 		* @todo Lists of abilities:
 		*  -playing
@@ -108,11 +154,6 @@ namespace neuro {
 			int getController() const { return controller; }
 
 			/**
-				* @brief Returns the current health of the tile.
-				*/
-			int getHealth() const { return health; }
-
-			/**
 				* @brief Tells whether the tile is considered a solid object.
 				*/
 			bool isSolid() const { return !( (type == TileType::INSTANT_ACTION) || (type == TileType::FOUNDATION) ); }
@@ -144,9 +185,11 @@ namespace neuro {
 			int owner;
 			int controller;
 			Placing placing;
-			int health;
+			Life life;
 			std::set< int > initiative;
 	};
+
+	Tile::terrorEndOnPlayer = -1;
 
 	using TileP = std::shared_ptr< Tile >;
 
