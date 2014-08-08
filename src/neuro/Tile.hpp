@@ -227,6 +227,33 @@ namespace neuro {
 	};
 
 	/**
+		* @brief A class representing the initiative of a tile.
+		*/
+	class Initiative {
+		public:
+			/**
+				* @brief Whether the tile has initiative at the given battle stage.
+				*/
+			bool hasInitiative( int battleStage ) { return ( initiative.count( battleStage ) > 0 );  }
+
+			/**
+				* @brief Add one initiative after every existing one.
+				*/
+			void duplicateInitiatives();
+
+			/**
+				* @brief Modify all the initiatives.
+				* @param[in] change The amount by which to modify the initiative.
+				* @param[in] fix Whether to make the initiative unmodifiable. Defaults to
+				* false.
+				*/
+			void modifyInitiatives( int change, bool fix = false );
+		private:
+			bool modifiable;
+			std::set< int > initiative;
+	};
+
+	/**
 		* @brief A tile to be created in an army and later played.
 		* @todo Lists of abilities:
 		*  -playing
@@ -297,7 +324,7 @@ namespace neuro {
 			std::list< Ability > otherOnBattleStart;
 			std::list< Ability > activeAbilities;
 			Life life;
-			std::set< int > initiative;
+			Initiative initiative;
 	};
 
 	using TileP = std::shared_ptr< Tile >;
