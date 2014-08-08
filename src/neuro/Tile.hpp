@@ -212,6 +212,21 @@ namespace neuro {
 	};
 
 	/**
+		* @brief A class representing a passive modifier, usually in a direction.
+		*/
+	class Modifier {
+		public:
+			/**
+				* @brief Modify the given tile.
+				* @param[in] tile The tile to modify.
+				*/
+			void modifyTile( TileP tile );
+		private:
+			bool wholeBoard;
+			std::string modifyActions;
+	};
+
+	/**
 		* @brief A tile to be created in an army and later played.
 		* @todo Lists of abilities:
 		*  -playing
@@ -276,8 +291,12 @@ namespace neuro {
 			Placing placing;
 			std::array< std::list< Attack >, 6 > attacksInDirections;
 			std::list< Attack > otherAttacks;
+			std::array< std::list< Modifier >, 6 > modifiersInDirections;
+			std::list< Modifier > otherModifiers;
+			std::array< std::list< Ability >, 6 > onBattleStartInDirections;
+			std::list< Ability > otherOnBattleStart;
+			std::list< Ability > activeAbilities;
 			Life life;
-			std::list< Ability > abilities;
 			std::set< int > initiative;
 	};
 
