@@ -41,7 +41,7 @@ namespace neuro {
 		public:
 			/**
 				* @brief Whether the supplied list of arguments is suitable for this tile.
-				* @param[in] A std::list of pointers to tiles which should be affected by the
+				* @param[in] args A std::list of pointers to tiles which should be affected by the
 				* placing.
 				* @return Whether the given arguments are acceptable for this tile's
 				* placing.
@@ -58,26 +58,15 @@ namespace neuro {
 			bool placeTile( std::list< TileP > targets );
 
 			/**
-				* @brief Returns the number of fields the tile should target.
+				* @brief Get a description of the possible shape of the targetted fields.
+				* @return A std::pair of an integer equal to the number of fields that will
+				* be targetted and a TargettingType defining the shape the fields can be in.
 				*/
-			int getNumberOfTargets() const { return maxArgs; }
-
-			/**
-				* @brief Returns whether the tile targets blobs.
-				* @return true if all the targetted fields should be in one blob, false if
-				* they can be anywhere.
-				*/
-			bool blobTargetting() const { return blob; }
-
-			/**
-				* @brief The description of actions to take when placing the tile.
-				*/
-			std::string placeActions;
+			std::pair< int, TargettingType > getTargettingDescription() const { return std::make_pair( targetsNumber, targettingType ); }
 		private:
-			int minArgs;
-			int maxArgs;
-			bool blob;
-			std::set< TileType > acceptableTargets;
+			TargettingType	targettingType;
+			int targetsNumber;
+			std::string placeActions;
 
 			void dealDamage(int amount, TileP target);
 			void destroyTile(TileP target);
@@ -179,7 +168,7 @@ namespace neuro {
 
 			void push( TileP tile );
 			void substitute( TileP tile );
-	}
+	};
 
 	/**
 		* @brief A tile to be created in an army and later played.
@@ -192,12 +181,10 @@ namespace neuro {
 	class Tile : public ui::Observable<Tile> {
 		public:
 			/**
-				* @brief Construct a tile with a specific type, health and initiative.
+				* @brief Construct a tile with a specific type.
 				* @param[in] type Type of the tile.
-				* @param[in] health Health of the tile. Defaults to 0.
-				* @param[in] initiative Initiative of the tile. Defaults to 0.
 				*/
-			Tile(TileType type, int health = 0) : type(type), health(health) {}
+			Tile(TileType type) : type(type) {}
 
 			/**
 				* @brief Returns the type of the tile.
@@ -250,8 +237,6 @@ namespace neuro {
 			std::list< Ability > abilities;
 			std::set< int > initiative;
 	};
-
-	Tile::terrorEndOnPlayer = -1;
 
 	using TileP = std::shared_ptr< Tile >;
 
