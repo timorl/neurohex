@@ -1,6 +1,7 @@
 #ifndef NEURO_TILE_HPP
 #define NEURO_TILE_HPP
 
+#include<string>
 #include<memory>
 #include<set>
 #include<list>
@@ -22,17 +23,80 @@ namespace neuro {
 		FOUNDATION
 	};
 
+	const std::map< std::string, TileType > tileTypeStringMap = {
+		{"INSTANT_ACTION", TileType::INSTANT_ACTION},
+		{"HQ", TileType::HQ},
+		{"MODULE", TileType::MODULE},
+		{"UNIT", TileType::UNIT},
+		{"FOUNDATION", TileType::FOUNDATION} };
+
 	/**
 		* @brief The possible types of targetting.
 		*/
 	enum class TargettingType {
 		LOCAL,
 		FREE,
+		LINE,
 		BLOB,
 		ADJECENT,
 		PATH,
 		AWAY,
 		HAND
+	};
+
+	const std::map< std::string, TargettingType > targettingTypeStringMap = {
+		{"LOCAL", TargettingType::LOCAL},
+		{"FREE", TargettingType::FREE},
+		{"LINE", TargettingType::LINE},
+		{"BLOB", TargettingType::BLOB},
+		{"ADJECENT", TargettingType::ADJECENT},
+		{"PATH", TargettingType::PATH},
+		{"AWAY", TargettingType::AWAY},
+		{"HAND", TargettingType::HAND} };
+
+	/**
+		* @brief a structure fully describing how to target an ability.
+		*/
+	struct Targetting {
+		/**
+			* @brief The type of the targetting.
+			*/
+		TargettingType	type;
+
+		/**
+			* @brief The number of fields or tiles that will actually be affected by the ability.
+			*/
+		int actualTargets;
+
+		/**
+			* @brief The number of fields or tiles that the player should target.
+			*/
+		int requiredTargets;
+
+		/**
+			* @brief The range of the ability. Ignored if irrelevant, -1 means infinite.
+			*/
+		int range;
+
+		/**
+			* @brief A set containing all the types of tiles that can be targetted.
+			*/
+		std::set< TileType > validTargetTypes;
+
+		/**
+			* @brief Whether the ability can target enemy tiles.
+			*/
+		bool enemy;
+
+		/**
+			* @brief Whether the ability can target own tiles.
+			*/
+		bool own;
+
+		/**
+			* @brief A list of tiles important for some targetting types, e.g. AWAY.
+			*/
+		std::list< TileP > importantTiles;
 	};
 
 	/**
@@ -47,6 +111,13 @@ namespace neuro {
 			class Placing {
 				public:
 					/**
+						* @brief Construct a placing with the given actions and targetting.
+						* @param[in] actions The stuff that should happen when the tile is placed.
+						* @param[in] targetting The way the tile might be placed.
+						*/
+					Placing( std::string actions, Targetting targetting ) : targetting(targetting), placeActions(actions) {}
+
+					/**
 						* @brief Whether the supplied list of arguments is suitable for this tile.
 						* @param[in] args A std::list of pointers to tiles which should be affected by the
 						* placing.
@@ -56,7 +127,7 @@ namespace neuro {
 					bool verifyArguments( std::list< TileP > args );
 
 					/**
-						* @brief Place the Tile ad affect the provided targets.
+						* @brief Place the Tile and affect the provided targets.
 						* @param[in,out] targets The tiles that might be modified by the placed
 						* tile.
 						* @return Whether the tile should end up on the board after the actions have
@@ -66,13 +137,11 @@ namespace neuro {
 
 					/**
 						* @brief Get a description of the possible shape of the targetted fields.
-						* @return A std::pair of an integer equal to the number of fields that will
-						* be targetted and a TargettingType defining the shape the fields can be in.
+						* @return A Targetting object describing the method of targetting used.
 						*/
-					std::pair< int, TargettingType > getTargettingDescription() const { return std::make_pair( targetsNumber, targettingType ); }
+					Targetting getTargettingDescription() const { return targetting; }
 				private:
-					TargettingType	targettingType;
-					int targetsNumber;
+					Targetting	targetting;
 					std::string placeActions;
 
 					void dealDamage(int amount, TileP target);
@@ -88,6 +157,12 @@ namespace neuro {
 				*/
 			class Life {
 				public:
+					/**
+						* @brief Construct a life object.
+						* @param[in] health The initial health of the object.
+						*/
+					Life( int health ) : alive(true), health(health), damage(0) {}
+
 					/**
 						* @brief Whether the tile is still alive.
 						*/
@@ -125,7 +200,6 @@ namespace neuro {
 					bool alive;
 					int health;
 					int damage;
-					std::list< TileP > redirectors;
 			};
 
 			/**
@@ -146,11 +220,15 @@ namespace neuro {
 					std::string getDescription() const { return description; }
 
 					/**
-						* @brief Get a description of the possible shape of the targetted fields.
-						* @return A std::pair of an integer equal to the number of fields that will
-						* be targetted and a TargettingType defining the shape the fields can be in.
+						* Returns the direction in which this ability works, -1 if not applicable.
 						*/
-					std::pair< int, TargettingType > getTargettingDescription() const { return std::make_pair( targetsNumber, targettingType ); }
+					int getDirection() { return direction; }
+
+					/**
+						* @brief Get a description of the possible shape of the targetted fields.
+						* @return A Targetting object describing the method of targetting used.
+						*/
+					Targetting getTargettingDescription() const { return targetting; }
 
 					/**
 						* @brief Whether the supplied list of arguments is suitable for this ability.
@@ -169,8 +247,8 @@ namespace neuro {
 				private:
 					std::string name;
 					std::string description;
-					TargettingType	targettingType;
-					int targetsNumber;
+					int direction;
+					Targetting	targetting;
 					std::string abilityActions;
 
 					void push( TileP tile );
@@ -183,11 +261,33 @@ namespace neuro {
 			class Attack {
 				public:
 					/**
-						* @brief Get a description of the possible shape of the targetted fields.
-						* @return A std::pair of an integer equal to the number of fields that will
-						* be targetted and a TargettingType defining the shape the fields can be in.
+						* @brief Construct an attack with the specified properties.
+						* @param[in] direction The direction in which the attack is, -1 means no
+						* direction.
+						* @param[in] targetting The way the attack is targetted.
+						* @param[in] melee Whether the attack is considered melee.
+						* @param[in] ranged Whether the attack is considered ranged.
+						* @param[in] strength The base amount of damage the attack will do.
+						* @param[in] attackActions The actions the attack will cause.
 						*/
-					std::pair< int, TargettingType > getTargettingDescription() const { return std::make_pair( targetsNumber, targettingType ); }
+					Attack( int direction, Targetting targetting, bool melee, bool ranged, int strength, std::string attackActions ) :
+						direction(direction),
+						targetting(targetting),
+						melee(melee),
+						ranged(ranged),
+						strength(strength),
+						attackActions(attackActions) {}
+
+					/**
+						* Returns the direction in which this attack works, -1 if not applicable.
+						*/
+					int getDirection() { return direction; }
+
+					/**
+						* @brief Get a description of the possible shape of the targetted fields.
+						* @return A Targetting object describing the method of targetting used.
+						*/
+					Targetting getTargettingDescription() const { return targetting; }
 
 					/**
 						* @brief Whether the attack is melee.
@@ -207,8 +307,8 @@ namespace neuro {
 						*/
 					void executeAttack( std::list< TileP > targets, int direction );
 				private:
-					TargettingType	targettingType;
-					int targetsNumber;
+					int direction;
+					Targetting	targetting;
 					bool melee;
 					bool ranged;
 					int strength;
@@ -223,11 +323,24 @@ namespace neuro {
 			class Modifier {
 				public:
 					/**
+						* Returns the direction in which this modifier works, -1 if not applicable.
+						*/
+					int getDirection() { return direction; }
+
+					/**
+						* @brief Get a description of the possible shape of the targetted fields.
+						* @return A Targetting object describing the method of targetting used.
+						*/
+					Targetting getTargettingDescription() const { return targetting; }
+
+					/**
 						* @brief Modify the given tile.
 						* @param[in] tile The tile to modify.
 						*/
 					void modifyTile( TileP tile );
 				private:
+					int direction;
+					Targetting	targetting;
 					std::string modifyActions;
 			};
 
@@ -236,6 +349,13 @@ namespace neuro {
 				*/
 			class Initiative {
 				public:
+					/**
+						* @brief Construct a initiative object.
+						* @param[in] initiative The set of initiatives the object should initially
+						* have.
+						*/
+					Initiative( std::set< int > initiative ) : initiative(initiative) {}
+
 					/**
 						* @brief Whether the tile has initiative at the given battle stage.
 						*/
@@ -259,10 +379,38 @@ namespace neuro {
 			};
 
 			/**
-				* @brief Construct a tile with a specific type.
+				* @brief Construct a full fledged tile without a owner.
+				* @param[in] name Name of the tile.
 				* @param[in] type Type of the tile.
+				* @param[in] placing The description of the placing of the tile.
+				* @param[in] health The initial health of the tile.
+				* @param[in] initiative A set of initial initiatives of the tile.
+				* @param[in] onBattleStart The abilities to be called at the start of each
+				* battle.
+				* @param[in] attacks Attacks the tile possesses.
+				* @param[in] modifiers Modifiers the tile possesses.
+				* @param[in] activeAbilities Active abilities the tile possesses.
+				* @param[in] defensiveAbilities Defensive abilities the tile possesses.
 				*/
-			Tile(TileType type) : type(type) {}
+			Tile( std::string name, TileType type, Placing placing, int health,
+					std::set< int > initiative, std::list< Ability > onBattleStart,
+					std::list< Attack > attacks, std::list< Modifier > modifiers,
+					std::list< Ability > activeAbilities, std::list< Ability > defensiveAbilities) :
+				placing(placing),
+				onBattleStart(onBattleStart),
+				attacks(attacks),
+				modifiers(modifiers),
+				activeAbilities(activeAbilities),
+				defensiveAbilities(defensiveAbilities),
+				life(health),
+				initiative(initiative),
+				name(name),
+				type(type) {}
+
+			/**
+				* @brief Returns the name of the tile.
+				*/
+			std::string getName() { return name; }
 
 			/**
 				* @brief Returns the type of the tile.
@@ -317,34 +465,19 @@ namespace neuro {
 			Placing placing;
 
 			/**
-				* @brief Abilities to use at the start of every battle in all directions.
-				*/
-			std::array< std::list< Ability >, 6 > onBattleStartInDirections;
-
-			/**
 				* @brief Abilities to use at the start of every battle.
 				*/
-			std::list< Ability > otherOnBattleStart;
-
-			/**
-				* @brief Attacks to launch at every own initiative in all directions.
-				*/
-			std::array< std::list< Attack >, 6 > attacksInDirections;
+			std::list< Ability > onBattleStart;
 
 			/**
 				* @brief Attacks to launch at every own initiative.
 				*/
-			std::list< Attack > otherAttacks;
-
-			/**
-				* @brief Modifiers to tiles in all directions.
-				*/
-			std::array< std::list< Modifier >, 6 > modifiersInDirections;
+			std::list< Attack > attacks;
 
 			/**
 				* @brief Modifiers to tiles anywhere.
 				*/
-			std::list< Modifier > otherModifiers;
+			std::list< Modifier > modifiers;
 
 			/**
 				* @brief Abilities the controller may use in every turn.
@@ -354,7 +487,7 @@ namespace neuro {
 			/**
 				* @brief Abilities that might affect incoming attacks.
 				*/
-			std::array< std::list< Ability >, 6 > defensiveAbilities;
+			std::list< Ability > defensiveAbilities;
 
 			/**
 				* @brief The life of the tile.
@@ -371,6 +504,7 @@ namespace neuro {
 				*/
 			static int terrorEndOnPlayer;
 		private:
+			std::string name;
 			TileType type;
 			int owner;
 			int controller;
