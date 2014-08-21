@@ -64,7 +64,7 @@ namespace neuro {
 		TargettingType	type;
 
 		/**
-			* @brief The number of fields or tiles that will actually be affected by the ability.
+			* @brief The number of fields or tiles that will actually be affected by the ability, -1 means all provided.
 			*/
 		int actualTargets;
 
@@ -339,6 +339,19 @@ namespace neuro {
 				*/
 			class Modifier {
 				public:
+					/**
+						* @brief Construct a modifier.
+						* @param[in] direction The direction in which the modifier will work, -1
+						* means everywhere.
+						* @param[in] targetting How the modifier will choose its target.
+						* @param[in] modifyActions What the modifier will do, encoded as a
+						* sequence of chars.
+						*/
+					Modifier( int direction, Targetting targetting, std::string modifyActions ) :
+						direction(direction),
+						targetting(targetting),
+						modifyActions(modifyActions) {}
+
 					/**
 						* Returns the direction in which this modifier works, -1 if not applicable.
 						*/

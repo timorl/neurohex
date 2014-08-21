@@ -76,6 +76,14 @@ namespace viewmodel {
 		for ( int i = 1; i < static_cast<int>( attackInfo.size() ); i++ ) {
 			if ( attackInfo[i] == "damage" ) {
 				actions += "d";
+			} else if ( attackInfo[i] == "become" ) {
+				actions += "b";
+				i++;
+				if ( attackInfo[i] == "ranged" ) {
+					actions += "r";
+				} else if ( attackInfo[i] == "nonranged" ) {
+					actions += "R";
+				}
 			}
 		}
 	}
@@ -86,6 +94,9 @@ namespace viewmodel {
 				melee = true;
 			} else if ( attackInfo[i] == "ranged" ) {
 				ranged = true;
+			} else if ( attackInfo[i] == "none" ) {
+				melee = false;
+				ranged = false;
 			}
 		}
 	}
@@ -157,8 +168,48 @@ namespace viewmodel {
 		abilities.emplace_back( name, description, direction, targetting, actions );
 	}
 
-	void parseModifier( utility::DFStyleParser & parser, std::list< neuro::Tile::Modifier > & abilities ) {
-		//FIXME: This is a stub.
+	void setModifierActions( std::vector< std::string > & modifierInfo, std::string & actions ) {
+		for ( int i = 1; i < static_cast<int>( modifierInfo.size() ); i++ ) {
+			if ( modifierInfo[i] == "web" ) {
+				actions += "w";
+			} else if ( modifierInfo[i] == "increase" ) {
+				actions += "i";
+				i++;
+				actions += modifierInfo[i];
+				i++;
+				if ( modifierInfo[i] == "initiative" ) {
+					actions += "i";
+				} else if ( modifierInfo[i] == "melee" ) {
+					actions += "m";
+				} else if ( modifierInfo[i] == "ranged" ) {
+					actions += "r";
+				}
+			} else if ( modifierInfo[i] == "save" ) {
+				actions += "s";
+			} else if ( modifierInfo[i] == "motivate" ) {
+				actions += "m";
+			}
+		}
+	}
+
+	void parseModifier( utility::DFStyleParser & parser, std::list< neuro::Tile::Modifier > & modifiers ) {
+		int direction;
+		neuro::Targetting targetting;
+		std::string actions;
+		while ( parser.hasNextToken() ) {
+			std::vector< std::string > modifierInfo = parser.getNextToken();
+			std::string type = modifierInfo[0];
+			if ( type == "MODIFIEREND" ) {
+				break;
+			} else if ( type == "DIRECTION" ) {
+				direction	= std::stoi( modifierInfo[1] );
+			} else if ( type == "ACTIONS" ) {
+				setModifierActions( modifierInfo, actions );
+			} else if ( type == "TARGETTINGBEGIN" ) {
+				parseTargetting( parser, targetting );
+			}
+		}
+		modifiers.emplace_back( direction, targetting, actions );
 	}
 
 	void parseTile( utility::DFStyleParser & parser, std::vector< neuro::TileP > & tiles, int amount ) {
