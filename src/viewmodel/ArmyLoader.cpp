@@ -1,117 +1,215 @@
+#include<iostream>
 #include"viewmodel/ArmyLoader.hpp"
 
 namespace viewmodel {
 
-	void setValidTargetTypes( std::vector< std::string > & targettingInfo, std::set< neuro::TileType > & validTargetTypes ) {
-		for ( int i = 1; i < static_cast<int>( targettingInfo.size() ); i++ ) {
-			if ( targettingInfo[i] == "solid" ) {
+	const std::string unrecognizedTokenMessage = "Ignoring unrecognized token: ";
+	const std::string emptyTokenMessage = "Empty token.";
+	const std::string tooFewArgumentsMessage = "Too few arguments for token: ";
+	const std::string missingInformationMessage = "Missing information.";
+	const std::string unrecognizedArgumentMessage = "Unrecognized argument: ";
+	const std::string targettingFailedMessage = "Loading of targetting failed.";
+
+	bool setValidTargetTypes( std::vector< std::string > & info, std::set< neuro::TileType > & validTargetTypes ) {
+		const std::string abortMessage = "Aborting setting valid target types: ";
+		for ( int i = 1; i < static_cast<int>( info.size() ); i++ ) {
+			if ( info[i] == "solid" ) {
 				validTargetTypes.insert( neuro::TileType::HQ );
 				validTargetTypes.insert( neuro::TileType::MODULE );
 				validTargetTypes.insert( neuro::TileType::UNIT );
-			} else if ( targettingInfo[i] == "nonsolid" ) {
+			} else if ( info[i] == "nonsolid" ) {
 				validTargetTypes.insert( neuro::TileType::INSTANT_ACTION );
 				validTargetTypes.insert( neuro::TileType::FOUNDATION );
-			} else if ( targettingInfo[i] == "unit" ) {
+			} else if ( info[i] == "unit" ) {
 				validTargetTypes.insert( neuro::TileType::UNIT );
-			} else if ( targettingInfo[i] == "module" ) {
+			} else if ( info[i] == "module" ) {
 				validTargetTypes.insert( neuro::TileType::MODULE );
+			} else {
+				std::cerr << abortMessage << unrecognizedArgumentMessage << "VALID_TARGET_TYPES" << " : " << info[i] << std::endl;
+				return false;
 			}
 		}
+		return true;
 	}
 
-	void setValidAffiliations( std::vector< std::string > & targettingInfo, neuro::Targetting & targetting ) {
-		for ( int i = 1; i < static_cast<int>( targettingInfo.size() ); i++ ) {
-			if ( targettingInfo[i] == "enemy" ) {
+	bool setValidAffiliations( std::vector< std::string > & info, neuro::Targetting & targetting ) {
+		const std::string abortMessage = "Aborting setting valid target affiliations: ";
+		for ( int i = 1; i < static_cast<int>( info.size() ); i++ ) {
+			if ( info[i] == "enemy" ) {
 				targetting.enemy = true;
-			} else if ( targettingInfo[i] == "own" ) {
+			} else if ( info[i] == "own" ) {
 				targetting.own = true;
+			} else {
+				std::cerr << abortMessage << unrecognizedArgumentMessage << "VALID_TARGET_AFFILIATION" << " : " << info[i] << std::endl;
+				return false;
 			}
 		}
+		return true;
 	}
 
-	void parseTargetting( utility::DFStyleParser & parser, neuro::Targetting & targetting ) {
+	bool parseTargetting( utility::DFStyleParser & parser, neuro::Targetting & targetting ) {
+		const std::string abortMessage = "Aborting targetting parse: ";
+		const std::string targetTypesFailedMessage = "Reading target types failed.";
+		const std::string targetAffiliationsFailedMessage = "Reading target affiliations failed.";
 		while ( parser.hasNextToken() ) {
-			std::vector< std::string > targettingInfo = parser.getNextToken();
-			std::string type = targettingInfo[0];
+			std::vector< std::string > info = parser.getNextToken();
+			if ( static_cast<int>( info.size() ) < 1 ) {
+				std::cerr << abortMessage << emptyTokenMessage << std::endl;
+				return false;
+			}
+			std::string type = info[0];
 			if ( type == "TARGETTINGEND" ) {
 				break;
 			} else if ( type == "TYPE" ) {
-				targetting.type = neuro::targettingTypeStringMap.at(targettingInfo[1]);
+				if ( static_cast<int>( info.size() ) < 2 ) {
+					std::cerr << abortMessage << tooFewArgumentsMessage << type << std::endl;
+					return false;
+				}
+				targetting.type = neuro::targettingTypeStringMap.at(info[1]);
 			} else if ( type == "ACTUAL_TARGETS" ) {
-				targetting.actualTargets = std::stoi( targettingInfo[1] );
+				if ( static_cast<int>( info.size() ) < 2 ) {
+					std::cerr << abortMessage << tooFewArgumentsMessage << type << std::endl;
+					return false;
+				}
+				targetting.actualTargets = std::stoi( info[1] );
 			} else if ( type == "REQUIRED_TARGETS" ) {
-				targetting.requiredTargets = std::stoi( targettingInfo[1] );
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					std::cerr << abortMessage << tooFewArgumentsMessage << type << std::endl;
+					return false;
+				}
+				targetting.requiredTargets = std::stoi( info[1] );
 			} else if ( type == "RANGE" ) {
-				targetting.range = std::stoi( targettingInfo[1] );
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					std::cerr << abortMessage << tooFewArgumentsMessage << type << std::endl;
+					return false;
+				}
+				targetting.range = std::stoi( info[1] );
 			} else if ( type == "VALID_TARGET_TYPES" ) {
-				setValidTargetTypes( targettingInfo, targetting.validTargetTypes );
+				if ( !setValidTargetTypes( info, targetting.validTargetTypes ) ) {
+					std::cerr << abortMessage << targetTypesFailedMessage << std::endl;
+					return false;
+				}
 			} else if ( type == "VALID_TARGET_AFFILIATION" ) {
-				setValidAffiliations( targettingInfo, targetting );
+				if ( !setValidAffiliations( info, targetting ) ) {
+					std::cerr << abortMessage << targetAffiliationsFailedMessage << std::endl;
+					return false;
+				}
+			} else {
+				std::cerr << unrecognizedTokenMessage << type << std::endl;
 			}
 		}
+		return true;
 	}
 
-	void setPlacingActions( std::vector< std::string > & placingInfo, std::string & actions ) {
-		for ( int i = 1; i < static_cast<int>( placingInfo.size() ); i++ ) {
-			if ( placingInfo[i] == "place" ) {
+	bool setPlacingActions( std::vector< std::string > & info, std::string & actions ) {
+		const std::string abortMessage = "Aborting setting placing actions: ";
+		for ( int i = 1; i < static_cast<int>( info.size() ); i++ ) {
+			if ( info[i] == "place" ) {
 				actions += "P";
-			} else if ( placingInfo[i] == "damage" ) {
+			} else if ( info[i] == "damage" ) {
 				actions += "d";
-			} else if ( placingInfo[i] == "move" ) {
+			} else if ( info[i] == "move" ) {
 				actions += "m";
-			} else if ( placingInfo[i] == "push" ) {
+			} else if ( info[i] == "push" ) {
 				actions += "p";
+			} else if ( info[i] == "battle" ) {
+				actions += "b";
+			} else {
+				std::cerr << abortMessage << unrecognizedArgumentMessage << "ACTIONS" << " : " << info[i] << std::endl;
+				return false;
 			}
 		}
+		return true;
 	}
 
-	void parsePlacing( utility::DFStyleParser & parser, std::unique_ptr< neuro::Tile::Placing > & placingP ) {
+	bool parsePlacing( utility::DFStyleParser & parser, std::unique_ptr< neuro::Tile::Placing > & placingP ) {
+		const std::string abortMessage = "Aborting placing parse: ";
+		const std::string placingActionsFailedMessage = "Reading placing actions failed.";
 		std::string actions;
 		neuro::Targetting targetting;
 		while ( parser.hasNextToken() ) {
-			std::vector< std::string > placingInfo = parser.getNextToken();
-			std::string type = placingInfo[0];
+			std::vector< std::string > info = parser.getNextToken();
+			if (  static_cast<int>( info.size() ) < 1 ) {
+				std::cerr << abortMessage << emptyTokenMessage << std::endl;
+				return false;
+			}
+			std::string type = info[0];
 			if ( type == "PLACINGEND" ) {
 				break;
 			} else if ( type == "ACTIONS" ) {
-				setPlacingActions( placingInfo, actions );
+				if ( !setPlacingActions( info, actions ) ) {
+					std::cerr << abortMessage << placingActionsFailedMessage << std::endl;
+					return false;
+				}
 			} else if ( type == "TARGETTINGBEGIN" ) {
-				parseTargetting( parser, targetting );
+				if ( !parseTargetting( parser, targetting ) ) {
+					std::cerr << abortMessage << targettingFailedMessage << std::endl;
+					return false;
+				}
+			} else {
+				std::cerr << unrecognizedTokenMessage << type << std::endl;
 			}
+		}
+		if ( actions.empty() ) {
+			std::cerr << abortMessage << missingInformationMessage << std::endl;
+			return false;
 		}
 		placingP.reset( new neuro::Tile::Placing( actions, targetting ) );
+		return true;
 	}
 
-	void setAttackActions( std::vector< std::string > & attackInfo, std::string & actions ) {
-		for ( int i = 1; i < static_cast<int>( attackInfo.size() ); i++ ) {
-			if ( attackInfo[i] == "damage" ) {
+	bool setAttackActions( std::vector< std::string > & info, std::string & actions ) {
+		const std::string abortMessage = "Aborting setting attack actions: ";
+		for ( int i = 1; i < static_cast<int>( info.size() ); i++ ) {
+			if ( info[i] == "damage" ) {
 				actions += "d";
-			} else if ( attackInfo[i] == "become" ) {
+			} else if ( info[i] == "become" ) {
+				if (  static_cast<int>( info.size() ) < i + 2 ) {
+					std::cerr << abortMessage << tooFewArgumentsMessage << "become" << std::endl;
+					return false;
+				}
 				actions += "b";
 				i++;
-				if ( attackInfo[i] == "ranged" ) {
+				if ( info[i] == "ranged" ) {
 					actions += "r";
-				} else if ( attackInfo[i] == "nonranged" ) {
+				} else if ( info[i] == "nonranged" ) {
 					actions += "R";
+				} else {
+					std::cerr << abortMessage << unrecognizedArgumentMessage << "become" << " : " << info[i] << std::endl;
+					return false;
 				}
+			} else if ( info[i] == "autodestroy" ) {
+				actions += "a";
+			} else {
+				std::cerr << abortMessage << unrecognizedArgumentMessage << "ACTIONS" << " : " << info[i] << std::endl;
+				return false;
 			}
 		}
+		return true;
 	}
 
-	void setAttackTypes( std::vector< std::string > & attackInfo, bool & melee, bool & ranged ) {
-		for ( int i = 1; i < static_cast<int>( attackInfo.size() ); i++ ) {
-			if ( attackInfo[i] == "melee" ) {
+	bool setAttackTypes( std::vector< std::string > & info, bool & melee, bool & ranged ) {
+		const std::string abortMessage = "Aborting setting attack types: ";
+		for ( int i = 1; i < static_cast<int>( info.size() ); i++ ) {
+			if ( info[i] == "melee" ) {
 				melee = true;
-			} else if ( attackInfo[i] == "ranged" ) {
+			} else if ( info[i] == "ranged" ) {
 				ranged = true;
-			} else if ( attackInfo[i] == "none" ) {
+			} else if ( info[i] == "none" ) {
 				melee = false;
 				ranged = false;
+			} else {
+				std::cerr << abortMessage << unrecognizedArgumentMessage << "TYPE" << " : " << info[i] << std::endl;
+				return false;
 			}
 		}
+		return true;
 	}
 
-	void parseAttack( utility::DFStyleParser & parser, std::list< neuro::Tile::Attack > & attacks ) {
+	bool parseAttack( utility::DFStyleParser & parser, std::list< neuro::Tile::Attack > & attacks ) {
+		const std::string abortMessage = "Aborting attack parse: ";
+		const std::string attackActionsFailedMessage = "Reading attack actions failed.";
+		const std::string attackTypesFailedMessage = "Reading attack types failed.";
 		int direction = -1;
 		neuro::Targetting targetting;
 		bool melee = false;
@@ -119,110 +217,221 @@ namespace viewmodel {
 		int strength;
 		std::string actions;
 		while ( parser.hasNextToken() ) {
-			std::vector< std::string > attackInfo = parser.getNextToken();
-			std::string type = attackInfo[0];
+			std::vector< std::string > info = parser.getNextToken();
+			if (  static_cast<int>( info.size() ) < 1 ) {
+				std::cerr << abortMessage << emptyTokenMessage << std::endl;
+				return false;
+			}
+			std::string type = info[0];
 			if ( type == "ATTACKEND" ) {
 				break;
 			} else if ( type == "TYPE" ) {
-				setAttackTypes( attackInfo, melee, ranged );
+				if ( !setAttackTypes( info, melee, ranged ) ) {
+					std::cerr << abortMessage << attackTypesFailedMessage << std::endl;
+					return false;
+				}
 			} else if ( type == "ACTIONS" ) {
-				setAttackActions( attackInfo, actions );
+				if ( !setAttackActions( info, actions ) ) {
+					std::cerr << abortMessage << attackActionsFailedMessage << std::endl;
+					return false;
+				}
 			} else if ( type == "STRENGTH" ) {
-				strength	= std::stoi( attackInfo[1] );
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					std::cerr << abortMessage << tooFewArgumentsMessage << type << std::endl;
+					return false;
+				}
+				strength	= std::stoi( info[1] );
 			} else if ( type == "DIRECTION" ) {
-				direction	= std::stoi( attackInfo[1] );
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					std::cerr << abortMessage << tooFewArgumentsMessage << type << std::endl;
+					return false;
+				}
+				direction	= std::stoi( info[1] );
 			} else if ( type == "TARGETTINGBEGIN" ) {
-				parseTargetting( parser, targetting );
+				if ( !parseTargetting( parser, targetting ) ) {
+					std::cerr << abortMessage << targettingFailedMessage << std::endl;
+					return false;
+				}
+			} else {
+				std::cerr << unrecognizedTokenMessage << type << std::endl;
 			}
+		}
+		if ( actions.empty() ) {
+			std::cerr << abortMessage << missingInformationMessage << std::endl;
+			return false;
 		}
 		attacks.emplace_back( direction, targetting, melee, ranged, strength, actions );
+		return true;
 	}
 
-	void setAbilityActions( std::vector< std::string > & abilityInfo, std::string & actions ) {
-		for ( int i = 1; i < static_cast<int>( abilityInfo.size() ); i++ ) {
-			if ( abilityInfo[i] == "prevent" ) {
+	bool setAbilityActions( std::vector< std::string > & info, std::string & actions ) {
+		const std::string abortMessage = "Aborting setting ability actions: ";
+		for ( int i = 1; i < static_cast<int>( info.size() ); i++ ) {
+			if ( info[i] == "prevent" ) {
+				if (  static_cast<int>( info.size() ) < i + 3 ) {
+					std::cerr << abortMessage << tooFewArgumentsMessage << "prevent" << std::endl;
+					return false;
+				}
 				actions += "p";
 				i++;
-				actions += abilityInfo[i];
+				actions += info[i];
 				i++;
-				if ( abilityInfo[i] == "ranged" ) {
+				if ( info[i] == "ranged" ) {
 					actions += "r";
+				} else {
+					std::cerr << abortMessage << unrecognizedArgumentMessage << "prevent" << " : " << info[i] << std::endl;
+					return false;
 				}
+			} else {
+				std::cerr << abortMessage << unrecognizedArgumentMessage << "ACTIONS" << " : " << info[i] << std::endl;
+				return false;
 			}
 		}
+		return true;
 	}
 
-	void parseAbility( utility::DFStyleParser & parser, std::list< neuro::Tile::Ability > & abilities ) {
+	bool parseAbility( utility::DFStyleParser & parser, std::list< neuro::Tile::Ability > & abilities ) {
+		const std::string abortMessage = "Aborting ability parse: ";
+		const std::string abilityActionsFailedMessage = "Reading ability actions failed.";
 		std::string name;
 		std::string description;
 		int direction;
 		neuro::Targetting targetting;
 		std::string actions;
 		while ( parser.hasNextToken() ) {
-			std::vector< std::string > abilityInfo = parser.getNextToken();
-			std::string type = abilityInfo[0];
+			std::vector< std::string > info = parser.getNextToken();
+			if (  static_cast<int>( info.size() ) < 1 ) {
+				std::cerr << abortMessage << emptyTokenMessage << std::endl;
+				return false;
+			}
+			std::string type = info[0];
 			if ( type == "ABILITYEND" ) {
 				break;
 			} else if ( type == "NAME" ) {
-				name = abilityInfo[1];
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					std::cerr << abortMessage << tooFewArgumentsMessage << type << std::endl;
+					return false;
+				}
+				name = info[1];
 			} else if ( type == "DESCRIPTION" ) {
-				description = abilityInfo[1];
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					std::cerr << abortMessage << tooFewArgumentsMessage << type << std::endl;
+					return false;
+				}
+				description = info[1];
 			} else if ( type == "DIRECTION" ) {
-				direction	= std::stoi( abilityInfo[1] );
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					std::cerr << abortMessage << tooFewArgumentsMessage << type << std::endl;
+					return false;
+				}
+				direction	= std::stoi( info[1] );
 			} else if ( type == "ACTIONS" ) {
-				setAbilityActions( abilityInfo, actions );
+				if ( !setAbilityActions( info, actions ) ) {
+					std::cerr << abortMessage << abilityActionsFailedMessage << std::endl;
+					return false;
+				}
 			} else if ( type == "TARGETTINGBEGIN" ) {
-				parseTargetting( parser, targetting );
+				if ( !parseTargetting( parser, targetting ) ) {
+					std::cerr << abortMessage << targettingFailedMessage << std::endl;
+					return false;
+				}
+			} else {
+				std::cerr << unrecognizedTokenMessage << type << std::endl;
 			}
+		}
+		if ( name.empty() || description.empty() || actions.empty() ) {
+			std::cerr << abortMessage << missingInformationMessage << std::endl;
+			return false;
 		}
 		abilities.emplace_back( name, description, direction, targetting, actions );
+		return true;
 	}
 
-	void setModifierActions( std::vector< std::string > & modifierInfo, std::string & actions ) {
-		for ( int i = 1; i < static_cast<int>( modifierInfo.size() ); i++ ) {
-			if ( modifierInfo[i] == "web" ) {
+	bool setModifierActions( std::vector< std::string > & info, std::string & actions ) {
+		const std::string abortMessage = "Aborting setting modifier actions: ";
+		for ( int i = 1; i < static_cast<int>( info.size() ); i++ ) {
+			if ( info[i] == "web" ) {
 				actions += "w";
-			} else if ( modifierInfo[i] == "increase" ) {
+			} else if ( info[i] == "increase" ) {
+				if (  static_cast<int>( info.size() ) < i + 3 ) {
+					std::cerr << abortMessage << tooFewArgumentsMessage << "increase" << std::endl;
+					return false;
+				}
 				actions += "i";
 				i++;
-				actions += modifierInfo[i];
+				actions += info[i];
 				i++;
-				if ( modifierInfo[i] == "initiative" ) {
+				if ( info[i] == "initiative" ) {
 					actions += "i";
-				} else if ( modifierInfo[i] == "melee" ) {
+				} else if ( info[i] == "melee" ) {
 					actions += "m";
-				} else if ( modifierInfo[i] == "ranged" ) {
+				} else if ( info[i] == "ranged" ) {
 					actions += "r";
+				} else {
+					std::cerr << abortMessage << unrecognizedArgumentMessage << "increase" << " : " << info[i] << std::endl;
+					return false;
 				}
-			} else if ( modifierInfo[i] == "save" ) {
+			} else if ( info[i] == "save" ) {
 				actions += "s";
-			} else if ( modifierInfo[i] == "motivate" ) {
+			} else if ( info[i] == "motivate" ) {
 				actions += "m";
+			} else {
+				std::cerr << abortMessage << unrecognizedArgumentMessage << "ACTIONS" << " : " << info[i] << std::endl;
+				return false;
 			}
 		}
+		return true;
 	}
 
-	void parseModifier( utility::DFStyleParser & parser, std::list< neuro::Tile::Modifier > & modifiers ) {
+	bool parseModifier( utility::DFStyleParser & parser, std::list< neuro::Tile::Modifier > & modifiers ) {
+		const std::string abortMessage = "Aborting modifier parse: ";
+		const std::string modifierActionsFailedMessage = "Reading modifier actions failed.";
 		int direction;
 		neuro::Targetting targetting;
 		std::string actions;
 		while ( parser.hasNextToken() ) {
-			std::vector< std::string > modifierInfo = parser.getNextToken();
-			std::string type = modifierInfo[0];
+			std::vector< std::string > info = parser.getNextToken();
+			if (  static_cast<int>( info.size() ) < 1 ) {
+				std::cerr << abortMessage << emptyTokenMessage << std::endl;
+				return false;
+			}
+			std::string type = info[0];
 			if ( type == "MODIFIEREND" ) {
 				break;
 			} else if ( type == "DIRECTION" ) {
-				direction	= std::stoi( modifierInfo[1] );
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					std::cerr << abortMessage << tooFewArgumentsMessage << type << std::endl;
+					return false;
+				}
+				direction	= std::stoi( info[1] );
 			} else if ( type == "ACTIONS" ) {
-				setModifierActions( modifierInfo, actions );
+				if ( !setModifierActions( info, actions ) ) {
+					std::cerr << abortMessage << modifierActionsFailedMessage << std::endl;
+					return false;
+				}
 			} else if ( type == "TARGETTINGBEGIN" ) {
-				parseTargetting( parser, targetting );
+				if ( !parseTargetting( parser, targetting ) ) {
+					std::cerr << abortMessage << targettingFailedMessage << std::endl;
+					return false;
+				}
+			} else {
+				std::cerr << unrecognizedTokenMessage << type << std::endl;
 			}
 		}
+		if ( actions.empty() ) {
+			std::cerr << abortMessage << missingInformationMessage << std::endl;
+			return false;
+		}
 		modifiers.emplace_back( direction, targetting, actions );
+		return true;
 	}
 
-	void parseTile( utility::DFStyleParser & parser, std::vector< neuro::TileP > & tiles, int amount ) {
+	bool parseTile( utility::DFStyleParser & parser, std::vector< neuro::TileP > & tiles, int amount ) {
+		const std::string abortMessage = "Aborting tile parse: ";
+		const std::string placingFailedMessage = "Loading of placing failed.";
+		const std::string attackFailedMessage = "Loading of attack failed.";
+		const std::string abilityFailedMessage = "Loading of ability failed.";
+		const std::string modifierFailedMessage = "Loading of modifier failed.";
 		std::string name;
 		neuro::TileType tileType;
 		std::set< int > initiative;
@@ -234,67 +443,150 @@ namespace viewmodel {
 		std::list< neuro::Tile::Modifier > modifiers;
 		int health = 1;
 		while ( parser.hasNextToken() ) {
-			std::vector< std::string > tileInfo = parser.getNextToken();
-			std::string type = tileInfo[0];
+			std::vector< std::string > info = parser.getNextToken();
+			if (  static_cast<int>( info.size() ) < 1 ) {
+				std::cerr << abortMessage << emptyTokenMessage << std::endl;
+				return false;
+			}
+			std::string type = info[0];
 			if ( type == "TILEEND" ) {
 				break;
 			} else if ( type == "NAME" ) {
-				name = tileInfo[1];
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					std::cerr << abortMessage << tooFewArgumentsMessage << type << std::endl;
+					return false;
+				}
+				name = info[1];
 			} else if ( type == "TYPE" ) {
-				tileType = neuro::tileTypeStringMap.at(tileInfo[1]);
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					std::cerr << abortMessage << tooFewArgumentsMessage << type << std::endl;
+					return false;
+				}
+				tileType = neuro::tileTypeStringMap.at(info[1]);
 			} else if ( type == "INITIATIVE" ) {
-				for ( int i = 1; i < static_cast<int>( tileInfo.size() ); i++ ) {
-					initiative.insert( std::stoi( tileInfo[i] ) );
+				for ( int i = 1; i < static_cast<int>( info.size() ); i++ ) {
+					initiative.insert( std::stoi( info[i] ) );
 				}
 			} else if ( type == "HEALTH" ) {
-				health = std::stoi( tileInfo[1] );
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					std::cerr << abortMessage << tooFewArgumentsMessage << type << std::endl;
+					return false;
+				}
+				health = std::stoi( info[1] );
 			} else if ( type == "PLACINGBEGIN" ) {
-				parsePlacing( parser, placingP );
+				if ( !parsePlacing( parser, placingP ) ) {
+					std::cerr << abortMessage << placingFailedMessage << std::endl;
+					return false;
+				}
 			} else if ( type == "ATTACKBEGIN" ) {
-				parseAttack( parser, attacks );
+				if ( !parseAttack( parser, attacks ) ) {
+					std::cerr << abortMessage << attackFailedMessage << std::endl;
+					return false;
+				}
 			} else if ( type == "ABILITYBEGIN" ) {
-				if ( tileInfo[1] == "battleStart" ) {
-					parseAbility( parser, onBattleStart );
-				} else if ( tileInfo[1] == "active" ) {
-					parseAbility( parser, activeAbilities );
-				} else if ( tileInfo[1] == "defensive" ) {
-					parseAbility( parser, defensiveAbilities );
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					std::cerr << abortMessage << tooFewArgumentsMessage << type << std::endl;
+					return false;
+				}
+				if ( info[1] == "battleStart" ) {
+					if ( !parseAbility( parser, onBattleStart ) ) {
+						std::cerr << abortMessage << abilityFailedMessage << std::endl;
+						return false;
+					}
+				} else if ( info[1] == "active" ) {
+					if ( !parseAbility( parser, activeAbilities ) ) {
+						std::cerr << abortMessage << abilityFailedMessage << std::endl;
+						return false;
+					}
+				} else if ( info[1] == "defensive" ) {
+					if ( !parseAbility( parser, defensiveAbilities ) ) {
+						std::cerr << abortMessage << abilityFailedMessage << std::endl;
+						return false;
+					}
+				} else {
+					std::cerr << abortMessage << unrecognizedArgumentMessage << type << " : " << info[1] << std::endl;
+					return false;
 				}
 			} else if ( type == "MODIFIERBEGIN" ) {
-				parseModifier( parser, modifiers );
+				if ( !parseModifier( parser, modifiers ) ) {
+					std::cerr << abortMessage << modifierFailedMessage << std::endl;
+					return false;
+				}
+			} else {
+				std::cerr << unrecognizedTokenMessage << type << std::endl;
 			}
+		}
+		if ( name.empty() || !placingP ) {
+			std::cerr << abortMessage << missingInformationMessage << std::endl;
+			return false;
 		}
 		for ( int i = 0; i < amount; i++ ) {
-			tiles.push_back( neuro::TileP( new neuro::Tile( name, tileType, *placingP, health, initiative, onBattleStart, attacks, modifiers, activeAbilities, defensiveAbilities ) ) );
+			tiles.emplace_back( new neuro::Tile( name, tileType, *placingP, health, initiative, onBattleStart, attacks, modifiers, activeAbilities, defensiveAbilities ) );
 		}
+		return true;
 	}
 
-	void parseArmy( utility::DFStyleParser & parser, std::string & armyName, std::string & armyDescription, std::vector< neuro::TileP > & tiles ) {
+	bool parseArmy( utility::DFStyleParser & parser, std::string & armyName, std::string & armyDescription, std::vector< neuro::TileP > & tiles ) {
+		const std::string abortMessage = "Aborting army load: ";
+		const std::string tileFailedMessage = "Loading of tile failed.";
 		while ( parser.hasNextToken() ) {
-			std::vector< std::string > armyInfo = parser.getNextToken();
-			std::string type = armyInfo[0];
+			std::vector< std::string > info = parser.getNextToken();
+			if (  static_cast<int>( info.size() ) < 1 ) {
+				std::cerr << abortMessage << emptyTokenMessage << std::endl;
+				return false;
+			}
+			std::string type = info[0];
 			if ( type == "NAME" ) {
-				armyName = armyInfo[1];
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					std::cerr << abortMessage << tooFewArgumentsMessage << type << std::endl;
+					return false;
+				}
+				armyName = info[1];
 			} else if ( type == "DESCRIPTION" ) {
-				armyDescription	= armyInfo[1];
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					std::cerr << abortMessage << tooFewArgumentsMessage << type << std::endl;
+					return false;
+				}
+				armyDescription	= info[1];
 			} else if ( type == "TILEBEGIN" ) {
-				int amount = std::stoi( armyInfo[1] );
-				parseTile( parser, tiles, amount );
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					std::cerr << abortMessage << tooFewArgumentsMessage << type << std::endl;
+					return false;
+				}
+				int amount = std::stoi( info[1] );
+				if ( !parseTile( parser, tiles, amount ) ) {
+					std::cerr << abortMessage << tileFailedMessage << std::endl;
+					return false;
+				}
+			} else {
+				std::cerr << unrecognizedTokenMessage << type << std::endl;
 			}
 		}
+		if ( armyName.empty() || armyDescription.empty() || tiles.empty() ) {
+			std::cerr << abortMessage << missingInformationMessage << std::endl;
+			return false;
+		}
+		return true;
 	}
 
 	void ArmyLoader::loadArmies( std::string directory ) {
 		utility::DFStyleParser parser( directory );
+		int armyCount = 0;
 		while ( parser.nextFile() ) {
 			std::string armyName;
 			std::string armyDescription;
 			std::vector< neuro::TileP > tiles;
-			parseArmy( parser, armyName, armyDescription, tiles );
-			if ( armies.count(armyName) == 0 ) {
+			
+			if ( parseArmy( parser, armyName, armyDescription, tiles ) && armies.count(armyName) == 0 ) {
+				armyCount++;
 				armies[armyName] = neuro::ArmyP( new neuro::Army(tiles) );
 				descriptions[armyName] = armyDescription;
 			}
+		}
+		if ( armyCount == 0 ) {
+			std::clog << "No new armies in directory " << directory << std::endl;
+		} else {
+			std::clog << "Loaded " << armyCount << " new armies from directory " << directory << std::endl;
 		}
 	}
 
