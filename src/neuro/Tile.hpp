@@ -208,6 +208,23 @@ namespace neuro {
 			class Ability {
 				public:
 					/**
+						* @brief Construct an ability object.
+						* @param[in] name The name of the ability.
+						* @param[in] description A short description of the ability.
+						* @param[in] direction The direction in which the ability is supposed to
+						* work, -1 if not applicable.
+						* @param[in] targetting How to target the ability.
+						* @param[in] abilityActions What the ability does, coded as a sequence of
+						* chars.
+						*/
+					Ability( std::string name, std::string description, int direction, Targetting targetting, std::string abilityActions ) :
+						name(name),
+						description(description),
+						direction(direction),
+						targetting(targetting),
+						abilityActions(abilityActions) {}
+
+					/**
 						* @brief Get the name of the ability.
 						* @return A std::string containing the name of the ability.
 						*/

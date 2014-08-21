@@ -117,8 +117,44 @@ namespace viewmodel {
 		attacks.emplace_back( direction, targetting, melee, ranged, strength, actions );
 	}
 
+	void setAbilityActions( std::vector< std::string > & abilityInfo, std::string & actions ) {
+		for ( int i = 1; i < static_cast<int>( abilityInfo.size() ); i++ ) {
+			if ( abilityInfo[i] == "prevent" ) {
+				actions += "p";
+				i++;
+				actions += abilityInfo[i];
+				i++;
+				if ( abilityInfo[i] == "ranged" ) {
+					actions += "r";
+				}
+			}
+		}
+	}
+
 	void parseAbility( utility::DFStyleParser & parser, std::list< neuro::Tile::Ability > & abilities ) {
-		//FIXME: This is a stub.
+		std::string name;
+		std::string description;
+		int direction;
+		neuro::Targetting targetting;
+		std::string actions;
+		while ( parser.hasNextToken() ) {
+			std::vector< std::string > abilityInfo = parser.getNextToken();
+			std::string type = abilityInfo[0];
+			if ( type == "ABILITYEND" ) {
+				break;
+			} else if ( type == "NAME" ) {
+				name = abilityInfo[1];
+			} else if ( type == "DESCRIPTION" ) {
+				description = abilityInfo[1];
+			} else if ( type == "DIRECTION" ) {
+				direction	= std::stoi( abilityInfo[1] );
+			} else if ( type == "ACTIONS" ) {
+				setAbilityActions( abilityInfo, actions );
+			} else if ( type == "TARGETTINGBEGIN" ) {
+				parseTargetting( parser, targetting );
+			}
+		}
+		abilities.emplace_back( name, description, direction, targetting, actions );
 	}
 
 	void parseModifier( utility::DFStyleParser & parser, std::list< neuro::Tile::Modifier > & abilities ) {
@@ -155,12 +191,14 @@ namespace viewmodel {
 				parsePlacing( parser, placingP );
 			} else if ( type == "ATTACKBEGIN" ) {
 				parseAttack( parser, attacks );
-			} else if ( type == "BATTLESTARTBEGIN" ) {
-				parseAbility( parser, onBattleStart );
-			} else if ( type == "ACTIVEBEGIN" ) {
-				parseAbility( parser, activeAbilities );
-			} else if ( type == "DEFENSIVEBEGIN" ) {
-				parseAbility( parser, defensiveAbilities );
+			} else if ( type == "ABILITYBEGIN" ) {
+				if ( tileInfo[1] == "battleStart" ) {
+					parseAbility( parser, onBattleStart );
+				} else if ( tileInfo[1] == "active" ) {
+					parseAbility( parser, activeAbilities );
+				} else if ( tileInfo[1] == "defensive" ) {
+					parseAbility( parser, defensiveAbilities );
+				}
 			} else if ( type == "MODIFIERBEGIN" ) {
 				parseModifier( parser, modifiers );
 			}
