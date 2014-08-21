@@ -11,6 +11,10 @@ namespace viewmodel {
 			} else if ( targettingInfo[i] == "nonsolid" ) {
 				validTargetTypes.insert( neuro::TileType::INSTANT_ACTION );
 				validTargetTypes.insert( neuro::TileType::FOUNDATION );
+			} else if ( targettingInfo[i] == "unit" ) {
+				validTargetTypes.insert( neuro::TileType::UNIT );
+			} else if ( targettingInfo[i] == "module" ) {
+				validTargetTypes.insert( neuro::TileType::MODULE );
 			}
 		}
 	}
@@ -50,6 +54,12 @@ namespace viewmodel {
 	void setPlacingActions( std::vector< std::string > & placingInfo, std::string & actions ) {
 		for ( int i = 1; i < static_cast<int>( placingInfo.size() ); i++ ) {
 			if ( placingInfo[i] == "place" ) {
+				actions += "P";
+			} else if ( placingInfo[i] == "damage" ) {
+				actions += "d";
+			} else if ( placingInfo[i] == "move" ) {
+				actions += "m";
+			} else if ( placingInfo[i] == "push" ) {
 				actions += "p";
 			}
 		}
