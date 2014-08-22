@@ -229,7 +229,7 @@ namespace viewmodel {
 		return true;
 	}
 
-	bool parseAttack( utility::DFStyleParser & parser, std::list< neuro::Tile::Attack > & attacks ) {
+	bool parseAttack( utility::DFStyleParser & parser, std::vector< neuro::Tile::Attack > & attacks ) {
 		const std::string abortMessage = "Aborting attack parse: ";
 		const std::string attackActionsFailedMessage = "Reading attack actions failed.";
 		const std::string attackTypesFailedMessage = "Reading attack types failed.";
@@ -313,7 +313,7 @@ namespace viewmodel {
 		return true;
 	}
 
-	bool parseAbility( utility::DFStyleParser & parser, std::list< neuro::Tile::Ability > & abilities ) {
+	bool parseAbility( utility::DFStyleParser & parser, std::vector< neuro::Tile::Ability > & abilities ) {
 		const std::string abortMessage = "Aborting ability parse: ";
 		const std::string abilityActionsFailedMessage = "Reading ability actions failed.";
 		std::string name;
@@ -406,7 +406,7 @@ namespace viewmodel {
 		return true;
 	}
 
-	bool parseModifier( utility::DFStyleParser & parser, std::list< neuro::Tile::Modifier > & modifiers ) {
+	bool parseModifier( utility::DFStyleParser & parser, std::vector< neuro::Tile::Modifier > & modifiers ) {
 		const std::string abortMessage = "Aborting modifier parse: ";
 		const std::string modifierActionsFailedMessage = "Reading modifier actions failed.";
 		int direction;
@@ -459,11 +459,11 @@ namespace viewmodel {
 		neuro::TileType tileType;
 		std::set< int > initiative;
 		std::unique_ptr< neuro::Tile::Placing > placingP;
-		std::list< neuro::Tile::Ability > onBattleStart;
-		std::list< neuro::Tile::Ability > activeAbilities;
-		std::list< neuro::Tile::Ability > defensiveAbilities;
-		std::list< neuro::Tile::Attack> attacks;
-		std::list< neuro::Tile::Modifier > modifiers;
+		std::vector< neuro::Tile::Ability > onBattleStart;
+		std::vector< neuro::Tile::Ability > activeAbilities;
+		std::vector< neuro::Tile::Ability > defensiveAbilities;
+		std::vector< neuro::Tile::Attack> attacks;
+		std::vector< neuro::Tile::Modifier > modifiers;
 		int health = 1;
 		while ( parser.hasNextToken() ) {
 			std::vector< std::string > info = parser.getNextToken();

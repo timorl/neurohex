@@ -5,6 +5,7 @@
 #include<memory>
 #include<set>
 #include<list>
+#include<vector>
 #include"ui/Observable.hpp"
 
 namespace neuro {
@@ -440,9 +441,9 @@ namespace neuro {
 				* @param[in] defensiveAbilities Defensive abilities the tile possesses.
 				*/
 			Tile( std::string name, TileType type, Placing placing, int health,
-					std::set< int > initiative, std::list< Ability > onBattleStart,
-					std::list< Attack > attacks, std::list< Modifier > modifiers,
-					std::list< Ability > activeAbilities, std::list< Ability > defensiveAbilities) :
+					std::set< int > initiative, std::vector< Ability > onBattleStart,
+					std::vector< Attack > attacks, std::vector< Modifier > modifiers,
+					std::vector< Ability > activeAbilities, std::vector< Ability > defensiveAbilities) :
 				placing(placing),
 				onBattleStart(onBattleStart),
 				attacks(attacks),
@@ -524,50 +525,53 @@ namespace neuro {
 			void dealDamage( int strength, int direction = -1, bool ranged = false );
 
 			/**
-				* @brief The object responsible for placing this tile.
+				* @brief Get the object responsible for placing this tile.
 				*/
-			Placing placing;
+			Placing & getPlacing() { return placing; }
 
 			/**
-				* @brief Abilities to use at the start of every battle.
+				* @brief Get a vector of abilities to use at the start of every battle.
 				*/
-			std::list< Ability > onBattleStart;
+			const std::vector< Ability > & getOnBattleStart() const { return onBattleStart; }
 
 			/**
-				* @brief Attacks to launch at every own initiative.
+				* @brief Get a vector of attacks to launch at every own initiative.
 				*/
-			std::list< Attack > attacks;
+			const std::vector< Attack > & getAttacks() const { return attacks; }
 
 			/**
-				* @brief Modifiers to tiles anywhere.
+				* @brief Get a vector of modifiers to tiles anywhere.
 				*/
-			std::list< Modifier > modifiers;
+			const std::vector< Modifier > & getModifiers() const { return modifiers; }
 
 			/**
-				* @brief Abilities the controller may use in every turn.
+				* @brief Get a vector of abilities the controller may use every turn.
 				*/
-			std::list< Ability > activeAbilities;
+			const std::vector< Ability > & getActiveAbilities() const { return activeAbilities; }
 
 			/**
-				* @brief Abilities that might affect incoming attacks.
+				* @brief Get a vector of abilities that might affect incoming attacks.
 				*/
-			std::list< Ability > defensiveAbilities;
+			const std::vector< Ability > & getDefensiveAbilities() const { return defensiveAbilities; }
 
 			/**
-				* @brief The life of the tile.
+				* @brief Get the initiative of the tile.
 				*/
-			Life life;
-
-			/**
-				* @brief The initiative of the tile.
-				*/
-			Initiative initiative;
+			Initiative & getInitiative() { return initiative; }
 
 			/**
 				* @brief At which player's turn should terror end. No terror if -1.
 				*/
 			static int terrorEndOnPlayer;
 		private:
+			Placing placing;
+			std::vector< Ability > onBattleStart;
+			std::vector< Attack > attacks;
+			std::vector< Modifier > modifiers;
+			std::vector< Ability > activeAbilities;
+			std::vector< Ability > defensiveAbilities;
+			Life life;
+			Initiative initiative;
 			std::string name;
 			TileType type;
 			int owner;
