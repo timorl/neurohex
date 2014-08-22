@@ -48,6 +48,7 @@ set(HDRS
 
 set(SRCS
 	${PROJECT_SOURCE_DIR}/Main.cpp
+	${PROJECT_SOURCE_DIR}/neuro/Tile.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Board.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Army.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Hand.cpp

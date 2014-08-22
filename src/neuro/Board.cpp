@@ -96,8 +96,8 @@ namespace neuro {
 		return result;
 	}
 
-	void Board::placeTile( Coordinates coord, TileOnBoard tile ) {
-		tiles[coord.first][coord.second].push_front(tile);
+	void Board::placeTile( Coordinates coord, Orientation orientation, TileP tile ) {
+		tiles[coord.first][coord.second].push_front( std::make_pair( tile, orientation ) );
 		sigModified(*this);
 	}
 

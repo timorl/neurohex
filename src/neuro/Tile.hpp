@@ -120,6 +120,7 @@ namespace neuro {
 	/**
 		* @brief A tile to be created in an army and later played.
 		* @todo Fill in functions while creating armies.
+		* @todo Code moving.
 		*/
 	class Tile : public ui::Observable<Tile> {
 		public:
@@ -158,16 +159,15 @@ namespace neuro {
 						* @return A Targetting object describing the method of targetting used.
 						*/
 					Targetting getTargettingDescription() const { return targetting; }
+
+					/**
+						* @brief Sets the parent of this tile.
+						*/
+					void setParent( TileP par ) { parent = par; }
 				private:
 					Targetting	targetting;
 					std::string placeActions;
-
-					void dealDamage(int amount, TileP target);
-					void destroyTile(TileP target);
-					void moveTile(TileP target);
-					void pushTile(TileP target);
-					void castleTiles(TileP first, TileP second);
-					void terrorize();
+					std::weak_ptr< Tile > parent;
 			};
 
 			/**
@@ -179,43 +179,34 @@ namespace neuro {
 						* @brief Construct a life object.
 						* @param[in] health The initial health of the object.
 						*/
-					Life( int health ) : alive(true), health(health), damage(0) {}
+					Life( int health ) : health(health), damage(0) {}
 
 					/**
 						* @brief Whether the tile is still alive.
 						*/
-					bool isAlive() const;
+					bool isAlive() const { return ( health > damage ); }
 
 					/**
 						* @brief Returns the full health of the tile.
 						*/
-					int getHealth() const;
+					int getHealth() const { return health; }
 
 					/**
 						* @brief Returns the amount of damage dealt to the tile.
 						*/
-					int getDamage() const;
+					int getDamage() const { return damage; }
 
 					/**
 						* @brief Tries to deal the specified amount of damage to the tile.
 						* @param[in] dmg The amount of damage to deal.
-						* @param[in] ignoreRedirect Whether to ignore redirections.
 						*/
-					void dealDamage(int dmg, bool ignoreRedirect = false);
+					void dealDamage(int dmg) { damage += dmg; }
 
 					/**
 						* @brief Tries to destroy the tile.
-						* @param[in] ignoreRedirect Whether to ignore redirections.
 						*/
-					void destroy( bool ignoreRedirect = false );
-
-					/**
-						* @brief Registers an entity to which to redirect incoming attacks.
-						* @param[in] redir A pointer to the tile handling the damage.
-						*/
-					void registerRedirectior( TileP redir );
+					void destroy();
 				private:
-					bool alive;
 					int health;
 					int damage;
 			};
@@ -279,6 +270,14 @@ namespace neuro {
 						* ability.
 						*/
 					void useAbility( std::list< TileP > targets );
+
+					/**
+						* @brief Use the ability as a defence against an attack.
+						* @param[in] damage A reference to the amount of damage the attack would
+						* do barring our intervention.
+						* @param[in] ranged Whether the attack was ranged.
+						*/
+					void useDefensiveAbility( int & damage, bool ranged );
 				private:
 					std::string name;
 					std::string description;
@@ -501,28 +500,19 @@ namespace neuro {
 				* @brief Sets the owner and original controller of the tile.
 				* @param[in] player The player to become the owner.
 				*/
-			void setOwner(int player) {
-				owner = player;
-				controller = player;
-			}
+			void setOwner(int player) { owner = player; controller = player; }
 
 			/**
 				* @brief Changes the controller of the tile.
 				* @param[in] player The new controller of the tile.
 				*/
-			void changeController(int player) {
-				controller = player;
-				sigModified(*this);
-			}
+			void changeController(int player) { controller = player; sigModified(*this); }
 
 			/**
-				* @brief Attempt to deal damage to the tile.
-				* @param[in] strength The amount of damage.
-				* @param[in] direction The direction from which the damage is coming. The
-				* default is -1, meaning no direction.
-				* @param[in] ranged Whether the attack is ranged, defaults to false.
+				* @brief Set parents for this tile's abilities.
+				* @param thisTile A shared_ptr to this tile.
 				*/
-			void dealDamage( int strength, int direction = -1, bool ranged = false );
+			void setParents( TileP thisTile );
 
 			/**
 				* @brief Get the object responsible for placing this tile.
@@ -563,6 +553,11 @@ namespace neuro {
 				* @brief At which player's turn should terror end. No terror if -1.
 				*/
 			static int terrorEndOnPlayer;
+
+			/**
+				* @brief Whether to start a battle because of tile effects.
+				*/
+			static bool battle;
 		private:
 			Placing placing;
 			std::vector< Ability > onBattleStart;
@@ -576,6 +571,14 @@ namespace neuro {
 			TileType type;
 			int owner;
 			int controller;
+
+			void dealDamage( int strength, int direction = -1, bool ranged = false );
+			void move();
+			void push( TileP source );
+			void castle();
+
+			static void terrorize( int terrorist );
+			static void startBattle();
 	};
 
 	using TileP = std::shared_ptr< Tile >;

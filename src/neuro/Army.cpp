@@ -12,10 +12,11 @@ namespace neuro {
 		std::shuffle(std::begin(tiles), std::end(tiles), std::default_random_engine());
 	}
 
-	void Army::setOwner(int player) {
+	void Army::initialize(int player) {
 		owner = player;
 		for ( TileP tile : tiles ) {
-			tile->setOwner(player);
+			tile->setOwner( player );
+			tile->setParents( tile );
 		}
 		sigModified(*this);
 	}

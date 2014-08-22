@@ -46,10 +46,10 @@ namespace neuro {
 			void shuffle();
 
 			/**
-				* @brief Sets the owner of the army.
+				* @brief Sets the owner of the army and sets parents for tile abilities.
 				* @param[in] player The id of the player to own the army.
 				*/
-			void setOwner(int player);
+			void initialize(int player);
 
 			/**
 				* @brief Draw one tile from the army.

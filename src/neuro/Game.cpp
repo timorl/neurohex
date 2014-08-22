@@ -60,6 +60,21 @@ namespace neuro {
 	}
 
 	void Game::tilePlacing( TileP tile ) {
+		int tilePlacer = tile->getController();
+		Targets targets = arbiters[tilePlacer].getTargets( tilePlacer, players, board, noArmy, *tile, AbilityGroup::PLACING, 0 );
+		std::list< TileP > affectedTiles;
+		Coordinates coords;
+		Orientation orientation;
+		for ( auto tpl : targets ) {
+			std::list< TileP > tls;
+			std::tie( coords, orientation, tls ) = tpl;
+			affectedTiles.splice( affectedTiles.end(), tls );
+		}
+		Tile::Placing & placing = tile->getPlacing();
+		if ( placing.placeTile( affectedTiles ) ) {
+			board.placeTile( coords, orientation, tile );
+		}
+		//TODO: Check for the possibility of battles.
 	}
 
 	void Game::abilityUsing( TileP tile, AbilityGroup abilityGroup, int abilityId ) {

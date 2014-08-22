@@ -51,7 +51,7 @@ namespace neuro {
 
 			/**
 				* @brief Start the game and play it to the end.
-				* @todo Actually playing tiles and using already played ones. Also, battles.
+				* @todo Actually using already played tiles. Also, battles.
 				*/
 			void play();
 		private:

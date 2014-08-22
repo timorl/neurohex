@@ -3,7 +3,7 @@
 namespace neuro {
 
 	Player::Player(int id, ArmyP army, int health) : id(id), army(army), health(health) {
-		army->setOwner(id);
+		army->initialize(id);
 	}
 
 	void Player::drawTiles(int toDraw) {

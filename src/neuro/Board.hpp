@@ -89,11 +89,11 @@ namespace neuro {
 			/**
 				* @brief Places a tile on the board.
 				* @param[in] coord Coordinates of the field on which the tile is placed as a std::pair<int, int>.
-				* @param[in] tile A pair of a pointer to a Tile 
-				* to place at the coordinates and an integer representing the initial
-				* orientation of the placed tile.
+				* @param[in] orientation The initial orientation with which the tile is
+				* placed.
+				* @param[in] tile A pointer to the Tile to place at the coordinates.
 				*/
-			void placeTile(Coordinates coord, TileOnBoard tile);
+			void placeTile(Coordinates coord, Orientation orientation, TileP tile);
 
 			/**
 				* @brief Removes a tile from the board.
