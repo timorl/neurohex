@@ -41,9 +41,8 @@ namespace neuro {
 				* @param[in] board A reference to the board.
 				* @param[in] noArmy Whether any players army already ran out.
 				* @param[in] tile The tile with the ability to target.
-				* @param[in] abilityGroup In which ability group the ability to target is.
-				* Ignored if abilityId is -1.
-				* @param[in] abilityId The id of the ability to target, -1 means placing.
+				* @param[in] abilityGroup In which ability group to look for the ability.
+				* @param[in] abilityId The id of the ability to target.
 				* @return A validated list of targets.
 				* @todo Actually validate the targets.
 				*/

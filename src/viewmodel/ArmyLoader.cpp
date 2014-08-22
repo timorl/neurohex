@@ -10,6 +10,23 @@ namespace viewmodel {
 	const std::string unrecognizedArgumentMessage = "Unrecognized argument: ";
 	const std::string targettingFailedMessage = "Loading of targetting failed.";
 
+	bool setTargetTiles( std::vector< std::string > & info, bool & targetTiles ) {
+		const std::string abortMessage = "Aborting determining what to target: ";
+		if (  static_cast<int>( info.size() ) < 2 ) {
+			std::cerr << abortMessage << tooFewArgumentsMessage << "TARGETS" << std::endl;
+			return false;
+		}
+		if ( info[1] == "tiles" ) {
+			targetTiles = true;
+		} else if ( info[1] == "fields" ) {
+			targetTiles = false;
+		} else {
+			std::cerr << abortMessage << unrecognizedArgumentMessage << "TARGETS" << " : " << info[1] << std::endl;
+			return false;
+		}
+		return true;
+	}
+
 	bool setValidTargetTypes( std::vector< std::string > & info, std::set< neuro::TileType > & validTargetTypes ) {
 		const std::string abortMessage = "Aborting setting valid target types: ";
 		for ( int i = 1; i < static_cast<int>( info.size() ); i++ ) {
@@ -49,6 +66,7 @@ namespace viewmodel {
 
 	bool parseTargetting( utility::DFStyleParser & parser, neuro::Targetting & targetting ) {
 		const std::string abortMessage = "Aborting targetting parse: ";
+		const std::string targetTilesFailedMessage = "Reading what to target failed.";
 		const std::string targetTypesFailedMessage = "Reading target types failed.";
 		const std::string targetAffiliationsFailedMessage = "Reading target affiliations failed.";
 		while ( parser.hasNextToken() ) {
@@ -84,6 +102,11 @@ namespace viewmodel {
 					return false;
 				}
 				targetting.range = std::stoi( info[1] );
+			} else if ( type == "TARGETS" ) {
+				if ( !setTargetTiles( info, targetting.targetTiles ) ) {
+					std::cerr << abortMessage << targetTilesFailedMessage << std::endl;
+					return false;
+				}
 			} else if ( type == "VALID_TARGET_TYPES" ) {
 				if ( !setValidTargetTypes( info, targetting.validTargetTypes ) ) {
 					std::cerr << abortMessage << targetTypesFailedMessage << std::endl;

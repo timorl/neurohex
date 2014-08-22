@@ -59,6 +59,11 @@ namespace neuro {
 		*/
 	struct Targetting {
 		/**
+			* @brief Whether to target specific tiles, targets whole fields if false.
+			*/
+		bool targetTiles;
+
+		/**
 			* @brief The type of the targetting.
 			*/
 		TargettingType	type;
