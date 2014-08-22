@@ -590,7 +590,7 @@ namespace viewmodel {
 	}
 
 	neuro::ArmyP ArmyLoader::getArmy( std::string name ) const {
-		return armies.at(name);
+		return neuro::ArmyP( new neuro::Army( *armies.at(name) ) );
 	}
 
 }

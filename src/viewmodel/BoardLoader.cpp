@@ -1,3 +1,4 @@
+#include<iostream>
 #include"viewmodel/BoardLoader.hpp"
 
 namespace viewmodel {

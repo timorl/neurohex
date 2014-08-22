@@ -14,6 +14,12 @@ namespace neuro {
 	class Army : public ui::Observable<Army> {
 		public:
 			/**
+				* @brief Provides a deep copy of the given army, but with no owner or observer.
+				* @param[in] other The object to be copied.
+				*/
+			Army( const Army & other );
+
+			/**
 				* @brief Construct an army from a vector of tiles.
 				* @param[in] tiles The vector to initialize the army with.
 				*/

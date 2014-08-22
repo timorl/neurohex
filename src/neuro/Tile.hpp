@@ -438,6 +438,23 @@ namespace neuro {
 				type(type) {}
 
 			/**
+				* @brief provides a copy of the tile with no owner, controller or observer.
+				* @param[in] other The tile to copy.
+				*/
+			Tile( const Tile & other ) :
+				placing(other.placing),
+				onBattleStart(other.onBattleStart),
+				attacks(other.attacks),
+				modifiers(other.modifiers),
+				activeAbilities(other.activeAbilities),
+				defensiveAbilities(other.defensiveAbilities),
+				life(other.life),
+				initiative(other.initiative),
+				name(other.name),
+				type(other.type) {}
+
+
+			/**
 				* @brief Returns the name of the tile.
 				*/
 			std::string getName() { return name; }

@@ -10,7 +10,6 @@ namespace viewmodel {
 
 	/**
 		* @brief A class for loading files with army descriptions.
-		* @todo Figure out how to handle the possibility of duplicate armies.
 		*/
 	class ArmyLoader : public ui::Observable< ArmyLoader > {
 		public:
@@ -28,9 +27,8 @@ namespace viewmodel {
 			/**
 				* @brief Get an army with the specified name.
 				* @param[in] name The name of the army we are looking for.
-				* @return A pointer to the army with the specified name. If no
+				* @return A pointer to a new copy of the army with the specified name. If no
 				* army has such name the pointer is empty.
-				* @todo Figure out how to handle the possibility of duplicate armies.
 				*/
 			neuro::ArmyP	getArmy(std::string name) const;
 		private:

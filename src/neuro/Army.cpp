@@ -2,6 +2,12 @@
 
 namespace neuro {
 
+	Army::Army( const Army & other ) {
+		for ( auto tile : other.tiles ) {
+			tiles.emplace_back( new Tile( *tile ) );
+		}
+	}
+
 	void Army::shuffle() {
 		std::shuffle(std::begin(tiles), std::end(tiles), std::default_random_engine());
 	}
