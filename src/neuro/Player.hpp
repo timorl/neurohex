@@ -74,11 +74,25 @@ namespace neuro {
 				* @param[in] tile The tile to remove.
 				*/
 			void removeTile(TileP tile) { hand.removeTile(tile); sigModified(*this); }
+
+			/**
+				* @brief Discard the specified tile from your hand.
+				* @param[in] tile The tile to discard.
+				*/
+			void discardTile(TileP tile) { discardedTile = true; removeTile(tile); }
+
+			/**
+				* @brief Do everything that should be done with the player on turn start.
+				* @param[in] firstTurns The parameter for drawing less tiles in the first
+				* two turns.
+				*/
+			void startTurn(int & firstTurns);
 		private:
 			int id;
 			Hand hand;
 			ArmyP army;
 			int health;
+			bool discardedTile;
 	};
 
 	using PlayerP = std::shared_ptr< Player >;

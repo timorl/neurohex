@@ -7,4 +7,9 @@ namespace neuro {
 		return contestant->getMove(playerId, players, board, noArmy);
 	}
 
+	Targets Arbiter::getTargets(int playerId, const Players & players, const Board & board, bool noArmy, const Tile & tile, AbilityGroup abilityGroup, int abilityId ) {
+		//TODO: Actually validate the targets.
+		return contestant->getTargets(playerId, players, board, noArmy, tile, abilityGroup, abilityId);
+	}
+
 }

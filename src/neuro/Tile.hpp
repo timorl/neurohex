@@ -100,6 +100,18 @@ namespace neuro {
 	};
 
 	/**
+		* @brief The groups of abilities a tile can have.
+		*/
+	enum class AbilityGroup {
+		PLACING,
+		BATTLE_START,
+		ATTACK,
+		MODIFIER,
+		ACTIVE,
+		DEFENSIVE
+	};
+
+	/**
 		* @brief A tile to be created in an army and later played.
 		* @todo Fill in functions while creating armies.
 		*/

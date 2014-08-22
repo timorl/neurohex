@@ -92,11 +92,8 @@ namespace neuro {
 				* @param[in] tile A pair of a pointer to a Tile 
 				* to place at the coordinates and an integer representing the initial
 				* orientation of the placed tile.
-				* @return true if the move was completed successfully, false otherwise.
-				* @todo This should use a custom function for every tile for placement.
-				* Possibly the validation should be in another class
 				*/
-			bool placeTile(Coordinates coord, TileOnBoard tile);
+			void placeTile(Coordinates coord, TileOnBoard tile);
 
 			/**
 				* @brief Removes a tile from the board.

@@ -18,4 +18,15 @@ namespace neuro {
 		sigModified(*this);
 	}
 
+	void Player::startTurn(int & firstTurns) {
+		int toDraw = 3 - getNumberOfTilesInHand();
+		if ( firstTurns ) {
+			toDraw -= firstTurns;
+			firstTurns--;
+		}
+		drawTiles( toDraw );
+		//Only require discarding a tile if the player had 3 in his hand.
+		discardedTile = ( getNumberOfTilesInHand() < 3 );
+	}
+
 }

@@ -8,6 +8,7 @@
 #include"neuro/Contestant.hpp"
 #include"neuro/GameOptions.hpp"
 #include"neuro/Player.hpp"
+#include"neuro/Tile.hpp"
 #include"ui/Observable.hpp"
 
 namespace neuro {
@@ -46,7 +47,7 @@ namespace neuro {
 			/**
 				* @brief Whether the current game is finished.
 				*/
-			bool isFinished() const { return finished; }
+			bool isFinished() const;
 
 			/**
 				* @brief Start the game and play it to the end.
@@ -59,7 +60,9 @@ namespace neuro {
 			Board board;
 			int currentPlayer;
 			bool noArmy;
-			bool finished;
+
+			void tilePlacing( TileP tile );
+			void abilityUsing( TileP tile, AbilityGroup abilityGroup, int abilityId );
 	};
 
 	using GameP = std::shared_ptr< Game >;

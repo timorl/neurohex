@@ -96,16 +96,9 @@ namespace neuro {
 		return result;
 	}
 
-	bool Board::placeTile( Coordinates coord, TileOnBoard tile ) {
-		if ( insideBoard(coord) ) {
-			if ( getFieldDescription(coord) != FieldType::NO_FIELD ) {
-				// No more validation, assume the game validates; maybe validation later?
-				tiles[coord.first][coord.second].push_front(tile);
-				sigModified(*this);
-				return true;
-			}
-		}
-		return false;
+	void Board::placeTile( Coordinates coord, TileOnBoard tile ) {
+		tiles[coord.first][coord.second].push_front(tile);
+		sigModified(*this);
 	}
 
 	bool Board::removeTile(TileP tile) {

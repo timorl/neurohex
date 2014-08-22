@@ -5,8 +5,7 @@ namespace neuro {
 	Game::Game(GameOptions options) :
 		board(options.board),
 		currentPlayer(0),
-		noArmy(false),
-		finished(false) {
+		noArmy(false) {
 		for ( int i = 0; i < static_cast<int>( options.contestants.size() ); i++ ) {
 			arbiters.emplace_back( options.contestants[i] );
 		}
@@ -25,12 +24,19 @@ namespace neuro {
 		return result;
 	}
 
+	bool Game::isFinished() const {
+		if ( (noArmy && players[currentPlayer]->getArmy().isEmpty()) || 
+			( getNumberOfLivingPlayers() <= 1 ) ) {
+			return true;
+		}
+		return false;
+	}
+
 	void Game::play() {
+		int firstTurns = 2; //How many turns drawing less tiles.
 		while ( !isFinished() ) {
 			if ( players[currentPlayer]->getHealth() > 0 ) {
-				players[currentPlayer]->drawTiles( 3 - players[currentPlayer]->getNumberOfTilesInHand() );
-				//Only require discarding a tile if the player had 3 in his hand.
-				bool discardedTile = ( players[currentPlayer]->getNumberOfTilesInHand() < 3 );
+				players[currentPlayer]->startTurn( firstTurns );
 				noArmy = noArmy || players[currentPlayer]->armyEmpty();
 				Move move;
 				do {
@@ -38,29 +44,25 @@ namespace neuro {
 					if ( !move.endTurn ) {
 						if ( players[currentPlayer]->getHand().containsTile( move.tile ) ) {
 							if ( move.discard ) {
-								players[currentPlayer]->removeTile( move.tile );
-								discardedTile = true;
-							} else {
-								//FIXME: This just places the tile at the first coordinate given.
-								board.placeTile( move.coords.front(), make_pair( move.tile, move.orientation ) );
-								players[currentPlayer]->removeTile( move.tile );
+								players[currentPlayer]->discardTile( move.tile );
+							} else if ( move.abilityGroup == AbilityGroup::PLACING ) {
+								tilePlacing( move.tile );
 							}
-						} else { //Assume the tile is on the board.
-							Coordinates coord = board.findTile( move.tile );
-							if ( coord.first != -1 ) {
-								//TODO: Actually moving or otherwise using the tile.
-							}
+						} else {
+							abilityUsing( move.tile, move.abilityGroup, move.abilityId );
 						}
 					}
-				} while ( !discardedTile || !move.endTurn );
+				} while ( !move.endTurn );
 			}
 			currentPlayer++;
 			currentPlayer	%= getNumberOfPlayers();
-			if ( (noArmy && players[currentPlayer]->getArmy().isEmpty()) || 
-				( getNumberOfLivingPlayers() <= 1 ) ) {
-				finished = true;
-			}
 		}
+	}
+
+	void Game::tilePlacing( TileP tile ) {
+	}
+
+	void Game::abilityUsing( TileP tile, AbilityGroup abilityGroup, int abilityId ) {
 	}
 
 }
