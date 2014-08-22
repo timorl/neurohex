@@ -10,7 +10,6 @@ namespace viewmodel {
 
 	/**
 		* @brief A class for loading files with army descriptions.
-		* @todo Finish all the parsing functions.
 		* @todo Figure out how to handle the possibility of duplicate armies.
 		*/
 	class ArmyLoader : public ui::Observable< ArmyLoader > {

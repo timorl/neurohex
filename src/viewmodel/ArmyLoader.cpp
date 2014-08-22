@@ -576,7 +576,6 @@ namespace viewmodel {
 			std::string armyName;
 			std::string armyDescription;
 			std::vector< neuro::TileP > tiles;
-			
 			if ( parseArmy( parser, armyName, armyDescription, tiles ) && armies.count(armyName) == 0 ) {
 				armyCount++;
 				armies[armyName] = neuro::ArmyP( new neuro::Army(tiles) );
@@ -586,7 +585,7 @@ namespace viewmodel {
 		if ( armyCount == 0 ) {
 			std::clog << "No new armies in directory " << directory << std::endl;
 		} else {
-			std::clog << "Loaded " << armyCount << " new armies from directory " << directory << std::endl;
+			std::clog << "Loaded " << armyCount << " new arm" << ( (armyCount > 1)?"ies":"y" ) << " from directory " << directory << std::endl;
 		}
 	}
 
