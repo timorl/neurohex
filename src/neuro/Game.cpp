@@ -6,13 +6,13 @@ namespace neuro {
 		board(options.board),
 		currentPlayer(0),
 		noArmy(false) {
-		for ( int i = 0; i < static_cast<int>( options.contestants.size() ); i++ ) {
-			arbiters.emplace_back( options.contestants[i] );
+			for ( int i = 0; i < static_cast<int>( options.contestants.size() ); i++ ) {
+				arbiters.emplace_back( options.contestants[i] );
+			}
+			for ( int i = 0; i < static_cast<int>( options.armies.size() ); i++ ) {
+				players.push_back( PlayerP( new Player(i, options.armies[i], options.initialHealth) ) );
+			}
 		}
-		for ( int i = 0; i < static_cast<int>( options.armies.size() ); i++ ) {
-			players.push_back( PlayerP( new Player(i, options.armies[i], options.initialHealth) ) );
-		}
-	}
 
 	int Game::getNumberOfLivingPlayers() const {
 		int result = 0;
@@ -26,7 +26,7 @@ namespace neuro {
 
 	bool Game::isFinished() const {
 		if ( (noArmy && players[currentPlayer]->getArmy().isEmpty()) || 
-			( getNumberOfLivingPlayers() <= 1 ) ) {
+				( getNumberOfLivingPlayers() <= 1 ) ) {
 			return true;
 		}
 		return false;
@@ -78,6 +78,36 @@ namespace neuro {
 	}
 
 	void Game::abilityUsing( TileP tile, AbilityGroup abilityGroup, int abilityId ) {
+		int abilityUser = tile->getController();
+		Targets targets = arbiters[abilityUser].getTargets( abilityUser, players, board, noArmy, *tile, abilityGroup, abilityId );
+		std::list< TileP > affectedTiles;
+		Coordinates coords;
+		Orientation orientation;
+		for ( auto tpl : targets ) {
+			std::list< TileP > tls;
+			std::tie( coords, orientation, tls ) = tpl;
+			affectedTiles.splice( affectedTiles.end(), tls );
+		}
+		switch ( abilityGroup ) {
+			case AbilityGroup::PLACING:
+				tile->getPlacing().placeTile( affectedTiles );
+				break;
+			case AbilityGroup::BATTLE_START:
+				tile->getOnBattleStart( abilityId ).useAbility( affectedTiles );
+				break;
+			case AbilityGroup::ATTACK:
+				tile->getAttack( abilityId ).executeAttack( affectedTiles );
+				break;
+			case AbilityGroup::MODIFIER:
+				tile->getModifier( abilityId ).modifyTiles( affectedTiles );
+				break;
+			case AbilityGroup::ACTIVE:
+				tile->getActiveAbility( abilityId ).useAbility( affectedTiles );
+				break;
+			case AbilityGroup::DEFENSIVE:
+				tile->getDefensiveAbility( abilityId ).useAbility( affectedTiles );
+				break;
+		}
 	}
 
 }

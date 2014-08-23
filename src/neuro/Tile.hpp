@@ -197,15 +197,10 @@ namespace neuro {
 					int getDamage() const { return damage; }
 
 					/**
-						* @brief Tries to deal the specified amount of damage to the tile.
+						* @brief Deals the specified amount of damage to the tile.
 						* @param[in] dmg The amount of damage to deal.
 						*/
 					void dealDamage(int dmg) { damage += dmg; }
-
-					/**
-						* @brief Tries to destroy the tile.
-						*/
-					void destroy();
 				private:
 					int health;
 					int damage;
@@ -255,14 +250,6 @@ namespace neuro {
 						* @return A Targetting object describing the method of targetting used.
 						*/
 					Targetting getTargettingDescription() const { return targetting; }
-
-					/**
-						* @brief Whether the supplied list of arguments is suitable for this ability.
-						* @param[in] args A std::list of pointers to tiles which should be affected by the
-						* abililty.
-						* @return Whether the given arguments are acceptable for this ability.
-						*/
-					bool verifyArguments( std::list< TileP > args );
 
 					/**
 						* @brief Use the ability on the specified tiles.
@@ -324,6 +311,11 @@ namespace neuro {
 					Targetting getTargettingDescription() const { return targetting; }
 
 					/**
+						* @brief Sets the parent of this tile.
+						*/
+					void setParent( TileP par ) { parent = par; }
+
+					/**
 						* @brief Whether the attack is melee.
 						*/
 					bool isMelee() const { return melee; }
@@ -334,12 +326,16 @@ namespace neuro {
 					bool isRanged() const { return ranged; }
 
 					/**
+						* @brief Modify the strength of the attack.
+						* @param[in] amount The amount by which to modify.
+						*/
+					void modifyStrength( int amount ) { strength += amount; }
+
+					/**
 						* @brief Execute the attack on the given tiles.
 						* @param[in] targets A std::list of affected tiles.
-						* @param[in] direction The direction in which the attack is executed.
-						* Important for some defensive abilities.
 						*/
-					void executeAttack( std::list< TileP > targets, int direction );
+					void executeAttack( std::list< TileP > targets );
 				private:
 					int direction;
 					Targetting	targetting;
@@ -347,12 +343,12 @@ namespace neuro {
 					bool ranged;
 					int strength;
 					std::string attackActions;
-
-					void hit( TileP tile, int direction );
+					std::weak_ptr< Tile > parent;
 			};
 
 			/**
 				* @brief A class representing a passive modifier, usually in a direction.
+				* @todo Finish handling medics.
 				*/
 			class Modifier {
 				public:
@@ -381,14 +377,20 @@ namespace neuro {
 					Targetting getTargettingDescription() const { return targetting; }
 
 					/**
-						* @brief Modify the given tile.
-						* @param[in] tile The tile to modify.
+						* @brief Sets the parent of this tile.
 						*/
-					void modifyTile( TileP tile );
+					void setParent( TileP par ) { parent = par; }
+
+					/**
+						* @brief Modify the given tiles.
+						* @param[in] targets The tiles to modify.
+						*/
+					void modifyTiles( std::list< TileP > targets );
 				private:
 					int direction;
 					Targetting	targetting;
 					std::string modifyActions;
+					std::weak_ptr< Tile > parent;
 			};
 
 			/**
@@ -401,17 +403,12 @@ namespace neuro {
 						* @param[in] initiative The set of initiatives the object should initially
 						* have.
 						*/
-					Initiative( std::set< int > initiative ) : initiative(initiative) {}
+					Initiative( std::set< int > initiative ) : modifiable(true), initiative(initiative) {}
 
 					/**
 						* @brief Whether the tile has initiative at the given battle stage.
 						*/
-					bool hasInitiative( int battleStage ) { return ( initiative.count( battleStage ) > 0 );  }
-
-					/**
-						* @brief Add one initiative after every existing one.
-						*/
-					void duplicateInitiatives();
+					bool hasInitiative( int battleStage ) const { return ( initiative.count( battleStage ) > 0 );  }
 
 					/**
 						* @brief Modify all the initiatives.
@@ -419,7 +416,18 @@ namespace neuro {
 						* @param[in] fix Whether to make the initiative unmodifiable. Defaults to
 						* false.
 						*/
-					void modifyInitiatives( int change, bool fix = false );
+					void changeInitiative( int change, bool fix = false );
+
+					/**
+						* @brief Add an additional initiative after the last one the initiative
+						* contains.
+						*/
+					void motivate();
+
+					/**
+						* @brief Whether the initiative can be modified.
+						*/
+					bool isModifiable() const { return modifiable; }
 				private:
 					bool modifiable;
 					std::set< int > initiative;
@@ -443,6 +451,14 @@ namespace neuro {
 					std::set< int > initiative, std::vector< Ability > onBattleStart,
 					std::vector< Attack > attacks, std::vector< Modifier > modifiers,
 					std::vector< Ability > activeAbilities, std::vector< Ability > defensiveAbilities) :
+				placingO(placing),
+				onBattleStartO(onBattleStart),
+				attacksO(attacks),
+				modifiersO(modifiers),
+				activeAbilitiesO(activeAbilities),
+				defensiveAbilitiesO(defensiveAbilities),
+				lifeO(health),
+				initiativeO(initiative),
 				placing(placing),
 				onBattleStart(onBattleStart),
 				attacks(attacks),
@@ -459,6 +475,14 @@ namespace neuro {
 				* @param[in] other The tile to copy.
 				*/
 			Tile( const Tile & other ) :
+				placingO(other.placing),
+				onBattleStartO(other.onBattleStart),
+				attacksO(other.attacks),
+				modifiersO(other.modifiers),
+				activeAbilitiesO(other.activeAbilities),
+				defensiveAbilitiesO(other.defensiveAbilities),
+				lifeO(other.life),
+				initiativeO(other.initiative),
 				placing(other.placing),
 				onBattleStart(other.onBattleStart),
 				attacks(other.attacks),
@@ -503,10 +527,9 @@ namespace neuro {
 			void setOwner(int player) { owner = player; controller = player; }
 
 			/**
-				* @brief Changes the controller of the tile.
-				* @param[in] player The new controller of the tile.
+				* @brief Whether the tile is currently webbed.
 				*/
-			void changeController(int player) { controller = player; sigModified(*this); }
+			bool isWebbed() { return webbed; }
 
 			/**
 				* @brief Set parents for this tile's abilities.
@@ -522,27 +545,58 @@ namespace neuro {
 			/**
 				* @brief Get a vector of abilities to use at the start of every battle.
 				*/
-			const std::vector< Ability > & getOnBattleStart() const { return onBattleStart; }
+			const std::vector< Ability > & getOnBattleStart() const;
+
+			/**
+				* @brief Get a specific ability from the ones to run at the start of a
+				* battle.
+				* @param[in] id The id of the ability to return.
+				*/
+			Ability & getOnBattleStart( int id ) { return onBattleStart[id]; }
 
 			/**
 				* @brief Get a vector of attacks to launch at every own initiative.
 				*/
-			const std::vector< Attack > & getAttacks() const { return attacks; }
+			const std::vector< Attack > & getAttacks() const;
+
+			/**
+				* @brief Get a specific attack.
+				* @param[in] id The id of the modifier to return.
+				*/
+			Attack & getAttack( int id ) { return attacks[id]; }
 
 			/**
 				* @brief Get a vector of modifiers to tiles anywhere.
 				*/
-			const std::vector< Modifier > & getModifiers() const { return modifiers; }
+			const std::vector< Modifier > & getModifiers() const;
+
+			/**
+				* @brief Get a specific modifier.
+				* @param[in] id The id of the modifier to return.
+				*/
+			Modifier & getModifier( int id ) { return modifiers[id]; }
 
 			/**
 				* @brief Get a vector of abilities the controller may use every turn.
 				*/
-			const std::vector< Ability > & getActiveAbilities() const { return activeAbilities; }
+			const std::vector< Ability > & getActiveAbilities() const;
+
+			/**
+				* @brief Get a specific active ability.
+				* @param[in] id The id of the ability to return.
+				*/
+			Ability & getActiveAbility( int id ) { return activeAbilities[id]; }
 
 			/**
 				* @brief Get a vector of abilities that might affect incoming attacks.
 				*/
-			const std::vector< Ability > & getDefensiveAbilities() const { return defensiveAbilities; }
+			const std::vector< Ability > & getDefensiveAbilities() const;
+
+			/**
+				* @brief Get a specific defensive ability.
+				* @param[in] id The id of the ability to return.
+				*/
+			Ability & getDefensiveAbility( int id ) { return defensiveAbilities[id]; }
 
 			/**
 				* @brief Get the initiative of the tile.
@@ -559,6 +613,14 @@ namespace neuro {
 				*/
 			static bool battle;
 		private:
+			Placing placingO;
+			std::vector< Ability > onBattleStartO;
+			std::vector< Attack > attacksO;
+			std::vector< Modifier > modifiersO;
+			std::vector< Ability > activeAbilitiesO;
+			std::vector< Ability > defensiveAbilitiesO;
+			Life lifeO;
+			Initiative initiativeO;
 			Placing placing;
 			std::vector< Ability > onBattleStart;
 			std::vector< Attack > attacks;
@@ -571,11 +633,22 @@ namespace neuro {
 			TileType type;
 			int owner;
 			int controller;
+			std::weak_ptr< Tile > thisP;
+
+			bool webbed;
 
 			void dealDamage( int strength, int direction = -1, bool ranged = false );
+			void destroy( bool noRedirect = false );
 			void move();
 			void push( TileP source );
 			void castle();
+			void web();
+			void motivate();
+			void changeInitiative( int amount, bool fix = false );
+			void changeMelee( int amount );
+			void changeRanged( int amount );
+
+			void addDefensiveAbility( Ability def );
 
 			static void terrorize( int terrorist );
 			static void startBattle();
