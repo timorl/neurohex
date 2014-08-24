@@ -70,6 +70,13 @@ namespace neuro {
 		}
 	}
 
+	int Tile::Initiative::getHighestInitiative() const {
+		if ( initiative.empty() ) {
+			return -1;
+		}
+		return *(initiative.rbegin());
+	}
+
 	bool Tile::Placing::placeTile( std::list< TileP > targets ) {
 		bool stayOnBoard = false;
 		for ( char action : placeActions ) {
@@ -205,6 +212,13 @@ namespace neuro {
 		for ( auto mdfr : modifiers ) {
 			mdfr.setParent( thisTile );
 		}
+	}
+
+	int Tile::getHighestInitiative() const {
+		if ( webbed ) {
+			return -1;
+		}
+		return initiative.getHighestInitiative();
 	}
 
 	void Tile::dealDamage( int strength, int direction, bool ranged ) {

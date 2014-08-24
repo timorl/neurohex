@@ -47,10 +47,26 @@ namespace neuro {
 			int getHeight() const { return height; }
 
 			/**
+				* @brief Returns the description of this board.
+				*/
+			const BoardDescription	& getBoardDescription() const { return fields; }
+
+			/**
 				* @brief Returns the FieldType of the field at the provided coordinates.
 				* @param[in] coord Coordinates of the field as a std::pair<int, int>.
 				*/
 			FieldType getFieldDescription(Coordinates coord) const;
+
+			/**
+				* @brief Returns the tiles laying on the board.
+				*/
+			const Tiles & getTiles() const { return tiles; }
+
+			/**
+				* @brief Returns a list of tiles with the specified initiative on board.
+				* @param[in] initiative The initiative of the tiles to find.
+				*/
+			std::list< TileP > getTilesWithInitiative( int initiative ) const;
 
 			/**
 				* @brief Returns a list of tiles with their orientation 
@@ -69,6 +85,11 @@ namespace neuro {
 				* is on the board or (-1, -1) otherwise.
 				*/
 			Coordinates findTile(TileP tile) const;
+
+			/**
+				* @brief Returns the highest initiative any tile currently on the board has.
+				*/
+			int getMaxInitiative() const;
 
 			/**
 				* @brief Returns a list of tiles with their orientation in

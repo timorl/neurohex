@@ -47,6 +47,17 @@ namespace neuro {
 				* @todo Actually validate the targets.
 				*/
 			Targets getTargets( int playerId, const Players & players, const Board & board, bool noArmy, const Tile & tile, AbilityGroup abilityGroup, int abilityId );
+
+			/**
+				* @brief Returns a tile the contestant wants to discard.
+				* @param[in] playerId The id of the Player the contestant controls.
+				* @param[in] players A reference to a std::vector of players in the game.
+				* @param[in] board A reference to the board.
+				* @param[in] noArmy Whether any players army already ran out.
+				* @return A pointer to the tile the contestant wants to discard.
+				* @todo Actually validate the tile.
+				*/
+			TileP requestDiscard( int playerId, const Players & players, const Board & board, bool noArmy );
 		private:
 			ContestantP contestant;
 	};

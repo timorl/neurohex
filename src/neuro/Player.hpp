@@ -58,6 +58,11 @@ namespace neuro {
 			bool armyEmpty() const { return army->isEmpty(); }
 
 			/**
+				* @brief Whether the player has discarded the required tile this turn.
+				*/
+			bool hasDiscardedTile() const { return discardedTile; }
+
+			/**
 				* @brief Modifies health by the specified amount.
 				* @param[in] mod The amount to be added to health.
 				*/

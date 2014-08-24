@@ -54,6 +54,7 @@ namespace neuro {
 		public:
 			virtual Move getMove(int playerId, const Players & players, const Board & board, bool noArmy) = 0;
 			virtual Targets getTargets(int playerId, const Players & players, const Board & board, bool noArmy, const Tile & tile, AbilityGroup abilityGroup, int abilityId) = 0;
+			virtual TileP requestDiscard(int playerId, const Players & players, const Board & board, bool noArmy) = 0;
 	};
 
 	using ContestantP = std::shared_ptr< Contestant >;

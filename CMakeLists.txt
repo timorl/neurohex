@@ -94,6 +94,7 @@ if(GTEST_FOUND)
 	set(NEURO_TEST_DIR ${PROJECT_SOURCE_DIR}/neuro/test)
 	set(NEURO_TEST_SRCS
 		${PROJECT_SOURCE_DIR}/neuro/Board.cpp
+		${PROJECT_SOURCE_DIR}/neuro/Tile.cpp
 		${NEURO_TEST_DIR}/BoardTest.cpp
 		${NEURO_TEST_DIR}/TileTest.cpp
 		)

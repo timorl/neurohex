@@ -428,6 +428,11 @@ namespace neuro {
 						* @brief Whether the initiative can be modified.
 						*/
 					bool isModifiable() const { return modifiable; }
+
+					/**
+						* Returns the highest initiative, -1 if none.
+						*/
+					int getHighestInitiative() const;
 				private:
 					bool modifiable;
 					std::set< int > initiative;
@@ -529,7 +534,17 @@ namespace neuro {
 			/**
 				* @brief Whether the tile is currently webbed.
 				*/
-			bool isWebbed() { return webbed; }
+			bool isWebbed() const { return webbed; }
+
+			/**
+				* @brief Returns the highest initiative this tile has, -1 if none.
+				*/
+			int getHighestInitiative() const;
+
+			/**
+				* @brief Whether this tile acts at the given battle stage.
+				*/
+			bool hasInitiative( int battleStage ) const { return initiative.hasInitiative(battleStage); }
 
 			/**
 				* @brief Set parents for this tile's abilities.

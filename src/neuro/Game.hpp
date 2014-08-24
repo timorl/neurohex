@@ -63,6 +63,7 @@ namespace neuro {
 
 			void tilePlacing( TileP tile );
 			void abilityUsing( TileP tile, AbilityGroup abilityGroup, int abilityId );
+			void runBattle();
 	};
 
 	using GameP = std::shared_ptr< Game >;

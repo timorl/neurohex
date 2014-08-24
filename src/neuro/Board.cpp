@@ -41,6 +41,10 @@ namespace neuro {
 			height = 0;
 		} else {
 			height = fields[0].size();
+			tiles.resize( width );
+			for ( int i = 0; i < width; i++ ) {
+				tiles[i].resize( height );
+			}
 		}
 	}
 
@@ -50,6 +54,20 @@ namespace neuro {
 		} else {
 			return FieldType::NO_FIELD;
 		}
+	}
+
+	std::list< TileP > Board::getTilesWithInitiative( int initiative ) const {
+		std::list< TileP > result;
+		for ( auto tileColumn : tiles ) {
+			for ( auto tileList : tileColumn ) {
+				for ( auto tileOnBoard : tileList ) {
+					if ( tileOnBoard.first->hasInitiative( initiative ) ) {
+						result.push_back( tileOnBoard.first );
+					}
+				}
+			}
+		}
+		return result;
 	}
 
 	std::list< TileOnBoard > Board::getTiles(Coordinates coord) const {
@@ -69,6 +87,20 @@ namespace neuro {
 						result.first = x;
 						result.second = y;
 						return result;
+					}
+				}
+			}
+		}
+		return result;
+	}
+
+	int Board::getMaxInitiative() const {
+		int result = -1;
+		for ( auto tileColumn : tiles ) {
+			for ( auto tileList : tileColumn ) {
+				for ( auto tileOnBoard : tileList ) {
+					if ( tileOnBoard.first->getHighestInitiative() > result ) {
+						result = tileOnBoard.first->getHighestInitiative();
 					}
 				}
 			}

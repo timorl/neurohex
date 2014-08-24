@@ -57,6 +57,7 @@ namespace neuro {
 			currentPlayer++;
 			currentPlayer	%= getNumberOfPlayers();
 		}
+		runBattle(); //The final battle.
 	}
 
 	void Game::tilePlacing( TileP tile ) {
@@ -107,6 +108,36 @@ namespace neuro {
 			case AbilityGroup::DEFENSIVE:
 				tile->getDefensiveAbility( abilityId ).useAbility( affectedTiles );
 				break;
+		}
+	}
+
+	void Game::runBattle() {
+		if ( !players[currentPlayer]->hasDiscardedTile() ) {
+			TileP toDiscard = arbiters[currentPlayer].requestDiscard( currentPlayer, players, board, noArmy );
+			players[currentPlayer]->discardTile( toDiscard );
+		}
+		const Tiles & tiles = board.getTiles();
+		for ( auto tileColumn : tiles ) {
+			for ( auto tileList : tileColumn ) {
+				for ( auto tileOnBoard : tileList ) {
+					TileP tile = tileOnBoard.first;
+					int numOnBattleStart = tile->getOnBattleStart().size();
+					for ( int i = 0; i < numOnBattleStart; i++ ) {
+						abilityUsing( tile, AbilityGroup::BATTLE_START, i );
+					}
+				}
+			}
+		}
+		int curInitiative = board.getMaxInitiative();
+		while ( curInitiative >= 0 ) {
+			const std::list< TileP > curTiles = board.getTilesWithInitiative( curInitiative );
+			for ( auto tile : curTiles ) {
+				int numAttack = tile->getAttacks().size();
+				for ( int i = 0; i < numAttack; i++ ) {
+					abilityUsing( tile, AbilityGroup::ATTACK, i );
+				}
+			}
+			curInitiative--;
 		}
 	}
 
