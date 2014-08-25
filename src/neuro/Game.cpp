@@ -78,9 +78,7 @@ namespace neuro {
 		//TODO: Check for the possibility of battles.
 	}
 
-	void Game::abilityUsing( TileP tile, AbilityGroup abilityGroup, int abilityId ) {
-		int abilityUser = tile->getController();
-		Targets targets = arbiters[abilityUser].getTargets( abilityUser, players, board, noArmy, *tile, abilityGroup, abilityId );
+	void Game::executeAbility( TileP tile, AbilityGroup abilityGroup, int abilityId, Targets & targets ) {
 		std::list< TileP > affectedTiles;
 		Coordinates coords;
 		Orientation orientation;
@@ -111,32 +109,78 @@ namespace neuro {
 		}
 	}
 
-	void Game::runBattle() {
-		if ( !players[currentPlayer]->hasDiscardedTile() ) {
-			TileP toDiscard = arbiters[currentPlayer].requestDiscard( currentPlayer, players, board, noArmy );
-			players[currentPlayer]->discardTile( toDiscard );
-		}
+	void Game::abilityUsing( TileP tile, AbilityGroup abilityGroup, int abilityId ) {
+		int abilityUser = tile->getController();
+		Targets targets = arbiters[abilityUser].getTargets( abilityUser, players, board, noArmy, *tile, abilityGroup, abilityId );
+		executeAbility( tile, abilityGroup, abilityId, targets );
+	}
+
+	void Game::battleStart() {
 		const Tiles & tiles = board.getTiles();
+		std::vector< std::vector< std::tuple< TileP, AbilityGroup, int > > > toRun;
+		toRun.resize( getNumberOfPlayers() );
 		for ( auto tileColumn : tiles ) {
 			for ( auto tileList : tileColumn ) {
 				for ( auto tileOnBoard : tileList ) {
 					TileP tile = tileOnBoard.first;
 					int numOnBattleStart = tile->getOnBattleStart().size();
+					int controller = tile->getController();
 					for ( int i = 0; i < numOnBattleStart; i++ ) {
-						abilityUsing( tile, AbilityGroup::BATTLE_START, i );
+						toRun[controller].push_back( std::make_tuple( tile, AbilityGroup::BATTLE_START, i ) );
 					}
 				}
 			}
 		}
+		for ( int i = 0; i < getNumberOfPlayers(); i++ ) {
+			arbiters[i].requestTargetsForAbilities( i, players, board, noArmy, toRun[i] );
+		}
+		for ( int i = 0; i < getNumberOfPlayers(); i++ ) {
+			for ( int j = 0; j < static_cast<int>( toRun[i].size() ); j++ ) {
+				Targets targets = arbiters[i].getTargetsForAbility( j );
+				TileP tile;
+				AbilityGroup	abilityGroup;
+				int abilityId;
+				std::tie( tile, abilityGroup, abilityId ) = toRun[i][j];
+				executeAbility( tile, abilityGroup, abilityId, targets );
+			}
+		}
+	}
+
+	void Game::battlePhase( int curInitiative ) {
+		const std::list< TileP > tiles = board.getTilesWithInitiative( curInitiative );
+		std::vector< std::vector< std::tuple< TileP, AbilityGroup, int > > > toRun;
+		toRun.resize( getNumberOfPlayers() );
+		for ( TileP tile : tiles ) {
+			int numAttacks = tile->getAttacks().size();
+			int controller = tile->getController();
+			for ( int i = 0; i < numAttacks; i++ ) {
+				toRun[controller].push_back( std::make_tuple( tile, AbilityGroup::ATTACK, i ) );
+			}
+		}
+		for ( int i = 0; i < getNumberOfPlayers(); i++ ) {
+			arbiters[i].requestTargetsForAbilities( i, players, board, noArmy, toRun[i] );
+		}
+		for ( int i = 0; i < getNumberOfPlayers(); i++ ) {
+			for ( int j = 0; j < static_cast<int>( toRun[i].size() ); j++ ) {
+				Targets targets = arbiters[i].getTargetsForAbility( j );
+				TileP tile;
+				AbilityGroup	abilityGroup;
+				int abilityId;
+				std::tie( tile, abilityGroup, abilityId ) = toRun[i][j];
+				executeAbility( tile, abilityGroup, abilityId, targets );
+			}
+		}
+	}
+
+	void Game::runBattle() {
+		if ( !players[currentPlayer]->hasDiscardedTile() ) {
+			TileP toDiscard = arbiters[currentPlayer].requestDiscard( currentPlayer, players, board, noArmy );
+			players[currentPlayer]->discardTile( toDiscard );
+		}
+		battleStart();
 		int curInitiative = board.getMaxInitiative();
 		while ( curInitiative >= 0 ) {
-			const std::list< TileP > curTiles = board.getTilesWithInitiative( curInitiative );
-			for ( auto tile : curTiles ) {
-				int numAttack = tile->getAttacks().size();
-				for ( int i = 0; i < numAttack; i++ ) {
-					abilityUsing( tile, AbilityGroup::ATTACK, i );
-				}
-			}
+			battlePhase( curInitiative );
 			curInitiative--;
 		}
 	}

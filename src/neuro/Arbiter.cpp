@@ -17,4 +17,13 @@ namespace neuro {
 		return contestant->requestDiscard(playerId, players, board, noArmy);
 	}
 
+	void Arbiter::requestTargetsForAbilities( int playerId, const Players & players, const Board & board, bool noArmy, std::vector< std::tuple< TileP, AbilityGroup, int > > abilities ) {
+		//TODO: Whis is a stub.
+	}
+
+	Targets Arbiter::getTargetsForAbility( int id ) {
+		Targets result;
+		return result;
+	}
+
 }

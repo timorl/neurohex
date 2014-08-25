@@ -3,6 +3,7 @@
 
 #include<memory>
 #include<vector>
+#include<tuple>
 #include"neuro/Arbiter.hpp"
 #include"neuro/Board.hpp"
 #include"neuro/Contestant.hpp"
@@ -62,7 +63,10 @@ namespace neuro {
 			bool noArmy;
 
 			void tilePlacing( TileP tile );
+			void executeAbility( TileP tile, AbilityGroup abilityGroup, int abilityId, Targets & targets );
 			void abilityUsing( TileP tile, AbilityGroup abilityGroup, int abilityId );
+			void battleStart();
+			void battlePhase( int initiative );
 			void runBattle();
 	};
 

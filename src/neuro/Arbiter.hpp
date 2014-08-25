@@ -58,6 +58,29 @@ namespace neuro {
 				* @todo Actually validate the tile.
 				*/
 			TileP requestDiscard( int playerId, const Players & players, const Board & board, bool noArmy );
+
+			/**
+				* @brief Starts requesting targets for a list of abilities from the
+				* contestant until it gets valid ones. Does not block.
+				* @param[in] playerId The id of the Player the contestant controls.
+				* @param[in] players A reference to a std::vector of players in the game.
+				* @param[in] board A reference to the board.
+				* @param[in] noArmy Whether any players army already ran out.
+				* @param[in] abilities The abilities for whose targets to ask.
+				* @todo This is a stub, implement.
+				*/
+			void requestTargetsForAbilities( int playerId, const Players & players, const Board & board, bool noArmy, std::vector< std::tuple< TileP, AbilityGroup, int > > abilities );
+
+			/**
+				* @brief Get the targets for one of previously requested abilities.
+				* @param[in] id The id of the ability for which we want the targets. It is
+				* the index of it in the vector provided for the request earlier.
+				* @return A validated list of targets for the ability. If no targets were
+				* earlier requested or id does not describe one of them the behaviour is
+				* undefined.
+				* @todo This is a stub, implement.
+				*/
+			Targets getTargetsForAbility( int id );
 		private:
 			ContestantP contestant;
 	};
