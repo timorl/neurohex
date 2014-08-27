@@ -71,7 +71,7 @@ namespace neuro {
 			std::tie( coords, orientation, tls ) = tpl;
 			affectedTiles.splice( affectedTiles.end(), tls );
 		}
-		Tile::Placing & placing = tile->getPlacing();
+		Tile::Ability & placing = tile->getPlacing();
 		if ( placing.placeTile( affectedTiles ) ) {
 			board.placeTile( coords, orientation, tile );
 		}
@@ -89,7 +89,7 @@ namespace neuro {
 		}
 		switch ( abilityGroup ) {
 			case AbilityGroup::PLACING:
-				tile->getPlacing().placeTile( affectedTiles );
+				tile->getPlacing().useAbility( affectedTiles );
 				break;
 			case AbilityGroup::BATTLE_START:
 				tile->getOnBattleStart( abilityId ).useAbility( affectedTiles );

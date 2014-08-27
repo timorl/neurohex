@@ -125,52 +125,6 @@ namespace neuro {
 	class Tile : public ui::Observable<Tile> {
 		public:
 			/**
-				* @brief A class controlling the placement of a Tile.
-				*/
-			class Placing {
-				public:
-					/**
-						* @brief Construct a placing with the given actions and targetting.
-						* @param[in] actions The stuff that should happen when the tile is placed.
-						* @param[in] targetting The way the tile might be placed.
-						*/
-					Placing( std::string actions, Targetting targetting ) : targetting(targetting), placeActions(actions) {}
-
-					/**
-						* @brief Whether the supplied list of arguments is suitable for this tile.
-						* @param[in] args A std::list of pointers to tiles which should be affected by the
-						* placing.
-						* @return Whether the given arguments are acceptable for this tile's
-						* placing.
-						*/
-					bool verifyArguments( std::list< TileP > args );
-
-					/**
-						* @brief Place the Tile and affect the provided targets.
-						* @param[in,out] targets The tiles that might be modified by the placed
-						* tile.
-						* @return Whether the tile should end up on the board after the actions have
-						* been performed.
-						*/
-					bool placeTile( std::list< TileP > targets );
-
-					/**
-						* @brief Get a description of the possible shape of the targetted fields.
-						* @return A Targetting object describing the method of targetting used.
-						*/
-					Targetting getTargettingDescription() const { return targetting; }
-
-					/**
-						* @brief Sets the parent of this tile.
-						*/
-					void setParent( TileP par ) { parent = par; }
-				private:
-					Targetting	targetting;
-					std::string placeActions;
-					std::weak_ptr< Tile > parent;
-			};
-
-			/**
 				* @brief A class controlling the health, damage and destruction of a Tile.
 				*/
 			class Life {
@@ -218,14 +172,16 @@ namespace neuro {
 						* @param[in] direction The direction in which the ability is supposed to
 						* work, -1 if not applicable.
 						* @param[in] targetting How to target the ability.
+						* @param[in] strength The strength of the ability, ignored when unneeded.
 						* @param[in] abilityActions What the ability does, coded as a sequence of
 						* chars.
 						*/
-					Ability( std::string name, std::string description, int direction, Targetting targetting, std::string abilityActions ) :
+					Ability( std::string name, std::string description, int direction, Targetting targetting, int strength, std::string abilityActions ) :
 						name(name),
 						description(description),
 						direction(direction),
 						targetting(targetting),
+						strength(strength),
 						abilityActions(abilityActions) {}
 
 					/**
@@ -255,8 +211,17 @@ namespace neuro {
 						* @brief Use the ability on the specified tiles.
 						* @param[in] targets A std::list of pointers to tiles to be affected by the
 						* ability.
+						* @returns Whether to place this tile at the last coordinate provided.
 						*/
-					void useAbility( std::list< TileP > targets );
+					bool useAbility( std::list< TileP > targets );
+
+					/**
+						* @brief Use the ability on the specified tiles.
+						* @param[in] targets A std::list of pointers to tiles to be affected by the
+						* ability.
+						* @returns Whether to place this tile at the last coordinate provided.
+						*/
+					bool placeTile( std::list< TileP > targets );
 
 					/**
 						* @brief Use the ability as a defence against an attack.
@@ -265,12 +230,19 @@ namespace neuro {
 						* @param[in] ranged Whether the attack was ranged.
 						*/
 					void useDefensiveAbility( int & damage, bool ranged );
+
+					/**
+						* @brief Sets the parent of this tile.
+						*/
+					void setParent( TileP par ) { parent = par; }
 				private:
 					std::string name;
 					std::string description;
 					int direction;
 					Targetting	targetting;
+					int strength;
 					std::string abilityActions;
+					std::weak_ptr< Tile > parent;
 
 					void push( TileP tile );
 					void substitute( TileP tile );
@@ -452,7 +424,7 @@ namespace neuro {
 				* @param[in] activeAbilities Active abilities the tile possesses.
 				* @param[in] defensiveAbilities Defensive abilities the tile possesses.
 				*/
-			Tile( std::string name, TileType type, Placing placing, int health,
+			Tile( std::string name, TileType type, Ability placing, int health,
 					std::set< int > initiative, std::vector< Ability > onBattleStart,
 					std::vector< Attack > attacks, std::vector< Modifier > modifiers,
 					std::vector< Ability > activeAbilities, std::vector< Ability > defensiveAbilities) :
@@ -555,7 +527,7 @@ namespace neuro {
 			/**
 				* @brief Get the object responsible for placing this tile.
 				*/
-			Placing & getPlacing() { return placing; }
+			Ability & getPlacing() { return placing; }
 
 			/**
 				* @brief Get a vector of abilities to use at the start of every battle.
@@ -628,7 +600,7 @@ namespace neuro {
 				*/
 			static bool battle;
 		private:
-			Placing placingO;
+			Ability placingO;
 			std::vector< Ability > onBattleStartO;
 			std::vector< Attack > attacksO;
 			std::vector< Modifier > modifiersO;
@@ -636,7 +608,7 @@ namespace neuro {
 			std::vector< Ability > defensiveAbilitiesO;
 			Life lifeO;
 			Initiative initiativeO;
-			Placing placing;
+			Ability placing;
 			std::vector< Ability > onBattleStart;
 			std::vector< Attack > attacks;
 			std::vector< Modifier > modifiers;

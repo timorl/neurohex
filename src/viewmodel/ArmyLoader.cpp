@@ -124,63 +124,6 @@ namespace viewmodel {
 		return true;
 	}
 
-	bool setPlacingActions( std::vector< std::string > & info, std::string & actions ) {
-		const std::string abortMessage = "Aborting setting placing actions: ";
-		for ( int i = 1; i < static_cast<int>( info.size() ); i++ ) {
-			if ( info[i] == "place" ) {
-				actions += "P";
-			} else if ( info[i] == "damage" ) {
-				actions += "d";
-			} else if ( info[i] == "move" ) {
-				actions += "m";
-			} else if ( info[i] == "push" ) {
-				actions += "p";
-			} else if ( info[i] == "battle" ) {
-				actions += "b";
-			} else {
-				std::cerr << abortMessage << unrecognizedArgumentMessage << "ACTIONS" << " : " << info[i] << std::endl;
-				return false;
-			}
-		}
-		return true;
-	}
-
-	bool parsePlacing( utility::DFStyleParser & parser, std::unique_ptr< neuro::Tile::Placing > & placingP ) {
-		const std::string abortMessage = "Aborting placing parse: ";
-		const std::string placingActionsFailedMessage = "Reading placing actions failed.";
-		std::string actions;
-		neuro::Targetting targetting;
-		while ( parser.hasNextToken() ) {
-			std::vector< std::string > info = parser.getNextToken();
-			if (  static_cast<int>( info.size() ) < 1 ) {
-				std::cerr << abortMessage << emptyTokenMessage << std::endl;
-				return false;
-			}
-			std::string type = info[0];
-			if ( type == "PLACINGEND" ) {
-				break;
-			} else if ( type == "ACTIONS" ) {
-				if ( !setPlacingActions( info, actions ) ) {
-					std::cerr << abortMessage << placingActionsFailedMessage << std::endl;
-					return false;
-				}
-			} else if ( type == "TARGETTINGBEGIN" ) {
-				if ( !parseTargetting( parser, targetting ) ) {
-					std::cerr << abortMessage << targettingFailedMessage << std::endl;
-					return false;
-				}
-			} else {
-				std::cerr << unrecognizedTokenMessage << type << std::endl;
-			}
-		}
-		if ( actions.empty() ) {
-			std::cerr << abortMessage << missingInformationMessage << std::endl;
-			return false;
-		}
-		placingP.reset( new neuro::Tile::Placing( actions, targetting ) );
-		return true;
-	}
-
 	bool setAttackActions( std::vector< std::string > & info, std::string & actions ) {
 		const std::string abortMessage = "Aborting setting attack actions: ";
 		for ( int i = 1; i < static_cast<int>( info.size() ); i++ ) {
@@ -290,21 +233,18 @@ namespace viewmodel {
 	bool setAbilityActions( std::vector< std::string > & info, std::string & actions ) {
 		const std::string abortMessage = "Aborting setting ability actions: ";
 		for ( int i = 1; i < static_cast<int>( info.size() ); i++ ) {
-			if ( info[i] == "prevent" ) {
-				if (  static_cast<int>( info.size() ) < i + 3 ) {
-					std::cerr << abortMessage << tooFewArgumentsMessage << "prevent" << std::endl;
-					return false;
-				}
+			if ( info[i] == "ranged" ) {
+				actions += "r";
+			} else if ( info[i] == "place" ) {
+				actions += "P";
+			} else if ( info[i] == "damage" ) {
+				actions += "d";
+			} else if ( info[i] == "move" ) {
+				actions += "m";
+			} else if ( info[i] == "push" ) {
 				actions += "p";
-				i++;
-				actions += info[i];
-				i++;
-				if ( info[i] == "ranged" ) {
-					actions += "r";
-				} else {
-					std::cerr << abortMessage << unrecognizedArgumentMessage << "prevent" << " : " << info[i] << std::endl;
-					return false;
-				}
+			} else if ( info[i] == "battle" ) {
+				actions += "b";
 			} else {
 				std::cerr << abortMessage << unrecognizedArgumentMessage << "ACTIONS" << " : " << info[i] << std::endl;
 				return false;
@@ -320,6 +260,7 @@ namespace viewmodel {
 		std::string description;
 		int direction;
 		neuro::Targetting targetting;
+		int strength;
 		std::string actions;
 		while ( parser.hasNextToken() ) {
 			std::vector< std::string > info = parser.getNextToken();
@@ -348,6 +289,12 @@ namespace viewmodel {
 					return false;
 				}
 				direction	= std::stoi( info[1] );
+			} else if ( type == "STRENGTH" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					std::cerr << abortMessage << tooFewArgumentsMessage << type << std::endl;
+					return false;
+				}
+				strength = std::stoi( info[1] );
 			} else if ( type == "ACTIONS" ) {
 				if ( !setAbilityActions( info, actions ) ) {
 					std::cerr << abortMessage << abilityActionsFailedMessage << std::endl;
@@ -366,7 +313,7 @@ namespace viewmodel {
 			std::cerr << abortMessage << missingInformationMessage << std::endl;
 			return false;
 		}
-		abilities.emplace_back( name, description, direction, targetting, actions );
+		abilities.emplace_back( name, description, direction, targetting, strength, actions );
 		return true;
 	}
 
@@ -451,18 +398,17 @@ namespace viewmodel {
 
 	bool parseTile( utility::DFStyleParser & parser, std::vector< neuro::TileP > & tiles, int amount ) {
 		const std::string abortMessage = "Aborting tile parse: ";
-		const std::string placingFailedMessage = "Loading of placing failed.";
 		const std::string attackFailedMessage = "Loading of attack failed.";
 		const std::string abilityFailedMessage = "Loading of ability failed.";
 		const std::string modifierFailedMessage = "Loading of modifier failed.";
 		std::string name;
 		neuro::TileType tileType;
 		std::set< int > initiative;
-		std::unique_ptr< neuro::Tile::Placing > placingP;
+		std::vector< neuro::Tile::Ability > placing;
 		std::vector< neuro::Tile::Ability > onBattleStart;
 		std::vector< neuro::Tile::Ability > activeAbilities;
 		std::vector< neuro::Tile::Ability > defensiveAbilities;
-		std::vector< neuro::Tile::Attack> attacks;
+		std::vector< neuro::Tile::Attack > attacks;
 		std::vector< neuro::Tile::Modifier > modifiers;
 		int health = 1;
 		while ( parser.hasNextToken() ) {
@@ -496,11 +442,6 @@ namespace viewmodel {
 					return false;
 				}
 				health = std::stoi( info[1] );
-			} else if ( type == "PLACINGBEGIN" ) {
-				if ( !parsePlacing( parser, placingP ) ) {
-					std::cerr << abortMessage << placingFailedMessage << std::endl;
-					return false;
-				}
 			} else if ( type == "ATTACKBEGIN" ) {
 				if ( !parseAttack( parser, attacks ) ) {
 					std::cerr << abortMessage << attackFailedMessage << std::endl;
@@ -526,6 +467,11 @@ namespace viewmodel {
 						std::cerr << abortMessage << abilityFailedMessage << std::endl;
 						return false;
 					}
+				} else if ( info[1] == "placing" ) {
+					if ( !parseAbility( parser, placing ) ) {
+						std::cerr << abortMessage << abilityFailedMessage << std::endl;
+						return false;
+					}
 				} else {
 					std::cerr << abortMessage << unrecognizedArgumentMessage << type << " : " << info[1] << std::endl;
 					return false;
@@ -539,12 +485,12 @@ namespace viewmodel {
 				std::cerr << unrecognizedTokenMessage << type << std::endl;
 			}
 		}
-		if ( name.empty() || !placingP ) {
+		if ( name.empty() || placing.empty() ) {
 			std::cerr << abortMessage << missingInformationMessage << std::endl;
 			return false;
 		}
 		for ( int i = 0; i < amount; i++ ) {
-			tiles.emplace_back( new neuro::Tile( name, tileType, *placingP, health, initiative, onBattleStart, attacks, modifiers, activeAbilities, defensiveAbilities ) );
+			tiles.emplace_back( new neuro::Tile( name, tileType, *placing.begin(), health, initiative, onBattleStart, attacks, modifiers, activeAbilities, defensiveAbilities ) );
 		}
 		return true;
 	}

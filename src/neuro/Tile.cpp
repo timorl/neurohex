@@ -15,7 +15,7 @@ namespace neuro {
 		//TODO: This is a stub.
 		Targetting targetting;
 		std::string actions;
-		return Tile::Ability( name, description, -1, targetting, actions );
+		return Tile::Ability( name, description, -1, targetting, 0, actions );
 	}
 
 	const std::vector< Tile::Ability > & Tile::getOnBattleStart() const {
@@ -77,10 +77,10 @@ namespace neuro {
 		return *(initiative.rbegin());
 	}
 
-	bool Tile::Placing::placeTile( std::list< TileP > targets ) {
+	bool Tile::Ability::placeTile( std::list< TileP > targets ) {
 		bool stayOnBoard = false;
-		for ( char action : placeActions ) {
-			switch ( action ) {
+		for ( auto action = abilityActions.begin(); action != abilityActions.end(); action++ ) {
+			switch ( *action ) {
 				case 'P':
 					stayOnBoard	= true;
 					break;
@@ -107,22 +107,22 @@ namespace neuro {
 		return stayOnBoard;
 	}
 
-	void Tile::Ability::useAbility( std::list< TileP > targets ) {
+	bool Tile::Ability::useAbility( std::list< TileP > targets ) {
+		bool placeTile = false;
 		for ( auto action = abilityActions.begin(); action != abilityActions.end(); action++ ) {
 			switch ( *action ) {
-				//TODO: Nothing here yet, cause we have no nondefensive abilities.
+				//TODO: Add abilities as we go along.
 			}
 		}
+		return placeTile;
 	}
 
 	void Tile::Ability::useDefensiveAbility( int & damage, bool ranged ) {
 		for ( auto action = abilityActions.begin(); action != abilityActions.end(); action++ ) {
 			switch ( *action ) {
-				case 'p':
-					action++;
-					int amount = (*action) - '0';
-					action++;
-					if ( *action == 'r' && ranged ) {
+				case 'r':
+					int amount = strength;
+					if ( ranged ) {
 						damage -= amount;
 					}
 					break;
