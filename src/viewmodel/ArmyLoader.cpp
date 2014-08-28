@@ -131,12 +131,12 @@ namespace viewmodel {
 				actions += "r";
 			} else if ( info[i] == "melee" ) {
 				actions += "m";
-			} else if ( info[i] == "place" ) {
-				actions += "P";
 			} else if ( info[i] == "damage" ) {
 				actions += "d";
 			} else if ( info[i] == "gauss" ) {
 				actions += "g";
+			} else if ( info[i] == "place" ) {
+				actions += "P";
 			} else if ( info[i] == "move" ) {
 				actions += "m";
 			} else if ( info[i] == "push" ) {
@@ -145,6 +145,14 @@ namespace viewmodel {
 				actions += "b";
 			} else if ( info[i] == "autodestroy" ) {
 				actions += "a";
+			} else if ( info[i] == "save" ) {
+				actions += "s";
+			} else if ( info[i] == "motivate" ) {
+				actions += "M";
+			} else if ( info[i] == "initiative" ) {
+				actions += "i";
+			} else if ( info[i] == "web" ) {
+				actions += "w";
 			} else {
 				std::cerr << abortMessage << unrecognizedArgumentMessage << "ACTIONS" << " : " << info[i] << std::endl;
 				return false;
@@ -217,90 +225,9 @@ namespace viewmodel {
 		return true;
 	}
 
-	bool setModifierActions( std::vector< std::string > & info, std::string & actions ) {
-		const std::string abortMessage = "Aborting setting modifier actions: ";
-		for ( int i = 1; i < static_cast<int>( info.size() ); i++ ) {
-			if ( info[i] == "web" ) {
-				actions += "w";
-			} else if ( info[i] == "increase" ) {
-				if (  static_cast<int>( info.size() ) < i + 3 ) {
-					std::cerr << abortMessage << tooFewArgumentsMessage << "increase" << std::endl;
-					return false;
-				}
-				actions += "i";
-				i++;
-				actions += info[i];
-				i++;
-				if ( info[i] == "initiative" ) {
-					actions += "i";
-				} else if ( info[i] == "melee" ) {
-					actions += "m";
-				} else if ( info[i] == "ranged" ) {
-					actions += "r";
-				} else {
-					std::cerr << abortMessage << unrecognizedArgumentMessage << "increase" << " : " << info[i] << std::endl;
-					return false;
-				}
-			} else if ( info[i] == "save" ) {
-				actions += "s";
-			} else if ( info[i] == "motivate" ) {
-				actions += "m";
-			} else {
-				std::cerr << abortMessage << unrecognizedArgumentMessage << "ACTIONS" << " : " << info[i] << std::endl;
-				return false;
-			}
-		}
-		return true;
-	}
-
-	bool parseModifier( utility::DFStyleParser & parser, std::vector< neuro::Tile::Modifier > & modifiers ) {
-		const std::string abortMessage = "Aborting modifier parse: ";
-		const std::string modifierActionsFailedMessage = "Reading modifier actions failed.";
-		int direction;
-		neuro::Targetting targetting;
-		std::string actions;
-		while ( parser.hasNextToken() ) {
-			std::vector< std::string > info = parser.getNextToken();
-			if (  static_cast<int>( info.size() ) < 1 ) {
-				std::cerr << abortMessage << emptyTokenMessage << std::endl;
-				return false;
-			}
-			std::string type = info[0];
-			if ( type == "MODIFIEREND" ) {
-				break;
-			} else if ( type == "DIRECTION" ) {
-				if (  static_cast<int>( info.size() ) < 2 ) {
-					std::cerr << abortMessage << tooFewArgumentsMessage << type << std::endl;
-					return false;
-				}
-				direction	= std::stoi( info[1] );
-			} else if ( type == "ACTIONS" ) {
-				if ( !setModifierActions( info, actions ) ) {
-					std::cerr << abortMessage << modifierActionsFailedMessage << std::endl;
-					return false;
-				}
-			} else if ( type == "TARGETTINGBEGIN" ) {
-				if ( !parseTargetting( parser, targetting ) ) {
-					std::cerr << abortMessage << targettingFailedMessage << std::endl;
-					return false;
-				}
-			} else {
-				std::cerr << unrecognizedTokenMessage << type << std::endl;
-			}
-		}
-		if ( actions.empty() ) {
-			std::cerr << abortMessage << missingInformationMessage << std::endl;
-			return false;
-		}
-		modifiers.emplace_back( direction, targetting, actions );
-		return true;
-	}
-
 	bool parseTile( utility::DFStyleParser & parser, std::vector< neuro::TileP > & tiles, int amount ) {
 		const std::string abortMessage = "Aborting tile parse: ";
-		const std::string attackFailedMessage = "Loading of attack failed.";
 		const std::string abilityFailedMessage = "Loading of ability failed.";
-		const std::string modifierFailedMessage = "Loading of modifier failed.";
 		std::string name;
 		neuro::TileType tileType;
 		std::set< int > initiative;
@@ -309,7 +236,7 @@ namespace viewmodel {
 		std::vector< neuro::Tile::Ability > activeAbilities;
 		std::vector< neuro::Tile::Ability > defensiveAbilities;
 		std::vector< neuro::Tile::Ability > attacks;
-		std::vector< neuro::Tile::Modifier > modifiers;
+		std::vector< neuro::Tile::Ability > modifiers;
 		int health = 1;
 		while ( parser.hasNextToken() ) {
 			std::vector< std::string > info = parser.getNextToken();
@@ -372,13 +299,13 @@ namespace viewmodel {
 						std::cerr << abortMessage << abilityFailedMessage << std::endl;
 						return false;
 					}
+				} else if ( info[1] == "modifier" ) {
+					if ( !parseAbility( parser, modifiers ) ) {
+						std::cerr << abortMessage << abilityFailedMessage << std::endl;
+						return false;
+					}
 				} else {
 					std::cerr << abortMessage << unrecognizedArgumentMessage << type << " : " << info[1] << std::endl;
-					return false;
-				}
-			} else if ( type == "MODIFIERBEGIN" ) {
-				if ( !parseModifier( parser, modifiers ) ) {
-					std::cerr << abortMessage << modifierFailedMessage << std::endl;
 					return false;
 				}
 			} else {

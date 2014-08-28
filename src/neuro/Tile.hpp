@@ -244,6 +244,12 @@ namespace neuro {
 					void executeAttack( std::list< TileP > targets );
 
 					/**
+						* @brief Modify the given tiles.
+						* @param[in] targets The tiles to modify.
+						*/
+					void modifyTiles( std::list< TileP > targets );
+
+					/**
 						* @brief Sets the parent of this tile.
 						*/
 					void setParent( TileP par ) { parent = par; }
@@ -264,53 +270,6 @@ namespace neuro {
 
 					void push( TileP tile );
 					void substitute( TileP tile );
-			};
-
-			/**
-				* @brief A class representing a passive modifier, usually in a direction.
-				* @todo Finish handling medics.
-				*/
-			class Modifier {
-				public:
-					/**
-						* @brief Construct a modifier.
-						* @param[in] direction The direction in which the modifier will work, -1
-						* means everywhere.
-						* @param[in] targetting How the modifier will choose its target.
-						* @param[in] modifyActions What the modifier will do, encoded as a
-						* sequence of chars.
-						*/
-					Modifier( int direction, Targetting targetting, std::string modifyActions ) :
-						direction(direction),
-						targetting(targetting),
-						modifyActions(modifyActions) {}
-
-					/**
-						* Returns the direction in which this modifier works, -1 if not applicable.
-						*/
-					int getDirection() { return direction; }
-
-					/**
-						* @brief Get a description of the possible shape of the targetted fields.
-						* @return A Targetting object describing the method of targetting used.
-						*/
-					Targetting getTargettingDescription() const { return targetting; }
-
-					/**
-						* @brief Sets the parent of this tile.
-						*/
-					void setParent( TileP par ) { parent = par; }
-
-					/**
-						* @brief Modify the given tiles.
-						* @param[in] targets The tiles to modify.
-						*/
-					void modifyTiles( std::list< TileP > targets );
-				private:
-					int direction;
-					Targetting	targetting;
-					std::string modifyActions;
-					std::weak_ptr< Tile > parent;
 			};
 
 			/**
@@ -367,14 +326,14 @@ namespace neuro {
 				* @param[in] initiative A set of initial initiatives of the tile.
 				* @param[in] onBattleStart The abilities to be called at the start of each
 				* battle.
-				* @param[in] attacks attacks the tile possesses.
-				* @param[in] modifiers modifiers the tile possesses.
+				* @param[in] attacks Attacks the tile possesses.
+				* @param[in] modifiers Modifiers the tile possesses.
 				* @param[in] activeAbilities Active abilities the tile possesses.
 				* @param[in] defensiveAbilities Defensive abilities the tile possesses.
 				*/
 			Tile( std::string name, TileType type, Ability placing, int health,
 					std::set< int > initiative, std::vector< Ability > onBattleStart,
-					std::vector< Ability > attacks, std::vector< Modifier > modifiers,
+					std::vector< Ability > attacks, std::vector< Ability > modifiers,
 					std::vector< Ability > activeAbilities, std::vector< Ability > defensiveAbilities) :
 				placingO(placing),
 				onBattleStartO(onBattleStart),
@@ -503,13 +462,13 @@ namespace neuro {
 			/**
 				* @brief Get a vector of modifiers to tiles anywhere.
 				*/
-			const std::vector< Modifier > & getModifiers() const;
+			const std::vector< Ability > & getModifiers() const;
 
 			/**
 				* @brief Get a specific modifier.
 				* @param[in] id The id of the modifier to return.
 				*/
-			Modifier & getModifier( int id ) { return modifiers[id]; }
+			Ability & getModifier( int id ) { return modifiers[id]; }
 
 			/**
 				* @brief Get a vector of abilities the controller may use every turn.
@@ -551,7 +510,7 @@ namespace neuro {
 			Ability placingO;
 			std::vector< Ability > onBattleStartO;
 			std::vector< Ability > attacksO;
-			std::vector< Modifier > modifiersO;
+			std::vector< Ability > modifiersO;
 			std::vector< Ability > activeAbilitiesO;
 			std::vector< Ability > defensiveAbilitiesO;
 			Life lifeO;
@@ -559,7 +518,7 @@ namespace neuro {
 			Ability placing;
 			std::vector< Ability > onBattleStart;
 			std::vector< Ability > attacks;
-			std::vector< Modifier > modifiers;
+			std::vector< Ability > modifiers;
 			std::vector< Ability > activeAbilities;
 			std::vector< Ability > defensiveAbilities;
 			Life life;

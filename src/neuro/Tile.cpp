@@ -6,7 +6,6 @@ namespace neuro {
 	bool Tile::battle = false;
 
 	const std::vector< Tile::Ability > emptyAbility;
-	const std::vector< Tile::Modifier > emptyModifier;
 
 	bool isMelee( Tile::Ability atk ) {
 		return ( atk.getActionString()[0] == 'm' );
@@ -39,9 +38,9 @@ namespace neuro {
 		return attacks;
 	}
 
-	const std::vector< Tile::Modifier > & Tile::getModifiers() const {
+	const std::vector< Tile::Ability > & Tile::getModifiers() const {
 		if ( webbed ) {
-			return emptyModifier;
+			return emptyAbility;
 		}
 		return modifiers;
 	}
@@ -167,49 +166,42 @@ namespace neuro {
 		}
 	}
 
-	void Tile::Modifier::modifyTiles( std::list< TileP > targets ) {
-		for ( auto action = modifyActions.begin(); action != modifyActions.end(); action++ ) {
+	void Tile::Ability::modifyTiles( std::list< TileP > targets ) {
+		for ( auto action = abilityActions.begin(); action != abilityActions.end(); action++ ) {
 			switch ( *action ) {
 				case 'w':
 					for ( TileP trgt : targets ) {
 						trgt->web();
 					}
 					break;
-				case 'i': {
-															action++;
-															int amount = *action - '0';
-															action++;
-															switch ( *action ) {
-																case 'i':
-																	for ( TileP trgt : targets ) {
-																		trgt->changeInitiative( amount );
-																	}
-																	break;
-																case 'm':
-																	for ( TileP trgt : targets ) {
-																		trgt->changeMelee( amount );
-																	}
-																	break;
-																case 'r':
-																	for ( TileP trgt : targets ) {
-																		trgt->changeRanged( amount );
-																	}
-																	break;
-															}
-															break;
-														}
-				case 's': {
-															Tile::Ability savior = createSavior( parent.lock() );
-															for ( TileP trgt : targets ) {
-																trgt->addDefensiveAbility( savior );
-															}
-															break;
-														}
+				case 'i':
+					for ( TileP trgt : targets ) {
+						trgt->changeInitiative( strength );
+					}
+					break;
 				case 'm':
-														for ( TileP trgt : targets ) {
-															trgt->motivate();
-														}
-														break;
+					for ( TileP trgt : targets ) {
+						trgt->changeMelee( strength );
+					}
+					break;
+				case 'r':
+					for ( TileP trgt : targets ) {
+						trgt->changeRanged( strength );
+					}
+					break;
+				case 's':
+					{
+						Tile::Ability savior = createSavior( parent.lock() );
+						for ( TileP trgt : targets ) {
+							trgt->addDefensiveAbility( savior );
+						}
+						break;
+					}
+				case 'M':
+					for ( TileP trgt : targets ) {
+						trgt->motivate();
+					}
+					break;
 			}
 		}
 	}
