@@ -6,8 +6,15 @@ namespace neuro {
 	bool Tile::battle = false;
 
 	const std::vector< Tile::Ability > emptyAbility;
-	const std::vector< Tile::Attack > emptyAttack;
 	const std::vector< Tile::Modifier > emptyModifier;
+
+	bool isMelee( Tile::Ability atk ) {
+		return ( atk.getActionString()[0] == 'm' );
+	}
+
+	bool isRanged( Tile::Ability atk ) {
+		return ( atk.getActionString()[0] == 'r' );
+	}
 
 	Tile::Ability createSavior( TileP sacrifice ) {
 		const std::string name = "Being saved";
@@ -25,9 +32,9 @@ namespace neuro {
 		return onBattleStart;
 	}
 
-	const std::vector< Tile::Attack > & Tile::getAttacks() const {
+	const std::vector< Tile::Ability > & Tile::getAttacks() const {
 		if ( webbed ) {
-			return emptyAttack;
+			return emptyAbility;
 		}
 		return attacks;
 	}
@@ -130,23 +137,27 @@ namespace neuro {
 		}
 	}
 
-	void Tile::Attack::executeAttack( std::list< TileP > targets ) {
-		for ( auto action = attackActions.begin(); action != attackActions.end(); action++ ) {
+	void Tile::Ability::executeAttack( std::list< TileP > targets ) {
+		for ( auto action = abilityActions.begin(); action != abilityActions.end(); action++ ) {
 			switch ( *action ) {
-				case 'd':
+				case 'r':
 					for ( TileP trgt : targets ) {
-						trgt->dealDamage( strength, direction, ranged );
+						trgt->dealDamage( strength, direction, true );
 					}
 					break;
-				case 'b':
-					action++;
-					switch ( *action ) {
-						case 'r':
-							ranged = true;
-							break;
-						case 'R':
-							ranged = false;
-							break;
+				case 'g': //For Gauss gun -- ranged damage, but not ranged attack.
+					for ( TileP trgt : targets ) {
+						trgt->dealDamage( strength, direction, true );
+					}
+					break;
+				case 'd':
+					for ( TileP trgt : targets ) {
+						trgt->dealDamage( strength, direction, false );
+					}
+					break;
+				case 'm':
+					for ( TileP trgt : targets ) {
+						trgt->dealDamage( strength, direction, false );
 					}
 					break;
 				case 'a':
@@ -266,16 +277,16 @@ namespace neuro {
 	}
 
 	void Tile::changeMelee( int amount ) {
-		for ( Attack & atk : attacks ) {
-			if ( atk.isMelee() ) {
+		for ( Ability & atk : attacks ) {
+			if ( isMelee( atk ) ) {
 				atk.modifyStrength( amount );
 			}
 		}
 	}
 
 	void Tile::changeRanged( int amount ) {
-		for ( Attack & atk : attacks ) {
-			if ( atk.isRanged() ) {
+		for ( Ability & atk : attacks ) {
+			if ( isRanged( atk ) ) {
 				atk.modifyStrength( amount );
 			}
 		}

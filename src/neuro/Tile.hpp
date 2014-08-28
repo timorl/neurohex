@@ -197,9 +197,14 @@ namespace neuro {
 					std::string getDescription() const { return description; }
 
 					/**
-						* Returns the direction in which this ability works, -1 if not applicable.
+						* @brief Returns the direction in which this ability works, -1 if not applicable.
 						*/
-					int getDirection() { return direction; }
+					int getDirection() const { return direction; }
+
+					/**
+						* @brief Returns a sequence of chars describing what the ability does.
+						*/
+					const std::string & getActionString() const { return abilityActions; }
 
 					/**
 						* @brief Get a description of the possible shape of the targetted fields.
@@ -232,9 +237,22 @@ namespace neuro {
 					void useDefensiveAbility( int & damage, bool ranged );
 
 					/**
+						* @brief Execute the attack against the specified targets.
+						* @param[in] targets A std::list of pointers to tiles to be affected by the
+						* attack.
+						*/
+					void executeAttack( std::list< TileP > targets );
+
+					/**
 						* @brief Sets the parent of this tile.
 						*/
 					void setParent( TileP par ) { parent = par; }
+
+					/**
+						* @brief Modify the strength of the ability.
+						* @param[in] amount The amount by which to modify.
+						*/
+					void modifyStrength( int amount ) { strength += amount; }
 				private:
 					std::string name;
 					std::string description;
@@ -246,76 +264,6 @@ namespace neuro {
 
 					void push( TileP tile );
 					void substitute( TileP tile );
-			};
-
-			/**
-				* @brief A class representing an attack of a tile, usually in a direction.
-				*/
-			class Attack {
-				public:
-					/**
-						* @brief Construct an attack with the specified properties.
-						* @param[in] direction The direction in which the attack is, -1 means no
-						* direction.
-						* @param[in] targetting The way the attack is targetted.
-						* @param[in] melee Whether the attack is considered melee.
-						* @param[in] ranged Whether the attack is considered ranged.
-						* @param[in] strength The base amount of damage the attack will do.
-						* @param[in] attackActions The actions the attack will cause.
-						*/
-					Attack( int direction, Targetting targetting, bool melee, bool ranged, int strength, std::string attackActions ) :
-						direction(direction),
-						targetting(targetting),
-						melee(melee),
-						ranged(ranged),
-						strength(strength),
-						attackActions(attackActions) {}
-
-					/**
-						* Returns the direction in which this attack works, -1 if not applicable.
-						*/
-					int getDirection() { return direction; }
-
-					/**
-						* @brief Get a description of the possible shape of the targetted fields.
-						* @return A Targetting object describing the method of targetting used.
-						*/
-					Targetting getTargettingDescription() const { return targetting; }
-
-					/**
-						* @brief Sets the parent of this tile.
-						*/
-					void setParent( TileP par ) { parent = par; }
-
-					/**
-						* @brief Whether the attack is melee.
-						*/
-					bool isMelee() const { return melee; }
-
-					/**
-						* @brief Whether the attack is ranged.
-						*/
-					bool isRanged() const { return ranged; }
-
-					/**
-						* @brief Modify the strength of the attack.
-						* @param[in] amount The amount by which to modify.
-						*/
-					void modifyStrength( int amount ) { strength += amount; }
-
-					/**
-						* @brief Execute the attack on the given tiles.
-						* @param[in] targets A std::list of affected tiles.
-						*/
-					void executeAttack( std::list< TileP > targets );
-				private:
-					int direction;
-					Targetting	targetting;
-					bool melee;
-					bool ranged;
-					int strength;
-					std::string attackActions;
-					std::weak_ptr< Tile > parent;
 			};
 
 			/**
@@ -419,14 +367,14 @@ namespace neuro {
 				* @param[in] initiative A set of initial initiatives of the tile.
 				* @param[in] onBattleStart The abilities to be called at the start of each
 				* battle.
-				* @param[in] attacks Attacks the tile possesses.
-				* @param[in] modifiers Modifiers the tile possesses.
+				* @param[in] attacks attacks the tile possesses.
+				* @param[in] modifiers modifiers the tile possesses.
 				* @param[in] activeAbilities Active abilities the tile possesses.
 				* @param[in] defensiveAbilities Defensive abilities the tile possesses.
 				*/
 			Tile( std::string name, TileType type, Ability placing, int health,
 					std::set< int > initiative, std::vector< Ability > onBattleStart,
-					std::vector< Attack > attacks, std::vector< Modifier > modifiers,
+					std::vector< Ability > attacks, std::vector< Modifier > modifiers,
 					std::vector< Ability > activeAbilities, std::vector< Ability > defensiveAbilities) :
 				placingO(placing),
 				onBattleStartO(onBattleStart),
@@ -544,13 +492,13 @@ namespace neuro {
 			/**
 				* @brief Get a vector of attacks to launch at every own initiative.
 				*/
-			const std::vector< Attack > & getAttacks() const;
+			const std::vector< Ability > & getAttacks() const;
 
 			/**
 				* @brief Get a specific attack.
 				* @param[in] id The id of the modifier to return.
 				*/
-			Attack & getAttack( int id ) { return attacks[id]; }
+			Ability & getAttack( int id ) { return attacks[id]; }
 
 			/**
 				* @brief Get a vector of modifiers to tiles anywhere.
@@ -602,7 +550,7 @@ namespace neuro {
 		private:
 			Ability placingO;
 			std::vector< Ability > onBattleStartO;
-			std::vector< Attack > attacksO;
+			std::vector< Ability > attacksO;
 			std::vector< Modifier > modifiersO;
 			std::vector< Ability > activeAbilitiesO;
 			std::vector< Ability > defensiveAbilitiesO;
@@ -610,7 +558,7 @@ namespace neuro {
 			Initiative initiativeO;
 			Ability placing;
 			std::vector< Ability > onBattleStart;
-			std::vector< Attack > attacks;
+			std::vector< Ability > attacks;
 			std::vector< Modifier > modifiers;
 			std::vector< Ability > activeAbilities;
 			std::vector< Ability > defensiveAbilities;
