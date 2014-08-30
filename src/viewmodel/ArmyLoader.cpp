@@ -161,7 +161,7 @@ namespace viewmodel {
 		return true;
 	}
 
-	bool parseAbility( utility::DFStyleParser & parser, neuro::Tile::Abilities & abilities ) {
+	bool parseAbility( utility::DFStyleParser & parser, neuro::Tile::Abilities & abilities, neuro::AbilityGroup group ) {
 		const std::string abortMessage = "Aborting ability parse: ";
 		const std::string abilityActionsFailedMessage = "Reading ability actions failed.";
 		std::string name;
@@ -221,7 +221,7 @@ namespace viewmodel {
 			std::cerr << abortMessage << missingInformationMessage << std::endl;
 			return false;
 		}
-		abilities.emplace_back( name, description, direction, targetting, strength, actions );
+		abilities.emplace_back( name, description, direction, targetting, strength, actions, abilities.size(), group );
 		return true;
 	}
 
@@ -275,32 +275,32 @@ namespace viewmodel {
 					return false;
 				}
 				if ( info[1] == "battleStart" ) {
-					if ( !parseAbility( parser, onBattleStart ) ) {
+					if ( !parseAbility( parser, onBattleStart, neuro::AbilityGroup::BATTLE_START ) ) {
 						std::cerr << abortMessage << abilityFailedMessage << std::endl;
 						return false;
 					}
 				} else if ( info[1] == "active" ) {
-					if ( !parseAbility( parser, activeAbilities ) ) {
+					if ( !parseAbility( parser, activeAbilities, neuro::AbilityGroup::ACTIVE ) ) {
 						std::cerr << abortMessage << abilityFailedMessage << std::endl;
 						return false;
 					}
 				} else if ( info[1] == "defensive" ) {
-					if ( !parseAbility( parser, defensiveAbilities ) ) {
+					if ( !parseAbility( parser, defensiveAbilities, neuro::AbilityGroup::DEFENSIVE ) ) {
 						std::cerr << abortMessage << abilityFailedMessage << std::endl;
 						return false;
 					}
 				} else if ( info[1] == "placing" ) {
-					if ( !parseAbility( parser, placing ) ) {
+					if ( !parseAbility( parser, placing, neuro::AbilityGroup::PLACING ) ) {
 						std::cerr << abortMessage << abilityFailedMessage << std::endl;
 						return false;
 					}
 				} else if ( info[1] == "attack" ) {
-					if ( !parseAbility( parser, attacks ) ) {
+					if ( !parseAbility( parser, attacks, neuro::AbilityGroup::ATTACK ) ) {
 						std::cerr << abortMessage << abilityFailedMessage << std::endl;
 						return false;
 					}
 				} else if ( info[1] == "modifier" ) {
-					if ( !parseAbility( parser, modifiers ) ) {
+					if ( !parseAbility( parser, modifiers, neuro::AbilityGroup::MODIFIER ) ) {
 						std::cerr << abortMessage << abilityFailedMessage << std::endl;
 						return false;
 					}

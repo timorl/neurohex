@@ -132,10 +132,15 @@ namespace neuro {
 		AbilityGroup	group;
 
 		/**
-			* @brief The id of the ability. Special values are -1 for life and -2 for
-			* initiative -- if any of these is used group is ignored.
+			* @brief The id of the ability, -1 if not applicable.
 			*/
 		int id;
+
+		/**
+			* @brief Provides an ordering on AbilityIdentifier objects, so they can be in
+			* sets.
+			*/
+		bool operator<( const AbilityIdentifier & other ) const;
 	};
 
 	/**
@@ -183,6 +188,7 @@ namespace neuro {
 
 			/**
 				* @brief A class representing an activated ability of a tile.
+				* @todo Medic code should consider more than one medic.
 				*/
 			class Ability {
 				public:
@@ -195,15 +201,19 @@ namespace neuro {
 						* @param[in] targetting How to target the ability.
 						* @param[in] strength The strength of the ability, ignored when unneeded.
 						* @param[in] abilityActions What the ability does, coded as a sequence of
+						* @param[in] id The id of the ability within the tile.
+						* @param[in] group The group of the ability within the tile.
 						* chars.
 						*/
-					Ability( std::string name, std::string description, int direction, Targetting targetting, int strength, std::string abilityActions ) :
+					Ability( std::string name, std::string description, int direction, Targetting targetting, int strength, std::string abilityActions, int id, AbilityGroup group ) :
 						name(name),
 						description(description),
 						direction(direction),
 						targetting(targetting),
 						strength(strength),
-						abilityActions(abilityActions) {}
+						abilityActions(abilityActions),
+						id(id),
+						group(group) {}
 
 					/**
 						* @brief Get the name of the ability.
@@ -232,6 +242,11 @@ namespace neuro {
 						* @return A Targetting object describing the method of targetting used.
 						*/
 					Targetting getTargettingDescription() const { return targetting; }
+
+					/**
+						* @brief Returns an identifier for this ability.
+						*/
+					AbilityIdentifier getIdentifier() const;
 
 					/**
 						* @brief Use the ability on the specified tiles.
@@ -271,6 +286,12 @@ namespace neuro {
 					void modifyTiles( std::list< TileP > targets );
 
 					/**
+						* @brief Remove modifications from the given tiles.
+						* @param[in] targets The tiles to modify.
+						*/
+					void demodifyTiles( std::list< TileP > targets );
+
+					/**
 						* @brief Sets the parent of this tile.
 						*/
 					void setParent( TileP par ) { parent = par; }
@@ -280,6 +301,11 @@ namespace neuro {
 						* @param[in] amount The amount by which to modify.
 						*/
 					void modifyStrength( int amount ) { strength += amount; }
+
+					/**
+						* @brief Make the ability do nothing.
+						*/
+					void neutralize() { abilityActions = ""; }
 				private:
 					std::string name;
 					std::string description;
@@ -288,6 +314,8 @@ namespace neuro {
 					int strength;
 					std::string abilityActions;
 					std::weak_ptr< Tile > parent;
+					int id;
+					AbilityGroup	group;
 
 					void push( TileP tile );
 					void substitute( TileP tile );
@@ -330,6 +358,11 @@ namespace neuro {
 					void motivate();
 
 					/**
+						* @brief Remove the effects of motivation.
+						*/
+					void demotivate();
+
+					/**
 						* @brief Whether the initiative can be modified.
 						*/
 					bool isModifiable() const { return modifiable; }
@@ -370,7 +403,8 @@ namespace neuro {
 				life(health),
 				initiative(initiative),
 				name(name),
-				type(type) {}
+				type(type),
+				webbed(0) {}
 
 			/**
 				* @brief provides a copy of the tile with no owner, controller or observer.
@@ -423,7 +457,7 @@ namespace neuro {
 			/**
 				* @brief Whether the tile is currently webbed.
 				*/
-			bool isWebbed() const { return webbed; }
+			bool isWebbed() const { return (webbed > 0); }
 
 			/**
 				* @brief Returns the highest initiative this tile has, -1 if none.
@@ -531,20 +565,32 @@ namespace neuro {
 			int controller;
 			std::weak_ptr< Tile > thisP;
 
-			bool webbed;
+			std::map< AbilityIdentifier, std::set< AbilityIdentifier > > modifications;
+			std::set< TileP > modifieds;
+
+			int webbed;
+
+			void addModified( TileP modified );
+			void delModified( TileP modified );
 
 			void dealDamage( int strength, int direction = -1, bool ranged = false );
 			void destroy( bool noRedirect = false );
 			void move();
 			void push( TileP source );
 			void castle();
-			void web();
-			void motivate();
-			void changeInitiative( int amount, bool fix = false );
-			void changeMelee( int amount );
-			void changeRanged( int amount );
+			void web( AbilityIdentifier ai );
+			void deweb( AbilityIdentifier ai );
+			void motivate( AbilityIdentifier ai );
+			void demotivate( AbilityIdentifier ai );
+			void changeInitiative( AbilityIdentifier ai, int amount, bool fix = false );
+			void dechangeInitiative( AbilityIdentifier ai, int amount, bool fix = false );
+			void changeMelee( AbilityIdentifier ai, int amount );
+			void dechangeMelee( AbilityIdentifier ai, int amount );
+			void changeRanged( AbilityIdentifier ai, int amount );
+			void dechangeRanged( AbilityIdentifier ai, int amount );
 
-			void addDefensiveAbility( Ability def );
+			void addDefensiveAbility( AbilityIdentifier ai, Ability def );
+			void delDefensiveAbility( AbilityIdentifier ai );
 
 			static void terrorize( int terrorist );
 			static void startBattle();

@@ -5,8 +5,6 @@ namespace neuro {
 	int Tile::terrorEndOnPlayer = -1;
 	bool Tile::battle = false;
 
-	const Tile::Abilities emptyAbility;
-
 	bool isMelee( Tile::Ability atk ) {
 		return ( atk.getActionString()[0] == 'm' );
 	}
@@ -15,47 +13,47 @@ namespace neuro {
 		return ( atk.getActionString()[0] == 'r' );
 	}
 
-	Tile::Ability createSavior( TileP sacrifice ) {
+	Tile::Ability createSavior( TileP sacrifice, TileP recipient ) {
 		const std::string name = "Being saved";
 		const std::string description = "This tile is being saved from damage. If anything tries to damage it, another will die instead.";
 		//TODO: This is a stub.
 		Targetting targetting;
 		std::string actions;
-		return Tile::Ability( name, description, -1, targetting, 0, actions );
+		int saviorId = recipient->getDefensiveAbilities().size();
+		AbilityGroup	group = AbilityGroup::DEFENSIVE;
+		return Tile::Ability( name, description, -1, targetting, 0, actions, saviorId, group );
+	}
+
+	bool AbilityIdentifier::operator<( const AbilityIdentifier & other ) const {
+		if ( tile != other.tile ) {
+			return tile < other.tile;
+		}
+		if ( group != other.group ) {
+			return group < other.group;
+		}
+		if ( id != other.id ) {
+			return id < other.id;
+		}
+		return false;
 	}
 
 	const Tile::Abilities & Tile::getOnBattleStart() const {
-		if ( webbed ) {
-			return emptyAbility;
-		}
 		return onBattleStart;
 	}
 
 	const Tile::Abilities & Tile::getAttacks() const {
-		if ( webbed ) {
-			return emptyAbility;
-		}
 		return attacks;
 	}
 
 	const Tile::Abilities & Tile::getModifiers() const {
-		if ( webbed ) {
-			return emptyAbility;
-		}
 		return modifiers;
 	}
 
 	const Tile::Abilities & Tile::getActiveAbilities() const {
-		if ( webbed ) {
-			return emptyAbility;
-		}
 		return activeAbilities;
 	}
 
 	const Tile::Abilities & Tile::getDefensiveAbilities() const {
-		if ( webbed ) {
-			return emptyAbility;
-		}
 		return defensiveAbilities;
 	}
 
@@ -63,6 +61,10 @@ namespace neuro {
 		if ( modifiable && !initiative.empty() ) {
 			initiative.insert( *( initiative.begin() ) - 1 );
 		}
+	}
+
+	void Tile::Initiative::demotivate() {
+		initiative.erase( initiative.begin() );
 	}
 
 	void Tile::Initiative::changeInitiative( int amount, bool fix ) {
@@ -81,6 +83,14 @@ namespace neuro {
 			return -1;
 		}
 		return *(initiative.rbegin());
+	}
+
+	AbilityIdentifier	Tile::Ability::getIdentifier() const {
+		AbilityIdentifier	ai;
+		ai.tile = parent.lock();
+		ai.id = id;
+		ai.group = group;
+		return ai;
 	}
 
 	bool Tile::Ability::placeTile( std::list< TileP > targets ) {
@@ -167,39 +177,91 @@ namespace neuro {
 	}
 
 	void Tile::Ability::modifyTiles( std::list< TileP > targets ) {
+		AbilityIdentifier ai = getIdentifier();
 		for ( auto action = abilityActions.begin(); action != abilityActions.end(); action++ ) {
 			switch ( *action ) {
 				case 'w':
 					for ( TileP trgt : targets ) {
-						trgt->web();
+						ai.tile->addModified( trgt );
+						trgt->web( ai );
 					}
 					break;
 				case 'i':
 					for ( TileP trgt : targets ) {
-						trgt->changeInitiative( strength );
+						ai.tile->addModified( trgt );
+						trgt->changeInitiative( ai, strength );
 					}
 					break;
 				case 'm':
 					for ( TileP trgt : targets ) {
-						trgt->changeMelee( strength );
+						ai.tile->addModified( trgt );
+						trgt->changeMelee( ai, strength );
 					}
 					break;
 				case 'r':
 					for ( TileP trgt : targets ) {
-						trgt->changeRanged( strength );
+						ai.tile->addModified( trgt );
+						trgt->changeRanged( ai, strength );
 					}
 					break;
 				case 's':
 					{
-						Tile::Ability savior = createSavior( parent.lock() );
 						for ( TileP trgt : targets ) {
-							trgt->addDefensiveAbility( savior );
+							ai.tile->addModified( trgt );
+							trgt->addDefensiveAbility( ai, createSavior( parent.lock(), trgt ) );
 						}
 						break;
 					}
 				case 'M':
 					for ( TileP trgt : targets ) {
-						trgt->motivate();
+						ai.tile->addModified( trgt );
+						trgt->motivate( ai );
+					}
+					break;
+			}
+		}
+	}
+
+	void Tile::Ability::demodifyTiles( std::list< TileP > targets ) {
+		AbilityIdentifier ai = getIdentifier();
+		for ( auto action = abilityActions.begin(); action != abilityActions.end(); action++ ) {
+			switch ( *action ) {
+				case 'w':
+					for ( TileP trgt : targets ) {
+						ai.tile->delModified( trgt );
+						trgt->deweb( ai );
+					}
+					break;
+				case 'i':
+					for ( TileP trgt : targets ) {
+						ai.tile->delModified( trgt );
+						trgt->dechangeInitiative( ai, strength );
+					}
+					break;
+				case 'm':
+					for ( TileP trgt : targets ) {
+						ai.tile->delModified( trgt );
+						trgt->dechangeMelee( ai, strength );
+					}
+					break;
+				case 'r':
+					for ( TileP trgt : targets ) {
+						ai.tile->delModified( trgt );
+						trgt->dechangeRanged( ai, strength );
+					}
+					break;
+				case 's':
+					{
+						for ( TileP trgt : targets ) {
+							ai.tile->delModified( trgt );
+							trgt->delDefensiveAbility( ai );
+						}
+						break;
+					}
+				case 'M':
+					for ( TileP trgt : targets ) {
+						ai.tile->delModified( trgt );
+						trgt->demotivate( ai );
 					}
 					break;
 			}
@@ -222,6 +284,14 @@ namespace neuro {
 			return -1;
 		}
 		return initiative.getHighestInitiative();
+	}
+
+	void Tile::addModified( TileP modified ) {
+		modifieds.insert( modified );
+	}
+
+	void Tile::delModified( TileP modified ) {
+		modifieds.erase( modified );
 	}
 
 	void Tile::dealDamage( int strength, int direction, bool ranged ) {
@@ -256,36 +326,111 @@ namespace neuro {
 		battle = true;
 	}
 
-	void Tile::web() {
-		webbed = true;
+	void Tile::web( AbilityIdentifier ai ) {
+		AbilityIdentifier	target;
+		target.tile = thisP.lock();
+		target.id = -1;
+		modifications[ai].insert(target);
+		webbed++;
 	}
 
-	void Tile::motivate() {
+	void Tile::deweb( AbilityIdentifier ai ) {
+		AbilityIdentifier	target;
+		target.tile = thisP.lock();
+		target.id = -1;
+		if ( modifications.count( ai ) > 0 ) {
+			modifications[ai].erase( target );
+			webbed--;
+		}
+	}
+
+	void Tile::motivate( AbilityIdentifier ai ) {
+		AbilityIdentifier	target;
+		target.tile = thisP.lock();
+		target.id = -1;
+		modifications[ai].insert(target);
 		initiative.motivate();
 	}
 
-	void Tile::changeInitiative( int amount, bool fix ) {
+	void Tile::demotivate( AbilityIdentifier ai ) {
+		AbilityIdentifier	target;
+		target.tile = thisP.lock();
+		target.id = -1;
+		if ( modifications.count( ai ) > 0 ) {
+			modifications[ai].erase( target );
+			initiative.demotivate();
+		}
+	}
+
+	void Tile::changeInitiative( AbilityIdentifier ai, int amount, bool fix ) {
+		AbilityIdentifier	target;
+		target.tile = thisP.lock();
+		target.id = -1;
+		modifications[ai].insert(target);
 		initiative.changeInitiative( amount, fix );
 	}
 
-	void Tile::changeMelee( int amount ) {
+	void Tile::dechangeInitiative( AbilityIdentifier ai, int amount, bool fix ) {
+		AbilityIdentifier	target;
+		target.tile = thisP.lock();
+		target.id = -1;
+		if ( modifications.count( ai ) > 0 ) {
+			modifications[ai].erase( target );
+			initiative.changeInitiative( -amount, fix );
+		}
+	}
+
+	void Tile::changeMelee( AbilityIdentifier ai, int amount ) {
 		for ( Ability & atk : attacks ) {
 			if ( isMelee( atk ) ) {
+				AbilityIdentifier	target = atk.getIdentifier();
+				modifications[ai].insert(target);
 				atk.modifyStrength( amount );
 			}
 		}
 	}
 
-	void Tile::changeRanged( int amount ) {
+	void Tile::dechangeMelee( AbilityIdentifier ai, int amount ) {
+		for ( AbilityIdentifier ident : modifications[ai] ) {
+			Ability & atk = getAttack( ident.id );
+			if ( isMelee( atk ) ) {
+				atk.modifyStrength( -amount );
+				modifications[ai].erase( ident );
+			}
+		}
+	}
+
+	void Tile::changeRanged( AbilityIdentifier ai, int amount ) {
 		for ( Ability & atk : attacks ) {
 			if ( isRanged( atk ) ) {
+				AbilityIdentifier	target = atk.getIdentifier();
+				modifications[ai].insert(target);
 				atk.modifyStrength( amount );
 			}
 		}
 	}
 
-	void Tile::addDefensiveAbility( Ability def ) {
+	void Tile::dechangeRanged( AbilityIdentifier ai, int amount ) {
+		for ( AbilityIdentifier ident : modifications[ai] ) {
+			Ability & atk = getAttack( ident.id );
+			if ( isRanged( atk ) ) {
+				atk.modifyStrength( -amount );
+				modifications[ai].erase( ident );
+			}
+		}
+	}
+
+	void Tile::addDefensiveAbility( AbilityIdentifier ai, Ability def ) {
+		AbilityIdentifier	target = def.getIdentifier();
+		modifications[ai].insert(target);
 		defensiveAbilities.push_back(def);
+	}
+
+	void Tile::delDefensiveAbility( AbilityIdentifier ai ) {
+		for ( AbilityIdentifier ident : modifications[ai] ) {
+			defensiveAbilities[ident.id].neutralize();
+		}
+		modifications[ai].clear();
 	}
 
 }
