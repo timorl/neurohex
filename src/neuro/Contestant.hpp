@@ -3,7 +3,6 @@
 
 #include<memory>
 #include<vector>
-#include<tuple>
 #include"neuro/Board.hpp"
 #include"neuro/Player.hpp"
 #include"neuro/Tile.hpp"
@@ -44,7 +43,27 @@ namespace neuro {
 		int abilityId;
 	};
 
-	using Targets = std::list< std::tuple< Coordinates, Orientation, std::list< TileP > > > ;
+	/**
+		* @brief Represents a single targetted field.
+		*/
+	struct Target {
+		/**
+			* @brief The coordinates of the field.
+			*/
+		Coordinates coords;
+
+		/**
+			* @brief An orientation, if applicable for targetting.
+			*/
+		Orientation orientation;
+
+		/**
+			* @brief A list of tiles on the field being targetted.
+			*/
+		std::list< TileP > tiles;
+	};
+
+	using Targets = std::list< Target > ;
 
 	/**
 		* @brief The interface any contestant (i.e. bot or player ui) should

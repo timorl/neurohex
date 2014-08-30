@@ -3,7 +3,6 @@
 
 #include<memory>
 #include<vector>
-#include<tuple>
 #include"neuro/Arbiter.hpp"
 #include"neuro/Board.hpp"
 #include"neuro/Contestant.hpp"

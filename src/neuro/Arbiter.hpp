@@ -69,7 +69,7 @@ namespace neuro {
 				* @param[in] abilities The abilities for whose targets to ask.
 				* @todo This is a stub, implement.
 				*/
-			void requestTargetsForAbilities( int playerId, const Players & players, const Board & board, bool noArmy, std::vector< std::tuple< TileP, AbilityGroup, int > > abilities );
+			void requestTargetsForAbilities( int playerId, const Players & players, const Board & board, bool noArmy, std::vector< AbilityIdentifier > abilities );
 
 			/**
 				* @brief Get the targets for one of previously requested abilities.

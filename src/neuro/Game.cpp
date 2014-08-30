@@ -64,28 +64,22 @@ namespace neuro {
 		int tilePlacer = tile->getController();
 		Targets targets = arbiters[tilePlacer].getTargets( tilePlacer, players, board, noArmy, *tile, AbilityGroup::PLACING, 0 );
 		std::list< TileP > affectedTiles;
-		Coordinates coords;
-		Orientation orientation;
+		Target curTarget;
 		for ( auto tpl : targets ) {
-			std::list< TileP > tls;
-			std::tie( coords, orientation, tls ) = tpl;
-			affectedTiles.splice( affectedTiles.end(), tls );
+			curTarget = tpl;
+			affectedTiles.splice( affectedTiles.end(), curTarget.tiles );
 		}
 		Tile::Ability & placing = tile->getPlacing();
 		if ( placing.placeTile( affectedTiles ) ) {
-			board.placeTile( coords, orientation, tile );
+			board.placeTile( curTarget.coords, curTarget.orientation, tile );
 		}
 		//TODO: Check for the possibility of battles.
 	}
 
 	void Game::executeAbility( TileP tile, AbilityGroup abilityGroup, int abilityId, Targets & targets ) {
 		std::list< TileP > affectedTiles;
-		Coordinates coords;
-		Orientation orientation;
 		for ( auto tpl : targets ) {
-			std::list< TileP > tls;
-			std::tie( coords, orientation, tls ) = tpl;
-			affectedTiles.splice( affectedTiles.end(), tls );
+			affectedTiles.splice( affectedTiles.end(), tpl.tiles );
 		}
 		switch ( abilityGroup ) {
 			case AbilityGroup::PLACING:
@@ -117,16 +111,18 @@ namespace neuro {
 
 	void Game::battleStart() {
 		const Tiles & tiles = board.getTiles();
-		std::vector< std::vector< std::tuple< TileP, AbilityGroup, int > > > toRun;
+		std::vector< std::vector< AbilityIdentifier > > toRun;
 		toRun.resize( getNumberOfPlayers() );
 		for ( auto tileColumn : tiles ) {
 			for ( auto tileList : tileColumn ) {
 				for ( auto tileOnBoard : tileList ) {
-					TileP tile = tileOnBoard.first;
-					int numOnBattleStart = tile->getOnBattleStart().size();
-					int controller = tile->getController();
-					for ( int i = 0; i < numOnBattleStart; i++ ) {
-						toRun[controller].push_back( std::make_tuple( tile, AbilityGroup::BATTLE_START, i ) );
+					AbilityIdentifier	ai;
+					ai.tile = tileOnBoard.first;
+					ai.group = AbilityGroup::BATTLE_START;
+					int numOnBattleStart = ai.tile->getOnBattleStart().size();
+					int controller = ai.tile->getController();
+					for ( ai.id = 0; ai.id < numOnBattleStart; ai.id++ ) {
+						toRun[controller].push_back( ai );
 					}
 				}
 			}
@@ -137,24 +133,24 @@ namespace neuro {
 		for ( int i = 0; i < getNumberOfPlayers(); i++ ) {
 			for ( int j = 0; j < static_cast<int>( toRun[i].size() ); j++ ) {
 				Targets targets = arbiters[i].getTargetsForAbility( j );
-				TileP tile;
-				AbilityGroup	abilityGroup;
-				int abilityId;
-				std::tie( tile, abilityGroup, abilityId ) = toRun[i][j];
-				executeAbility( tile, abilityGroup, abilityId, targets );
+				AbilityIdentifier	ai = toRun[i][j];
+				executeAbility( ai.tile, ai.group, ai.id, targets );
 			}
 		}
 	}
 
 	void Game::battlePhase( int curInitiative ) {
 		const std::list< TileP > tiles = board.getTilesWithInitiative( curInitiative );
-		std::vector< std::vector< std::tuple< TileP, AbilityGroup, int > > > toRun;
+		std::vector< std::vector< AbilityIdentifier > > toRun;
 		toRun.resize( getNumberOfPlayers() );
 		for ( TileP tile : tiles ) {
+			AbilityIdentifier ai;
+			ai.tile = tile;
+			ai.group = AbilityGroup::ATTACK;
 			int numAttacks = tile->getAttacks().size();
 			int controller = tile->getController();
-			for ( int i = 0; i < numAttacks; i++ ) {
-				toRun[controller].push_back( std::make_tuple( tile, AbilityGroup::ATTACK, i ) );
+			for ( ai.id = 0; ai.id < numAttacks; ai.id++ ) {
+				toRun[controller].push_back( ai );
 			}
 		}
 		for ( int i = 0; i < getNumberOfPlayers(); i++ ) {
@@ -163,11 +159,8 @@ namespace neuro {
 		for ( int i = 0; i < getNumberOfPlayers(); i++ ) {
 			for ( int j = 0; j < static_cast<int>( toRun[i].size() ); j++ ) {
 				Targets targets = arbiters[i].getTargetsForAbility( j );
-				TileP tile;
-				AbilityGroup	abilityGroup;
-				int abilityId;
-				std::tie( tile, abilityGroup, abilityId ) = toRun[i][j];
-				executeAbility( tile, abilityGroup, abilityId, targets );
+				AbilityIdentifier	ai = toRun[i][j];
+				executeAbility( ai.tile, ai.group, ai.id, targets );
 			}
 		}
 	}

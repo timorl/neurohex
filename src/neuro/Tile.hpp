@@ -118,6 +118,27 @@ namespace neuro {
 	};
 
 	/**
+		* @brief A structure exactly identifying a ability or another part of a tile.
+		*/
+	struct AbilityIdentifier {
+		/**
+			* @brief The tile owning the ability.
+			*/
+		TileP tile;
+
+		/**
+			* @brief The group containing the ability.
+			*/
+		AbilityGroup	group;
+
+		/**
+			* @brief The id of the ability. Special values are -1 for life and -2 for
+			* initiative -- if any of these is used group is ignored.
+			*/
+		int id;
+	};
+
+	/**
 		* @brief A tile to be created in an army and later played.
 		* @todo Fill in functions while creating armies.
 		* @todo Code moving.
