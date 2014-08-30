@@ -1,6 +1,7 @@
 #include<cstdlib>
 #include<iostream>
 #include"viewmodel/Application.hpp"
+#include"ui/sdl/Application.hpp"
 
 bool setEnvironmentVariables() {
 	char * tmp;
@@ -24,12 +25,17 @@ bool setEnvironmentVariables() {
 	return true;
 }
 
-int main() {
+int main( int argc, char* args[] ) {
 	if ( !setEnvironmentVariables() ) {
 		std::cerr << "$HOME variable is not set, what are you, using win***s?" << std::endl;
 		return 1;
 	}
 	viewmodel::Application application;
+	ui::sdl::Application appV;
+
+	appV.play();
+
+
 	application.start();
 	return 0;
 }

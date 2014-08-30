@@ -44,6 +44,7 @@ set(HDRS
 	${PROJECT_SOURCE_DIR}/viewmodel/Configurer.hpp
 	${PROJECT_SOURCE_DIR}/viewmodel/MainMenu.hpp
 	${PROJECT_SOURCE_DIR}/viewmodel/Application.hpp
+	${PROJECT_SOURCE_DIR}/ui/sdl/Application.hpp
 	)
 
 set(SRCS
@@ -60,19 +61,22 @@ set(SRCS
 	${PROJECT_SOURCE_DIR}/viewmodel/Configurer.cpp
 	${PROJECT_SOURCE_DIR}/viewmodel/MainMenu.cpp
 	${PROJECT_SOURCE_DIR}/viewmodel/Application.cpp
+	${PROJECT_SOURCE_DIR}/ui/sdl/Application.cpp
 	)
 
 pkg_search_module(SDL2 REQUIRED sdl2)
+pkg_search_module(SDL2IMAGE REQUIRED SDL2_image)
 find_package(Boost 1.54 COMPONENTS system filesystem REQUIRED)
 find_package(Threads)
 
 include_directories(
 	${SDL2_INCLUDE_DIRS}
+	${SDL2IMAGE_INCLUDE_DIRS}
 	${Boost_INCLUDE_DIR}
 	${PROJECT_SOURCE_DIR}
 	)
 
-set(LIBS ${LIBS} ${SDL2_LIBRARIES} ${Boost_LIBRARIES})
+set(LIBS ${LIBS} ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARIES} ${Boost_LIBRARIES})
 
 link_libraries(${LIBS} ${CMAKE_THREAD_LIBS_INIT})
 
