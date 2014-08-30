@@ -161,7 +161,7 @@ namespace viewmodel {
 		return true;
 	}
 
-	bool parseAbility( utility::DFStyleParser & parser, std::vector< neuro::Tile::Ability > & abilities ) {
+	bool parseAbility( utility::DFStyleParser & parser, neuro::Tile::Abilities & abilities ) {
 		const std::string abortMessage = "Aborting ability parse: ";
 		const std::string abilityActionsFailedMessage = "Reading ability actions failed.";
 		std::string name;
@@ -231,12 +231,12 @@ namespace viewmodel {
 		std::string name;
 		neuro::TileType tileType;
 		std::set< int > initiative;
-		std::vector< neuro::Tile::Ability > placing;
-		std::vector< neuro::Tile::Ability > onBattleStart;
-		std::vector< neuro::Tile::Ability > activeAbilities;
-		std::vector< neuro::Tile::Ability > defensiveAbilities;
-		std::vector< neuro::Tile::Ability > attacks;
-		std::vector< neuro::Tile::Ability > modifiers;
+		neuro::Tile::Abilities placing;
+		neuro::Tile::Abilities onBattleStart;
+		neuro::Tile::Abilities activeAbilities;
+		neuro::Tile::Abilities defensiveAbilities;
+		neuro::Tile::Abilities attacks;
+		neuro::Tile::Abilities modifiers;
 		int health = 1;
 		while ( parser.hasNextToken() ) {
 			std::vector< std::string > info = parser.getNextToken();

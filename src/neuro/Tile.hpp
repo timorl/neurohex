@@ -273,6 +273,11 @@ namespace neuro {
 			};
 
 			/**
+				* @brief A vector of abilities.
+				*/
+			using Abilities = std::vector< Ability >;
+
+			/**
 				* @brief A class representing the initiative of a tile.
 				*/
 			class Initiative {
@@ -332,17 +337,9 @@ namespace neuro {
 				* @param[in] defensiveAbilities Defensive abilities the tile possesses.
 				*/
 			Tile( std::string name, TileType type, Ability placing, int health,
-					std::set< int > initiative, std::vector< Ability > onBattleStart,
-					std::vector< Ability > attacks, std::vector< Ability > modifiers,
-					std::vector< Ability > activeAbilities, std::vector< Ability > defensiveAbilities) :
-				placingO(placing),
-				onBattleStartO(onBattleStart),
-				attacksO(attacks),
-				modifiersO(modifiers),
-				activeAbilitiesO(activeAbilities),
-				defensiveAbilitiesO(defensiveAbilities),
-				lifeO(health),
-				initiativeO(initiative),
+					std::set< int > initiative, Abilities onBattleStart,
+					Abilities attacks, std::vector< Ability > modifiers,
+					Abilities activeAbilities, std::vector< Ability > defensiveAbilities) :
 				placing(placing),
 				onBattleStart(onBattleStart),
 				attacks(attacks),
@@ -359,14 +356,6 @@ namespace neuro {
 				* @param[in] other The tile to copy.
 				*/
 			Tile( const Tile & other ) :
-				placingO(other.placing),
-				onBattleStartO(other.onBattleStart),
-				attacksO(other.attacks),
-				modifiersO(other.modifiers),
-				activeAbilitiesO(other.activeAbilities),
-				defensiveAbilitiesO(other.defensiveAbilities),
-				lifeO(other.life),
-				initiativeO(other.initiative),
 				placing(other.placing),
 				onBattleStart(other.onBattleStart),
 				attacks(other.attacks),
@@ -439,7 +428,7 @@ namespace neuro {
 			/**
 				* @brief Get a vector of abilities to use at the start of every battle.
 				*/
-			const std::vector< Ability > & getOnBattleStart() const;
+			const Abilities & getOnBattleStart() const;
 
 			/**
 				* @brief Get a specific ability from the ones to run at the start of a
@@ -451,7 +440,7 @@ namespace neuro {
 			/**
 				* @brief Get a vector of attacks to launch at every own initiative.
 				*/
-			const std::vector< Ability > & getAttacks() const;
+			const Abilities & getAttacks() const;
 
 			/**
 				* @brief Get a specific attack.
@@ -462,7 +451,7 @@ namespace neuro {
 			/**
 				* @brief Get a vector of modifiers to tiles anywhere.
 				*/
-			const std::vector< Ability > & getModifiers() const;
+			const Abilities & getModifiers() const;
 
 			/**
 				* @brief Get a specific modifier.
@@ -473,7 +462,7 @@ namespace neuro {
 			/**
 				* @brief Get a vector of abilities the controller may use every turn.
 				*/
-			const std::vector< Ability > & getActiveAbilities() const;
+			const Abilities & getActiveAbilities() const;
 
 			/**
 				* @brief Get a specific active ability.
@@ -484,7 +473,7 @@ namespace neuro {
 			/**
 				* @brief Get a vector of abilities that might affect incoming attacks.
 				*/
-			const std::vector< Ability > & getDefensiveAbilities() const;
+			const Abilities & getDefensiveAbilities() const;
 
 			/**
 				* @brief Get a specific defensive ability.
@@ -507,20 +496,12 @@ namespace neuro {
 				*/
 			static bool battle;
 		private:
-			Ability placingO;
-			std::vector< Ability > onBattleStartO;
-			std::vector< Ability > attacksO;
-			std::vector< Ability > modifiersO;
-			std::vector< Ability > activeAbilitiesO;
-			std::vector< Ability > defensiveAbilitiesO;
-			Life lifeO;
-			Initiative initiativeO;
 			Ability placing;
-			std::vector< Ability > onBattleStart;
-			std::vector< Ability > attacks;
-			std::vector< Ability > modifiers;
-			std::vector< Ability > activeAbilities;
-			std::vector< Ability > defensiveAbilities;
+			Abilities onBattleStart;
+			Abilities attacks;
+			Abilities modifiers;
+			Abilities activeAbilities;
+			Abilities defensiveAbilities;
 			Life life;
 			Initiative initiative;
 			std::string name;

@@ -5,7 +5,7 @@ namespace neuro {
 	int Tile::terrorEndOnPlayer = -1;
 	bool Tile::battle = false;
 
-	const std::vector< Tile::Ability > emptyAbility;
+	const Tile::Abilities emptyAbility;
 
 	bool isMelee( Tile::Ability atk ) {
 		return ( atk.getActionString()[0] == 'm' );
@@ -24,35 +24,35 @@ namespace neuro {
 		return Tile::Ability( name, description, -1, targetting, 0, actions );
 	}
 
-	const std::vector< Tile::Ability > & Tile::getOnBattleStart() const {
+	const Tile::Abilities & Tile::getOnBattleStart() const {
 		if ( webbed ) {
 			return emptyAbility;
 		}
 		return onBattleStart;
 	}
 
-	const std::vector< Tile::Ability > & Tile::getAttacks() const {
+	const Tile::Abilities & Tile::getAttacks() const {
 		if ( webbed ) {
 			return emptyAbility;
 		}
 		return attacks;
 	}
 
-	const std::vector< Tile::Ability > & Tile::getModifiers() const {
+	const Tile::Abilities & Tile::getModifiers() const {
 		if ( webbed ) {
 			return emptyAbility;
 		}
 		return modifiers;
 	}
 
-	const std::vector< Tile::Ability > & Tile::getActiveAbilities() const {
+	const Tile::Abilities & Tile::getActiveAbilities() const {
 		if ( webbed ) {
 			return emptyAbility;
 		}
 		return activeAbilities;
 	}
 
-	const std::vector< Tile::Ability > & Tile::getDefensiveAbilities() const {
+	const Tile::Abilities & Tile::getDefensiveAbilities() const {
 		if ( webbed ) {
 			return emptyAbility;
 		}
