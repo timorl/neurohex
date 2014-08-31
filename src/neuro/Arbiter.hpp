@@ -40,13 +40,12 @@ namespace neuro {
 				* @param[in] players A reference to a std::vector of players in the game.
 				* @param[in] board A reference to the board.
 				* @param[in] noArmy Whether any players army already ran out.
-				* @param[in] tile The tile with the ability to target.
-				* @param[in] abilityGroup In which ability group to look for the ability.
-				* @param[in] abilityId The id of the ability to target.
+				* @param[in] abilityIdentifier The ability for which the target is being
+				* requested.
 				* @return A validated list of targets.
 				* @todo Actually validate the targets.
 				*/
-			Targets getTargets( int playerId, const Players & players, const Board & board, bool noArmy, const Tile & tile, AbilityGroup abilityGroup, int abilityId );
+			Targets getTargets( int playerId, const Players & players, const Board & board, bool noArmy, AbilityIdentifier & abilityIdentifier );
 
 			/**
 				* @brief Returns a tile the contestant wants to discard.
@@ -81,6 +80,27 @@ namespace neuro {
 				* @todo This is a stub, implement.
 				*/
 			Targets getTargetsForAbility( int id );
+
+			/**
+				* @brief Create targets for abilities which do not require decisions.
+				* @param[in] board A reference to the board.
+				* @param[in] abilityIdentifier The ability for which to generate targets.
+				* @return A list of targets for the ability.
+				* @todo Actually do anything of the above.
+				*/
+			static Targets generateTargets( const Board & board, AbilityIdentifier & abilityIdentifier );
+
+			/**
+				* @brief Removes from the provided targets those, which would not be
+				* affected.
+				* @param[in, out] targets A list of targets to be purged.
+				* @param[in] board A reference to the board.
+				* @param[in] identifier The identifier of the ability to target.
+				* @return If the purging was successfull true, if the targets are not
+				* acceptable false.
+				* @todo Actually do anything of the above.
+				*/
+			static bool purgeTargets( Targets & targets, const Board & board, AbilityIdentifier identifier );
 		private:
 			ContestantP contestant;
 	};

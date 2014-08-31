@@ -22,25 +22,15 @@ namespace neuro {
 		bool endTurn;
 
 		/**
-			* @brief A pointer to the tile to use in the move.
-			*/
-		TileP tile;
-
-		/**
-			* @brief Whether to discard the choosen tile. If true all following
-			* parameters are ignored.
+			* @brief Whether to discard a tile.
 			*/
 		bool discard;
 
 		/**
-			* @brief The group of abilities the ability to use belongs to.
+			* @brief The identifier of the ability to use, if discard is true everything
+			* but the tile is ignored.
 			*/
-		AbilityGroup abilityGroup;
-
-		/**
-			* @brief the id of the tile's ability to use.
-			*/
-		int abilityId;
+		AbilityIdentifier abilityIdentifier;
 	};
 
 	/**
@@ -72,7 +62,7 @@ namespace neuro {
 	class Contestant {
 		public:
 			virtual Move getMove(int playerId, const Players & players, const Board & board, bool noArmy) = 0;
-			virtual Targets getTargets(int playerId, const Players & players, const Board & board, bool noArmy, const Tile & tile, AbilityGroup abilityGroup, int abilityId) = 0;
+			virtual Targets getTargets(int playerId, const Players & players, const Board & board, bool noArmy, AbilityIdentifier & abilityIdentifier) = 0;
 			virtual TileP requestDiscard(int playerId, const Players & players, const Board & board, bool noArmy) = 0;
 	};
 

@@ -79,6 +79,11 @@ namespace neuro {
 			std::list< TileOnBoard > getTiles(Coordinates coord) const;
 
 			/**
+				* @brief Whether there is a solid tile at the given coordinate.
+				*/
+			bool containsSolid( Coordinates coord ) const;
+
+			/**
 				* @brief Looks up the specified tile on the board.
 				* @param[in] tile A shared_ptr to the tile to look up.
 				* @return A std::pair<int, int> containing the coordinates of the tile if it
@@ -90,6 +95,11 @@ namespace neuro {
 				* @brief Returns the highest initiative any tile currently on the board has.
 				*/
 			int getMaxInitiative() const;
+
+			/**
+				* @brief Whether the board is full, and therefore a battle should happen.
+				*/
+			bool isFull() const;
 
 			/**
 				* @brief Returns a list of tiles with their orientation in
@@ -132,6 +142,7 @@ namespace neuro {
 			bool insideBoard(Coordinates coord) const {
 				return ( coord.first > 0 ) && ( coord.first < width ) && ( coord.second > 0 ) && ( coord.second < height );
 			}
+
 	};
 
 }

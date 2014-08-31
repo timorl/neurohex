@@ -146,7 +146,6 @@ namespace neuro {
 	/**
 		* @brief A tile to be created in an army and later played.
 		* @todo Fill in functions while creating armies.
-		* @todo Code moving.
 		*/
 	class Tile : public ui::Observable<Tile> {
 		public:
@@ -189,6 +188,7 @@ namespace neuro {
 			/**
 				* @brief A class representing an activated ability of a tile.
 				* @todo Medic code should consider more than one medic.
+				* @todo Webbing is implemented only partially.
 				*/
 			class Ability {
 				public:
@@ -460,6 +460,11 @@ namespace neuro {
 			bool isWebbed() const { return (webbed > 0); }
 
 			/**
+				* @brief Whether the tile is alive.
+				*/
+			bool isAlive() const { return life.isAlive(); }
+
+			/**
 				* @brief Returns the highest initiative this tile has, -1 if none.
 				*/
 			int getHighestInitiative() const;
@@ -540,6 +545,16 @@ namespace neuro {
 				* @brief Get the initiative of the tile.
 				*/
 			Initiative & getInitiative() { return initiative; }
+
+			/**
+				* @brief Remove all the modifications to which this tile has been subject.
+				*/
+			void clearModifications();
+
+			/**
+				* @brief Remove all the modifications this tile has made.
+				*/
+			void stopModifying();
 
 			/**
 				* @brief At which player's turn should terror end. No terror if -1.

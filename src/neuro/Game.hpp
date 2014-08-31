@@ -19,7 +19,7 @@ namespace neuro {
 
 	/**
 		* @brief A game containing some players and controlling the flow.
-		* @todo Battles should happen.
+		* @todo Handle movement and other immiediately used abilities.
 		*/
 	class Game : public ui::Observable<Game> {
 		public:
@@ -51,9 +51,17 @@ namespace neuro {
 
 			/**
 				* @brief Start the game and play it to the end.
-				* @todo Actually using already played tiles. Also, battles.
 				*/
 			void play();
+
+			/**
+				* @brief Remove all modifiers from the tile and then apply all proper
+				* modifiers again.
+				* @param[in] coords Coordinates where the tile is laying.
+				* @param[in] orientation The orientation of the tile.
+				* @param[in] tile The tile to update.
+				*/
+			void updateTile( Coordinates coords, Orientation orientation, TileP tile );
 		private:
 			Arbiters arbiters;
 			Players players;
@@ -62,8 +70,10 @@ namespace neuro {
 			bool noArmy;
 
 			void tilePlacing( TileP tile );
-			void executeAbility( TileP tile, AbilityGroup abilityGroup, int abilityId, Targets & targets );
-			void abilityUsing( TileP tile, AbilityGroup abilityGroup, int abilityId );
+			void executeAbility( AbilityIdentifier & abilityIdentifier, Targets & targets );
+			void abilityUsing( AbilityIdentifier & abilityIdentifier );
+			void useModifications( TileP tile );
+			void clearDead();
 			void battleStart();
 			void battlePhase( int initiative );
 			void runBattle();

@@ -78,6 +78,16 @@ namespace neuro {
 		}
 	}
 
+	bool Board::containsSolid( Coordinates coord ) const {
+		auto tls = getTiles( coord );
+		for ( auto t : tls ) {
+			if ( t.first->isSolid() ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	Coordinates Board::findTile(TileP tile) const {
 		Coordinates result(-1, -1);
 		for ( int x = 0; x < static_cast<int>( tiles.size() ); x++ ) {
@@ -92,6 +102,17 @@ namespace neuro {
 			}
 		}
 		return result;
+	}
+
+	bool Board::isFull() const {
+		for ( int i = 0; i < width; i++ ) {
+			for ( int j = 0; j < height; j++ ) {
+				if ( fields[i][j] != FieldType::NO_FIELD && !containsSolid( std::make_pair(i, j) ) ) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	int Board::getMaxInitiative() const {

@@ -7,9 +7,9 @@ namespace neuro {
 		return contestant->getMove(playerId, players, board, noArmy);
 	}
 
-	Targets Arbiter::getTargets(int playerId, const Players & players, const Board & board, bool noArmy, const Tile & tile, AbilityGroup abilityGroup, int abilityId ) {
+	Targets Arbiter::getTargets(int playerId, const Players & players, const Board & board, bool noArmy, AbilityIdentifier & abilityIdentifier ) {
 		//TODO: Actually validate the targets.
-		return contestant->getTargets(playerId, players, board, noArmy, tile, abilityGroup, abilityId);
+		return contestant->getTargets(playerId, players, board, noArmy, abilityIdentifier);
 	}
 
 	TileP Arbiter::requestDiscard(int playerId, const Players & players, const Board & board, bool noArmy) {
@@ -24,6 +24,16 @@ namespace neuro {
 	Targets Arbiter::getTargetsForAbility( int id ) {
 		Targets result;
 		return result;
+	}
+
+	Targets Arbiter::generateTargets( const Board & board, AbilityIdentifier & abilityIdentifier ) {
+		Targets result;
+		return result;
+	}
+
+	bool Arbiter::purgeTargets( Targets & targets, const Board & board, AbilityIdentifier identifier ) {
+		//TODO: This is a stub.
+		return true;
 	}
 
 }

@@ -286,6 +286,21 @@ namespace neuro {
 		return initiative.getHighestInitiative();
 	}
 
+	void Tile::clearModifications() {
+		std::list< TileP > toDemod;
+		toDemod.push_back( thisP.lock() );
+		for ( auto modif : modifications ) {
+			modif.first.tile->getModifier( modif.first.id ).demodifyTiles( toDemod );
+		}
+	}
+
+	void Tile::stopModifying() {
+		std::list< TileP > toDemod( modifieds.begin(), modifieds.end() );
+		for ( Ability & mod : modifiers ) {
+			mod.demodifyTiles( toDemod );
+		}
+	}
+
 	void Tile::addModified( TileP modified ) {
 		modifieds.insert( modified );
 	}
