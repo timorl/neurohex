@@ -167,4 +167,18 @@ namespace neuro {
 		}
 	}
 
+	TileP Board::getActivatedTile() {
+		TileP result;
+		for ( auto tileColumn : tiles ) {
+			for ( auto tileList : tileColumn ) {
+				for ( auto tileOnBoard : tileList ) {
+					if ( tileOnBoard.first->isActivated() ) {
+						return tileOnBoard.first;
+					}
+				}
+			}
+		}
+		return result;
+	}
+
 }

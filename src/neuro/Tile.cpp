@@ -24,6 +24,43 @@ namespace neuro {
 		return Tile::Ability( name, description, -1, targetting, 0, actions, saviorId, group );
 	}
 
+	Tile::Ability createMovement( TileP recipient ) {
+		const std::string name = "Moving";
+		const std::string description = "This tile is currently moving.";
+		Targetting targetting;
+		targetting.targetTiles = false;
+		targetting.type = TargettingType::ADJECENT;
+		targetting.actualTargets = -1;
+		targetting.requiredTargets = 1;
+		targetting.range = 1;
+		targetting.validTargetTypes.insert( TileType::FOUNDATION );
+		targetting.enemy = true;
+		targetting.own = true;
+		std::string actions("mx");
+		int id = recipient->getActiveAbilities().size();
+		AbilityGroup	group = AbilityGroup::ACTIVE;
+		return Tile::Ability( name, description, -1, targetting, 0, actions, id, group );
+	}
+
+	Tile::Ability createPush( TileP source, TileP recipient ) {
+		const std::string name = "Being pushed";
+		const std::string description = "This tile is currently being pushed away.";
+		Targetting targetting;
+		targetting.targetTiles = false;
+		targetting.type = TargettingType::AWAY;
+		targetting.actualTargets = -1;
+		targetting.requiredTargets = 1;
+		targetting.range = 1;
+		targetting.validTargetTypes.insert( TileType::FOUNDATION );
+		targetting.enemy = true;
+		targetting.own = true;
+		targetting.importantTiles.push_back( source );
+		std::string actions("mx");
+		int id = recipient->getActiveAbilities().size();
+		AbilityGroup	group = AbilityGroup::ACTIVE;
+		return Tile::Ability( name, description, -1, targetting, 0, actions, id, group );
+	}
+
 	bool AbilityIdentifier::operator<( const AbilityIdentifier & other ) const {
 		if ( tile != other.tile ) {
 			return tile < other.tile;
@@ -127,7 +164,12 @@ namespace neuro {
 		bool placeTile = false;
 		for ( auto action = abilityActions.begin(); action != abilityActions.end(); action++ ) {
 			switch ( *action ) {
-				//TODO: Add abilities as we go along.
+				case 'm':
+					placeTile = true;
+					break;
+				case 'x':
+					neutralize();
+					break;
 			}
 		}
 		return placeTile;
@@ -286,6 +328,12 @@ namespace neuro {
 		return initiative.getHighestInitiative();
 	}
 
+	AbilityIdentifier	Tile::getActivatedAbility() {
+		AbilityIdentifier	result = activatedAbilities.front();
+		activatedAbilities.pop();
+		return result;
+	}
+
 	void Tile::clearModifications() {
 		std::list< TileP > toDemod;
 		toDemod.push_back( thisP.lock() );
@@ -330,11 +378,13 @@ namespace neuro {
 	}
 
 	void Tile::move() {
-		//TODO: This is a stub.
+		activeAbilities.push_back( createMovement( thisP.lock() ) );
+		activatedAbilities.push( activeAbilities.back().getIdentifier() );
 	}
 
 	void Tile::push( TileP source ) {
-		//TODO: This is a stub.
+		activeAbilities.push_back( createPush( source, thisP.lock() ) );
+		activatedAbilities.push( activeAbilities.back().getIdentifier() );
 	}
 
 	void Tile::startBattle() {

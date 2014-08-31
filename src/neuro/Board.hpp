@@ -133,6 +133,12 @@ namespace neuro {
 				*/
 			bool removeTile(TileP tile);
 
+			/**
+				* @brief Get any activated tile on the board.
+				* @return A pointer to an activated tile on the board or an empty pointer if
+				* no tile is activated.
+				*/
+			TileP getActivatedTile();
 		private:
 			int width;
 			int height;

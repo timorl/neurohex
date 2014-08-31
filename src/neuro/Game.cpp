@@ -51,9 +51,11 @@ namespace neuro {
 						} else {
 							abilityUsing( move.abilityIdentifier );
 						}
+						resolveActivated();
 					}
 					if ( Tile::battle ) {
 						runBattle();
+						Tile::battle = false;
 					}
 				} while ( !move.endTurn );
 			}
@@ -91,6 +93,21 @@ namespace neuro {
 		}
 	}
 
+	void Game::removeFromBoard( TileP tile ) {
+		tile->clearModifications();
+		tile->stopModifying();
+		board.removeTile( tile );
+	}
+
+	void Game::placeOnBoard( TileP tile, Coordinates coords, Orientation orientation ) {
+		board.placeTile( coords, orientation, tile );
+		updateTile( coords, orientation, tile );
+		useModifications( tile );
+		while ( board.isFull() ) {
+			runBattle();
+		}
+	}
+
 	void Game::tilePlacing( TileP tile ) {
 		int tilePlacer = tile->getController();
 		AbilityIdentifier ai;
@@ -106,19 +123,18 @@ namespace neuro {
 		}
 		Tile::Ability & placing = tile->getPlacing();
 		if ( placing.placeTile( affectedTiles ) ) {
-			board.placeTile( curTarget.coords, curTarget.orientation, tile );
-			updateTile( curTarget.coords, curTarget.orientation, tile );
-			useModifications( tile );
-			while ( board.isFull() ) {
-				runBattle();
-			}
+			placeOnBoard( tile, curTarget.coords, curTarget.orientation );
 		}
 	}
 
 	void Game::executeAbility( AbilityIdentifier & abilityIdentifier, Targets & targets ) {
 		std::list< TileP > affectedTiles;
+		Coordinates coords;
+		Orientation orientation;
 		for ( auto tpl : targets ) {
 			affectedTiles.splice( affectedTiles.end(), tpl.tiles );
+			coords = tpl.coords;
+			orientation = tpl.orientation;
 		}
 		switch ( abilityIdentifier.group ) {
 			case AbilityGroup::PLACING:
@@ -134,7 +150,10 @@ namespace neuro {
 				abilityIdentifier.tile->getModifier( abilityIdentifier.id ).modifyTiles( affectedTiles );
 				break;
 			case AbilityGroup::ACTIVE:
-				abilityIdentifier.tile->getActiveAbility( abilityIdentifier.id ).useAbility( affectedTiles );
+				if ( abilityIdentifier.tile->getActiveAbility( abilityIdentifier.id ).useAbility( affectedTiles ) ) {
+					removeFromBoard( abilityIdentifier.tile );
+					placeOnBoard( abilityIdentifier.tile, coords, orientation );
+				}
 				break;
 			case AbilityGroup::DEFENSIVE:
 				abilityIdentifier.tile->getDefensiveAbility( abilityIdentifier.id ).useAbility( affectedTiles );
@@ -162,12 +181,9 @@ namespace neuro {
 		for ( auto tileColumn : tiles ) {
 			for ( auto tileList : tileColumn ) {
 				for ( auto tileOnBoard : tileList ) {
-					if ( tileOnBoard.first->isAlive() ) {
-						continue;
+					if ( !tileOnBoard.first->isAlive() ) {
+						removeFromBoard( tileOnBoard.first );
 					}
-					tileOnBoard.first->clearModifications();
-					tileOnBoard.first->stopModifying();
-					board.removeTile( tileOnBoard.first );
 				}
 			}
 		}
@@ -245,6 +261,15 @@ namespace neuro {
 		while ( curInitiative >= 0 ) {
 			battlePhase( curInitiative );
 			curInitiative--;
+		}
+	}
+
+	void Game::resolveActivated() {
+		TileP tile = board.getActivatedTile();
+		while ( tile ) {
+			AbilityIdentifier ai = tile->getActivatedAbility();
+			abilityUsing( ai );
+			tile = board.getActivatedTile();
 		}
 	}
 

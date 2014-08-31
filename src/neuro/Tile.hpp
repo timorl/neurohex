@@ -6,6 +6,7 @@
 #include<set>
 #include<list>
 #include<vector>
+#include<queue>
 #include"ui/Observable.hpp"
 
 namespace neuro {
@@ -187,7 +188,8 @@ namespace neuro {
 
 			/**
 				* @brief A class representing an activated ability of a tile.
-				* @todo Medic code should consider more than one medic.
+				* @todo Medic code should consider more than one medic and actually create
+				* the proper defensive ability.
 				* @todo Webbing is implemented only partially.
 				*/
 			class Ability {
@@ -316,9 +318,6 @@ namespace neuro {
 					std::weak_ptr< Tile > parent;
 					int id;
 					AbilityGroup	group;
-
-					void push( TileP tile );
-					void substitute( TileP tile );
 			};
 
 			/**
@@ -465,6 +464,11 @@ namespace neuro {
 			bool isAlive() const { return life.isAlive(); }
 
 			/**
+				* @brief Whether the tile has any currently activated abilities.
+				*/
+			bool isActivated() const { return !activatedAbilities.empty(); }
+
+			/**
 				* @brief Returns the highest initiative this tile has, -1 if none.
 				*/
 			int getHighestInitiative() const;
@@ -547,6 +551,11 @@ namespace neuro {
 			Initiative & getInitiative() { return initiative; }
 
 			/**
+				* @brief Returns the ability that has been triggered first.
+				*/
+			AbilityIdentifier	getActivatedAbility();
+
+			/**
 				* @brief Remove all the modifications to which this tile has been subject.
 				*/
 			void clearModifications();
@@ -582,6 +591,8 @@ namespace neuro {
 
 			std::map< AbilityIdentifier, std::set< AbilityIdentifier > > modifications;
 			std::set< TileP > modifieds;
+
+			std::queue< AbilityIdentifier > activatedAbilities;
 
 			int webbed;
 

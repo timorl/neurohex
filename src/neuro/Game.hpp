@@ -19,7 +19,6 @@ namespace neuro {
 
 	/**
 		* @brief A game containing some players and controlling the flow.
-		* @todo Handle movement and other immiediately used abilities.
 		*/
 	class Game : public ui::Observable<Game> {
 		public:
@@ -69,6 +68,9 @@ namespace neuro {
 			int currentPlayer;
 			bool noArmy;
 
+			void removeFromBoard( TileP tile );
+			void placeOnBoard( TileP tile, Coordinates coords, Orientation orientation );
+
 			void tilePlacing( TileP tile );
 			void executeAbility( AbilityIdentifier & abilityIdentifier, Targets & targets );
 			void abilityUsing( AbilityIdentifier & abilityIdentifier );
@@ -77,6 +79,7 @@ namespace neuro {
 			void battleStart();
 			void battlePhase( int initiative );
 			void runBattle();
+			void resolveActivated();
 	};
 
 	using GameP = std::shared_ptr< Game >;
