@@ -24,11 +24,20 @@ bool setEnvironmentVariables() {
 	return true;
 }
 
+void setApplicationVariables() {
+	std::string programDirectory("/neurohex");
+	std::string globalDataDirectories( std::getenv("XDG_DATA_DIRS") );
+	viewmodel::Application::globalDataDirectory = globalDataDirectories.substr( 0, globalDataDirectories.find_first_of(':') ) + programDirectory;
+	std::string localDataDirectories( std::getenv("XDG_DATA_HOME") );
+	viewmodel::Application::localDataDirectory = localDataDirectories.substr( 0, localDataDirectories.find_first_of(':') ) + programDirectory;
+}
+
 int main() {
 	if ( !setEnvironmentVariables() ) {
 		std::cerr << "$HOME variable is not set, what are you, using win***s?" << std::endl;
 		return 1;
 	}
+	setApplicationVariables();
 	viewmodel::Application application;
 	application.start();
 	return 0;

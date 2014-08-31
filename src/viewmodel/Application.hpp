@@ -33,6 +33,17 @@ namespace viewmodel {
 				* @brief Returns a pointer to the main menu.
 				*/
 			MainMenuP getMainMenu() { return mainMenu; }
+
+			/**
+				* @brief The global directory containing all the application data.
+				*/
+			static std::string globalDataDirectory;
+
+			/**
+				* @brief The local directory containing the application data changed by the
+				* user.
+				*/
+			static std::string localDataDirectory;
 		private:
 			MainMenuP mainMenu;
 			BoardLoaderP boardLoader;
