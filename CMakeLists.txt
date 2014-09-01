@@ -47,7 +47,6 @@ set(HDRS
 	)
 
 set(SRCS
-	${PROJECT_SOURCE_DIR}/Main.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Tile.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Board.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Army.cpp
@@ -77,7 +76,7 @@ set(LIBS ${LIBS} ${SDL2_LIBRARIES} ${Boost_LIBRARIES})
 
 link_libraries(${LIBS} ${CMAKE_THREAD_LIBS_INIT})
 
-add_executable(Neurohex ${HDRS} ${SRCS})
+add_executable(Neurohex ${HDRS} ${SRCS} ${PROJECT_SOURCE_DIR}/Main.cpp)
 
 install(TARGETS Neurohex
 	RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
@@ -93,8 +92,7 @@ if(GTEST_FOUND)
 	
 	set(NEURO_TEST_DIR ${PROJECT_SOURCE_DIR}/neuro/test)
 	set(NEURO_TEST_SRCS
-		${PROJECT_SOURCE_DIR}/neuro/Board.cpp
-		${PROJECT_SOURCE_DIR}/neuro/Tile.cpp
+		${SRCS}
 		${NEURO_TEST_DIR}/BoardTest.cpp
 		${NEURO_TEST_DIR}/TileTest.cpp
 		)
@@ -103,7 +101,18 @@ if(GTEST_FOUND)
 		${GTEST_LIBRARY}	${GTEST_MAIN_LIBRARY})
 	add_test(NAME neuroTest
 		COMMAND neuroTest)
-	
+
+	set(VIEWMODEL_TEST_DIR ${PROJECT_SOURCE_DIR}/viewmodel/test)
+	set(VIEWMODEL_TEST_SRCS
+		${SRCS}
+		${VIEWMODEL_TEST_DIR}/ArmyLoaderTest.cpp
+		)
+	add_executable(viewmodelTest ${VIEWMODEL_TEST_SRCS})
+	target_link_libraries(viewmodelTest
+		${GTEST_LIBRARY}	${GTEST_MAIN_LIBRARY})
+	add_test(NAME viewmodelTest
+		COMMAND viewmodelTest)
+
 endif()
 # Use doxygen for documentation.
 

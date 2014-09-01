@@ -386,7 +386,11 @@ namespace viewmodel {
 	}
 
 	neuro::ArmyP ArmyLoader::getArmy( std::string name ) const {
-		return neuro::ArmyP( new neuro::Army( *armies.at(name) ) );
+		neuro::ArmyP result;
+		if ( armies.count( name ) != 0 ) {
+			result.reset( new neuro::Army( *( armies.at(name) ) ) );
+		}
+		return result;
 	}
 
 }

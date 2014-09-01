@@ -1,7 +1,7 @@
 [NAME:Moloch]
 [DESCRIPTION:A tough army.]
 #HQ
-[TILEBEGIN:2]
+[TILEBEGIN:1]
 	[NAME:Moloch]
 	[TYPE:UNIT]
 	[INITIATIVE:0]
