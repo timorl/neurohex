@@ -14,17 +14,17 @@ namespace viewmodel {
 			boardFields[i].resize(y);
 		}
 		auto curChar = flds.begin();
-		for ( int i = 0; i < x; i++ ) {
-			for ( int j = 0; j < y; j++ ) {
+		for ( int i = 0; i < y; i++ ) {
+			for ( int j = 0; j < x; j++ ) {
 				while ( *curChar == ' ' || *curChar == '\n' || *curChar == '\t' ) {
 					curChar++;
 				}
 				switch ( *curChar ) {
 					case '0':
-						boardFields[i][j] = neuro::FieldType::NO_FIELD;
+						boardFields[j][i] = neuro::FieldType::NO_FIELD;
 						break;
 					case '1':
-						boardFields[i][j] = neuro::FieldType::NORMAL;
+						boardFields[j][i] = neuro::FieldType::NORMAL;
 						break;
 				}
 				curChar++;

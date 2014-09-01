@@ -106,6 +106,7 @@ if(GTEST_FOUND)
 	set(VIEWMODEL_TEST_SRCS
 		${SRCS}
 		${VIEWMODEL_TEST_DIR}/ArmyLoaderTest.cpp
+		${VIEWMODEL_TEST_DIR}/BoardLoaderTest.cpp
 		)
 	add_executable(viewmodelTest ${VIEWMODEL_TEST_SRCS})
 	target_link_libraries(viewmodelTest
