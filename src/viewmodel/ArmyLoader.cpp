@@ -64,7 +64,7 @@ namespace viewmodel {
 		return true;
 	}
 
-	bool parseTargetting( utility::DFStyleParser & parser, neuro::Targetting & targetting ) {
+	bool parseTargetting( utility::DFStyleReader & parser, neuro::Targetting & targetting ) {
 		const std::string abortMessage = "Aborting targetting parse: ";
 		const std::string targetTilesFailedMessage = "Reading what to target failed.";
 		const std::string targetTypesFailedMessage = "Reading target types failed.";
@@ -161,7 +161,7 @@ namespace viewmodel {
 		return true;
 	}
 
-	bool parseAbility( utility::DFStyleParser & parser, neuro::Tile::Abilities & abilities, neuro::AbilityGroup group ) {
+	bool parseAbility( utility::DFStyleReader & parser, neuro::Tile::Abilities & abilities, neuro::AbilityGroup group ) {
 		const std::string abortMessage = "Aborting ability parse: ";
 		const std::string abilityActionsFailedMessage = "Reading ability actions failed.";
 		std::string name;
@@ -225,7 +225,7 @@ namespace viewmodel {
 		return true;
 	}
 
-	bool parseTile( utility::DFStyleParser & parser, std::vector< neuro::TileP > & tiles, int amount ) {
+	bool parseTile( utility::DFStyleReader & parser, std::vector< neuro::TileP > & tiles, int amount ) {
 		const std::string abortMessage = "Aborting tile parse: ";
 		const std::string abilityFailedMessage = "Loading of ability failed.";
 		std::string name;
@@ -322,7 +322,7 @@ namespace viewmodel {
 		return true;
 	}
 
-	bool parseArmy( utility::DFStyleParser & parser, std::string & armyName, std::string & armyDescription, std::vector< neuro::TileP > & tiles ) {
+	bool parseArmy( utility::DFStyleReader & parser, std::string & armyName, std::string & armyDescription, std::vector< neuro::TileP > & tiles ) {
 		const std::string abortMessage = "Aborting army load: ";
 		const std::string tileFailedMessage = "Loading of tile failed.";
 		while ( parser.hasNextToken() ) {
@@ -366,9 +366,10 @@ namespace viewmodel {
 	}
 
 	void ArmyLoader::loadArmies( std::string directory ) {
-		utility::DFStyleParser parser( directory );
+		utility::DFDirectoryReader reader( directory );
 		int armyCount = 0;
-		while ( parser.nextFile() ) {
+		while ( reader.nextFile() ) {
+			utility::DFStyleReader parser = reader.getCurrentFileReader();
 			std::string armyName;
 			std::string armyDescription;
 			std::vector< neuro::TileP > tiles;

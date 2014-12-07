@@ -32,7 +32,7 @@ namespace viewmodel {
 		}
 	}
 
-	bool parseBoard( utility::DFStyleParser & parser, std::string & boardName, std::string & boardDescription, neuro::BoardDescription & boardFields ) {
+	bool parseBoard( utility::DFStyleReader & parser, std::string & boardName, std::string & boardDescription, neuro::BoardDescription & boardFields ) {
 		const std::string abortMessage = "Aborting board load: ";
 		int boardX, boardY;
 		std::string boardFieldsS;
@@ -81,9 +81,10 @@ namespace viewmodel {
 	}
 
 	void BoardLoader::loadBoards(std::string directory) {
-		utility::DFStyleParser parser(directory);
+		utility::DFDirectoryReader reader(directory);
 		int boardCount = 0;
-		while ( parser.nextFile() ) {
+		while ( reader.nextFile() ) {
+			utility::DFStyleReader parser = reader.getCurrentFileReader();
 			std::string boardName;
 			std::string boardDescription;
 			neuro::BoardDescription boardFields;

@@ -3,7 +3,8 @@
 
 #include<vector>
 #include"ui/Observable.hpp"
-#include"utility/DFStyleParser.hpp"
+#include"utility/DFDirectoryReader.hpp"
+#include"utility/DFStyleReader.hpp"
 #include"neuro/Army.hpp"
 
 namespace viewmodel {
