@@ -59,4 +59,17 @@ namespace neuro {
 		return false;
 	}
 
+	void Army::encodeAsDFStyle(utility::DFStyleCreator & output) {
+		output.startToken("OWNER");
+		output.addToToken(owner);
+		output.endToken();
+		for ( TileP tile : tiles ) {
+			output.startToken("TILEBEGIN");
+			output.endToken();
+			tile->encodeAsDFStyle(output);
+		}
+		output.startToken("ARMYEND");
+		output.endToken();
+	}
+
 }

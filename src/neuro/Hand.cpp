@@ -35,4 +35,14 @@ namespace neuro {
 		return false;
 	}
 
+	void Hand::encodeAsDFStyle(utility::DFStyleCreator & output) {
+		for ( TileP & tile : tiles ) {
+			output.startToken("TILEBEGIN");
+			output.endToken();
+			tile->encodeAsDFStyle(output);
+		}
+		output.startToken("HANDEND");
+		output.endToken();
+	}
+
 }

@@ -4,6 +4,8 @@
 #include<list>
 #include"ui/Observable.hpp"
 #include"neuro/Tile.hpp"
+#include"utility/DFStyleReader.hpp"
+#include"utility/DFStyleCreator.hpp"
 
 namespace neuro {
 
@@ -55,6 +57,12 @@ namespace neuro {
 				* the game for the client. Really needs work, but... after The Eduardo.
 				*/
 			bool fillFromDFStyle(utility::DFStyleReader & input);
+
+			/**
+				* @brief Encode the hand as DFStyle.
+				* @param[out] output The encoder to which to write.
+				*/
+			void encodeAsDFStyle(utility::DFStyleCreator & output);
 		private:
 			std::list< TileP > tiles;
 	};

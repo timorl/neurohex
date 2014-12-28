@@ -143,6 +143,26 @@ namespace neuro {
 		return false;
 	}
 
+	void Game::encodeAsDFStyle(utility::DFStyleCreator & output) {
+		output.startToken("BOARDBEGIN");
+		output.endToken();
+		board.encodeAsDFStyle(output);
+		output.startToken("CURRENTPLAYER");
+		output.addToToken(currentPlayer);
+		output.endToken();
+		output.startToken("NOARMY");
+		output.addToToken(noArmy);
+		output.endToken();
+		for ( int i = 0; i < static_cast<int>( players.size() ); i++ ) {
+			output.startToken("PLAYERBEGIN");
+			output.addToToken(i);
+			output.endToken();
+			players[i]->encodeAsDFStyle(output);
+		}
+		output.startToken("GAMEEND");
+		output.endToken();
+	}
+
 	void Game::removeFromBoard( TileP tile ) {
 		tile->clearModifications();
 		tile->stopModifying();

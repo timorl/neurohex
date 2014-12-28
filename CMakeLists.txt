@@ -39,6 +39,7 @@ set(HDRS
 	${PROJECT_SOURCE_DIR}/neuro/Game.hpp
 	${PROJECT_SOURCE_DIR}/neuro/GameOptions.hpp
 	${PROJECT_SOURCE_DIR}/utility/DFStyleReader.hpp
+	${PROJECT_SOURCE_DIR}/utility/DFStyleCreator.hpp
 	${PROJECT_SOURCE_DIR}/utility/DFDirectoryReader.hpp
 	${PROJECT_SOURCE_DIR}/viewmodel/BoardLoader.hpp
 	${PROJECT_SOURCE_DIR}/viewmodel/ArmyLoader.hpp
@@ -56,6 +57,7 @@ set(SRCS
 	${PROJECT_SOURCE_DIR}/neuro/Arbiter.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Game.cpp
 	${PROJECT_SOURCE_DIR}/utility/DFStyleReader.cpp
+	${PROJECT_SOURCE_DIR}/utility/DFStyleCreator.cpp
 	${PROJECT_SOURCE_DIR}/utility/DFDirectoryReader.cpp
 	${PROJECT_SOURCE_DIR}/viewmodel/BoardLoader.cpp
 	${PROJECT_SOURCE_DIR}/viewmodel/ArmyLoader.cpp

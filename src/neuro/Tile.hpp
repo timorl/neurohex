@@ -9,6 +9,7 @@
 #include<queue>
 #include"ui/Observable.hpp"
 #include"utility/DFStyleReader.hpp"
+#include"utility/DFStyleCreator.hpp"
 
 namespace neuro {
 
@@ -32,6 +33,12 @@ namespace neuro {
 		{"MODULE", TileType::MODULE},
 		{"UNIT", TileType::UNIT},
 		{"FOUNDATION", TileType::FOUNDATION} };
+	const std::map< TileType, std::string > stringTileTypeMap = {
+		{TileType::INSTANT_ACTION, "INSTANT_ACTION"},
+		{TileType::HQ, "HQ"},
+		{TileType::MODULE, "MODULE"},
+		{TileType::UNIT, "UNIT"},
+		{TileType::FOUNDATION, "FOUNDATION"} };
 
 	/**
 		* @brief The possible types of targetting.
@@ -56,6 +63,15 @@ namespace neuro {
 		{"PATH", TargettingType::PATH},
 		{"AWAY", TargettingType::AWAY},
 		{"HAND", TargettingType::HAND} };
+	const std::map< TargettingType, std::string > stringTargettingTypeMap = {
+		{TargettingType::LOCAL, "LOCAL"},
+		{TargettingType::FREE, "FREE"},
+		{TargettingType::LINE, "LINE"},
+		{TargettingType::BLOB, "BLOB"},
+		{TargettingType::ADJECENT, "ADJECENT"},
+		{TargettingType::PATH, "PATH"},
+		{TargettingType::AWAY, "AWAY"},
+		{TargettingType::HAND, "HAND"} };
 
 	/**
 		* @brief a structure fully describing how to target an ability.
@@ -120,6 +136,12 @@ namespace neuro {
 			* should identify tiles in some other way...?
 			*/
 		bool fillFromDFStyle(utility::DFStyleReader & input);
+
+		/**
+			* @brief Encode the targetting as DFStyle.
+			* @param[out] output The encoder to which to write.
+			*/
+		void encodeAsDFStyle(utility::DFStyleCreator & output);
 	};
 
 	/**
@@ -208,6 +230,12 @@ namespace neuro {
 						* the game for the client. Really needs work, but... after The Eduardo.
 						*/
 					bool fillFromDFStyle(utility::DFStyleReader & input);
+
+					/**
+						* @brief Encode the life as DFStyle.
+						* @param[out] output The encoder to which to write.
+						*/
+					void encodeAsDFStyle(utility::DFStyleCreator & output);
 				private:
 					int health;
 					int damage;
@@ -347,6 +375,12 @@ namespace neuro {
 						* the game for the client. Really needs work, but... after The Eduardo.
 						*/
 					bool fillFromDFStyle(utility::DFStyleReader & input, AbilityGroup grp);
+
+					/**
+						* @brief Encode the ability as DFStyle.
+						* @param[out] output The encoder to which to write.
+						*/
+					void encodeAsDFStyle(utility::DFStyleCreator & output);
 				private:
 					std::string name;
 					std::string description;
@@ -420,6 +454,12 @@ namespace neuro {
 						* the game for the client. Really needs work, but... after The Eduardo.
 						*/
 					bool fillFromDFStyle(utility::DFStyleReader & input);
+
+					/**
+						* @brief Encode the initiative as DFStyle.
+						* @param[out] output The encoder to which to write.
+						*/
+					void encodeAsDFStyle(utility::DFStyleCreator & output);
 				private:
 					bool modifiable;
 					std::set< int > initiative;
@@ -625,6 +665,12 @@ namespace neuro {
 				* the game for the client. Really needs work, but... after The Eduardo.
 				*/
 			bool fillFromDFStyle(utility::DFStyleReader & input);
+
+			/**
+				* @brief Encode the tile as DFStyle.
+				* @param[out] output The encoder to which to write.
+				*/
+			void encodeAsDFStyle(utility::DFStyleCreator & output);
 
 			/**
 				* @brief Returns a pointer to a dummy Tile, only useful when filled later.

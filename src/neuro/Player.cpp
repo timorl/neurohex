@@ -74,4 +74,24 @@ namespace neuro {
 		return false;
 	}
 
+	void Player::encodeAsDFStyle(utility::DFStyleCreator & output) {
+		output.startToken("ID");
+		output.addToToken(id);
+		output.endToken();
+		output.startToken("HANDBEGIN");
+		output.endToken();
+		hand.encodeAsDFStyle(output);
+		output.startToken("ARMYBEGIN");
+		output.endToken();
+		army->encodeAsDFStyle(output);
+		output.startToken("HEALTH");
+		output.addToToken(health);
+		output.endToken();
+		output.startToken("DISCARDEDTILE");
+		output.addToToken(discardedTile);
+		output.endToken();
+		output.startToken("PLAYEREND");
+		output.endToken();
+	}
+
 }

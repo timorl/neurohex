@@ -249,4 +249,34 @@ namespace neuro {
 		return false;
 	}
 
+	void Board::encodeAsDFStyle(utility::DFStyleCreator & output) {
+		output.startToken("DIMENSIONS");
+		output.addToToken(width);
+		output.addToToken(height);
+		output.endToken();
+		for ( int i = 0; i < width; i++ ) {
+			for ( int j = 0; j < height; j++ ) {
+				for ( TileOnBoard & curTOB : tiles[i][j] ) {
+					output.startToken("TILEBEGIN");
+					output.addToToken(i);
+					output.addToToken(j);
+					output.addToToken(curTOB.second);
+					output.endToken();
+					curTOB.first->encodeAsDFStyle(output);
+				}
+				output.startToken("FIELD");
+				output.addToToken(i);
+				output.addToToken(j);
+				if ( fields[i][j] == FieldType::NO_FIELD ) {
+					output.addToToken(std::string("no_field"));
+				} else if ( fields[i][j] == FieldType::NORMAL ) {
+					output.addToToken(std::string("normal"));
+				}
+				output.endToken();
+			}
+		}
+		output.startToken("BOARDEND");
+		output.endToken();
+	}
+
 }

@@ -454,6 +454,63 @@ namespace neuro {
 		return false;
 	}
 
+	void Tile::encodeAsDFStyle(utility::DFStyleCreator & output) {
+		output.startToken("ABILITYBEGIN");
+		output.addToToken(std::string("placing"));
+		output.endToken();
+		placing.encodeAsDFStyle(output);
+		for ( Ability & ablt : onBattleStart ) {
+			output.startToken("ABILITYBEGIN");
+			output.addToToken(std::string("battleStart"));
+			output.endToken();
+			ablt.encodeAsDFStyle(output);
+		}
+		for ( Ability & ablt : attacks ) {
+			output.startToken("ABILITYBEGIN");
+			output.addToToken(std::string("attack"));
+			output.endToken();
+			ablt.encodeAsDFStyle(output);
+		}
+		for ( Ability & ablt : modifiers ) {
+			output.startToken("ABILITYBEGIN");
+			output.addToToken(std::string("modifier"));
+			output.endToken();
+			ablt.encodeAsDFStyle(output);
+		}
+		for ( Ability & ablt : activeAbilities ) {
+			output.startToken("ABILITYBEGIN");
+			output.addToToken(std::string("active"));
+			output.endToken();
+			ablt.encodeAsDFStyle(output);
+		}
+		for ( Ability & ablt : defensiveAbilities ) {
+			output.startToken("ABILITYBEGIN");
+			output.addToToken(std::string("defensive"));
+			output.endToken();
+			ablt.encodeAsDFStyle(output);
+		}
+		output.startToken("LIFEBEGIN");
+		output.endToken();
+		life.encodeAsDFStyle(output);
+		output.startToken("INITIATIVEBEGIN");
+		output.endToken();
+		initiative.encodeAsDFStyle(output);
+		output.startToken("TYPE");
+		output.addToToken(stringTileTypeMap.at(type));
+		output.endToken();
+		output.startToken("OWNER");
+		output.addToToken(owner);
+		output.endToken();
+		output.startToken("CONTROLLER");
+		output.addToToken(controller);
+		output.endToken();
+		output.startToken("WEBBED");
+		output.addToToken(webbed);
+		output.endToken();
+		output.startToken("TILEEND");
+		output.endToken();
+	}
+
 	bool Tile::Ability::fillFromDFStyle(utility::DFStyleReader & input, AbilityGroup grp) {
 		group = grp;
 		while ( input.hasNextToken() ) {
@@ -505,6 +562,32 @@ namespace neuro {
 		return false;
 	}
 
+	void Tile::Ability::encodeAsDFStyle(utility::DFStyleCreator & output) {
+		output.startToken("NAME");
+		output.addToToken(name);
+		output.endToken();
+		output.startToken("DESCRIPTION");
+		output.addToToken(description);
+		output.endToken();
+		output.startToken("DIRECTION");
+		output.addToToken(direction);
+		output.endToken();
+		output.startToken("TARGETTINGBEGIN");
+		output.endToken();
+		targetting.encodeAsDFStyle(output);
+		output.startToken("STRENGTH");
+		output.addToToken(strength);
+		output.endToken();
+		output.startToken("ACTIONS");
+		output.addToToken(abilityActions);
+		output.endToken();
+		output.startToken("ID");
+		output.addToToken(id);
+		output.endToken();
+		output.startToken("ABILITYEND");
+		output.endToken();
+	}
+
 	bool Tile::Life::fillFromDFStyle(utility::DFStyleReader & input) {
 		while ( input.hasNextToken() ) {
 			std::vector< std::string > info = input.getNextToken();
@@ -529,6 +612,17 @@ namespace neuro {
 			}
 		}
 		return false;
+	}
+
+	void Tile::Life::encodeAsDFStyle(utility::DFStyleCreator & output) {
+		output.startToken("HEALTH");
+		output.addToToken(health);
+		output.endToken();
+		output.startToken("DAMAGE");
+		output.addToToken(damage);
+		output.endToken();
+		output.startToken("LIFEEND");
+		output.endToken();
 	}
 
 	bool Tile::Initiative::fillFromDFStyle(utility::DFStyleReader & input) {
@@ -561,6 +655,19 @@ namespace neuro {
 			}
 		}
 		return false;
+	}
+
+	void Tile::Initiative::encodeAsDFStyle(utility::DFStyleCreator & output) {
+		output.startToken("MODIFIABLE");
+		output.addToToken(modifiable);
+		output.endToken();
+		output.startToken("INITIATIVE");
+		for ( const int & initi : initiative ) {
+			output.addToToken(initi);
+		}
+		output.endToken();
+		output.startToken("INITIATIVEEND");
+		output.endToken();
 	}
 
 	bool Targetting::fillFromDFStyle(utility::DFStyleReader & input) {
@@ -635,6 +742,37 @@ namespace neuro {
 			}
 		}
 		return false;
+	}
+
+	void Targetting::encodeAsDFStyle(utility::DFStyleCreator & output) {
+		output.startToken("TARGET_TILES");
+		output.addToToken(targetTiles);
+		output.endToken();
+		output.startToken("TYPE");
+		output.addToToken(stringTargettingTypeMap.at(type));
+		output.endToken();
+		output.startToken("ACTUAL_TARGETS");
+		output.addToToken(actualTargets);
+		output.endToken();
+		output.startToken("REQUIRED_TARGETS");
+		output.addToToken(requiredTargets);
+		output.endToken();
+		output.startToken("RANGE");
+		output.addToToken(range);
+		output.endToken();
+		output.startToken("TARGET_TYPES");
+		for ( const TileType & tt : validTargetTypes ) {
+			output.addToToken(stringTileTypeMap.at(tt));
+		}
+		output.endToken();
+		output.startToken("ENEMY");
+		output.addToToken(enemy);
+		output.endToken();
+		output.startToken("OWN");
+		output.addToToken(own);
+		output.endToken();
+		output.startToken("TARGETTINGEND");
+		output.endToken();
 	}
 
 	void Tile::addModified( TileP modified ) {
