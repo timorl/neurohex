@@ -30,4 +30,33 @@ namespace neuro {
 		return result;
 	}
 
+	bool Army::fillFromDFStyle(utility::DFStyleReader & input) {
+		tiles.clear();
+		while ( input.hasNextToken() ) {
+			std::vector< std::string > info = input.getNextToken();
+			if (  static_cast<int>( info.size() ) < 1 ) {
+				return false;
+			}
+			std::string type = info[0];
+			if ( type == "ARMYEND" ) {
+				return true;
+			} else if ( type == "OWNER" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				owner = std::stoi(info[1]);
+			} else if ( type == "TILEBEGIN" ) {
+				TileP tile = Tile::getDummy();
+				if ( !tile->fillFromDFStyle(input) ) {
+					return false;
+				}
+				tile->setParents(tile);
+				tiles.push_back(tile);
+			} else {
+				return false;
+			}
+		}
+		return false;
+	}
+
 }

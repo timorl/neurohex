@@ -8,6 +8,7 @@
 #include<vector>
 #include<queue>
 #include"ui/Observable.hpp"
+#include"utility/DFStyleReader.hpp"
 
 namespace neuro {
 
@@ -102,8 +103,23 @@ namespace neuro {
 
 		/**
 			* @brief A list of tiles important for some targetting types, e.g. AWAY.
+			* @todo Not the best way of identifying tiles, since it's hard to communicate
+			* it over a network or something.
 			*/
 		std::list< TileP > importantTiles;
+
+		/**
+			* @brief Make the targetting represent the one described.
+			* @details If this fails, the targetting might be in an illegal state, so this
+			* should be immiediately called again, before doing anything else.
+			* @param[in] input The description.
+			* @return True if this operation was successfull, false otherwise.
+			* @todo This probably should actually be in a different class representing
+			* the game for the client. Really needs work, but... after The Eduardo.
+			* @todo This won't really work now, because we have a pointer here. Maybe we
+			* should identify tiles in some other way...?
+			*/
+		bool fillFromDFStyle(utility::DFStyleReader & input);
 	};
 
 	/**
@@ -181,6 +197,17 @@ namespace neuro {
 						* @param[in] dmg The amount of damage to deal.
 						*/
 					void dealDamage(int dmg) { damage += dmg; }
+
+					/**
+						* @brief Make the life represent the one described.
+						* @details If this fails, the life might be in an illegal state, so this
+						* should be immiediately called again, before doing anything else.
+						* @param[in] input The description.
+						* @return True if this operation was successfull, false otherwise.
+						* @todo This probably should actually be in a different class representing
+						* the game for the client. Really needs work, but... after The Eduardo.
+						*/
+					bool fillFromDFStyle(utility::DFStyleReader & input);
 				private:
 					int health;
 					int damage;
@@ -308,6 +335,18 @@ namespace neuro {
 						* @brief Make the ability do nothing.
 						*/
 					void neutralize() { abilityActions = ""; }
+
+					/**
+						* @brief Make the ability represent the one described.
+						* @details If this fails, the ability might be in an illegal state, so this
+						* should be immiediately called again, before doing anything else.
+						* @param[in] input The description.
+						* @param[in] grp The ability group of the ability.
+						* @return True if this operation was successfull, false otherwise.
+						* @todo This probably should actually be in a different class representing
+						* the game for the client. Really needs work, but... after The Eduardo.
+						*/
+					bool fillFromDFStyle(utility::DFStyleReader & input, AbilityGroup grp);
 				private:
 					std::string name;
 					std::string description;
@@ -370,6 +409,17 @@ namespace neuro {
 						* Returns the highest initiative, -1 if none.
 						*/
 					int getHighestInitiative() const;
+
+					/**
+						* @brief Make the initiative represent the one described.
+						* @details If this fails, the initiative might be in an illegal state, so this
+						* should be immiediately called again, before doing anything else.
+						* @param[in] input The description.
+						* @return True if this operation was successfull, false otherwise.
+						* @todo This probably should actually be in a different class representing
+						* the game for the client. Really needs work, but... after The Eduardo.
+						*/
+					bool fillFromDFStyle(utility::DFStyleReader & input);
 				private:
 					bool modifiable;
 					std::set< int > initiative;
@@ -391,8 +441,8 @@ namespace neuro {
 				*/
 			Tile( std::string name, TileType type, Ability placing, int health,
 					std::set< int > initiative, Abilities onBattleStart,
-					Abilities attacks, std::vector< Ability > modifiers,
-					Abilities activeAbilities, std::vector< Ability > defensiveAbilities) :
+					Abilities attacks, Abilities modifiers,
+					Abilities activeAbilities, Abilities defensiveAbilities) :
 				placing(placing),
 				onBattleStart(onBattleStart),
 				attacks(attacks),
@@ -564,6 +614,24 @@ namespace neuro {
 				* @brief Remove all the modifications this tile has made.
 				*/
 			void stopModifying();
+
+			/**
+				* @brief Make the tile represent the one described.
+				* @details If this fails, the tile might be in an illegal state, so this
+				* should be immiediately called again, before doing anything else.
+				* @param[in] input The description.
+				* @return True if this operation was successfull, false otherwise.
+				* @todo This probably should actually be in a different class representing
+				* the game for the client. Really needs work, but... after The Eduardo.
+				*/
+			bool fillFromDFStyle(utility::DFStyleReader & input);
+
+			/**
+				* @brief Returns a pointer to a dummy Tile, only useful when filled later.
+				* @todo Again, this probably means there should be two tiles -- server and
+				* client.
+				*/
+			static TileP getDummy();
 
 			/**
 				* @brief At which player's turn should terror end. No terror if -1.

@@ -10,6 +10,7 @@
 #include"neuro/Player.hpp"
 #include"neuro/Tile.hpp"
 #include"ui/Observable.hpp"
+#include"utility/DFStyleReader.hpp"
 
 namespace neuro {
 
@@ -61,6 +62,17 @@ namespace neuro {
 				* @param[in] tile The tile to update.
 				*/
 			void updateTile( Coordinates coords, Orientation orientation, TileP tile );
+
+			/**
+				* @brief Make the game represent the one described.
+				* @details If this fails, the game might be in an illegal state, so this
+				* should be immiediately called again, before doing anything else.
+				* @param[in] input The description.
+				* @return True if this operation was successfull, false otherwise.
+				* @todo This probably should actually be in a different class representing
+				* the game for the client. Really needs work, but... after The Eduardo.
+				*/
+			bool fillFromDFStyle(utility::DFStyleReader & input);
 		private:
 			Arbiters arbiters;
 			Players players;

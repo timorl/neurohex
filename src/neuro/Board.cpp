@@ -181,4 +181,72 @@ namespace neuro {
 		return result;
 	}
 
+	bool Board::fillFromDFStyle(utility::DFStyleReader & input) {
+		fields.clear();
+		tiles.clear();
+		while ( input.hasNextToken() ) {
+			std::vector< std::string > info = input.getNextToken();
+			if (  static_cast<int>( info.size() ) < 1 ) {
+				return false;
+			}
+			std::string type = info[0];
+			if ( type == "BOARDEND" ) {
+				return true;
+			} else if ( type == "DIMENSIONS" ) {
+				if (  static_cast<int>( info.size() ) < 3 ) {
+					return false;
+				}
+				width = std::stoi( info[1] );
+				height = std::stoi( info[2] );
+				fields.resize(width);
+				tiles.resize(height);
+				for ( int i = 0; i < width; i++ ) {
+					fields[i].resize(height);
+					tiles[i].resize(height);
+				}
+			} else if ( type == "TILEBEGIN" ) {
+				if (  static_cast<int>( info.size() ) < 4 ) {
+					return false;
+				}
+				Coordinates coords;
+				int & x = coords.first;
+				int & y = coords.second;
+				x = std::stoi(info[1]);
+				y = std::stoi(info[2]);
+				int ori = std::stoi(info[3]);
+				if ( !insideBoard(coords) || ori < 0 || ori > 5 ) {
+					return false;
+				}
+				TileP tile = Tile::getDummy();
+				if ( !tile->fillFromDFStyle(input) ) {
+					return false;
+				}
+				tile->setParents(tile);
+				tiles[x][y].push_back(std::make_pair(tile, ori));
+			} else if ( type == "FIELD" ) {
+				if (  static_cast<int>( info.size() ) < 4 ) {
+					return false;
+				}
+				Coordinates coords;
+				int & x = coords.first;
+				int & y = coords.second;
+				x = std::stoi(info[1]);
+				y = std::stoi(info[2]);
+				if ( !insideBoard(coords) ) {
+					return false;
+				}
+				if ( info[3] == "no_field" ) {
+					fields[x][y] = FieldType::NO_FIELD;
+				} else if ( info[3] == "normal" ) {
+					fields[x][y] = FieldType::NORMAL;
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		}
+		return false;
+	}
+
 }

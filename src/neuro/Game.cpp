@@ -93,6 +93,56 @@ namespace neuro {
 		}
 	}
 
+	bool Game::fillFromDFStyle(utility::DFStyleReader & input) {
+		while ( input.hasNextToken() ) {
+			std::vector< std::string > info = input.getNextToken();
+			if (  static_cast<int>( info.size() ) < 1 ) {
+				return false;
+			}
+			std::string type = info[0];
+			if ( type == "GAMEEND" ) {
+				return true;
+			} else if ( type == "BOARDBEGIN" ) {
+				if ( !board.fillFromDFStyle(input) ) {
+					return false;
+				}
+			} else if ( type == "CURRENTPLAYER" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				currentPlayer = std::stoi(info[1]);
+				if ( currentPlayer < 0 || currentPlayer >= static_cast<int>( players.size() ) ) {
+					return false;
+				}
+			} else if ( type == "NOARMY" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				if ( info[1] == "true" ) {
+					noArmy = true;
+				} else if ( info[1] == "false" ) {
+					noArmy = false;
+				} else {
+					return false;
+				}
+			} else if ( type == "PLAYERBEGIN" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				int playerNum = std::stoi(info[1]);
+				if ( playerNum < 0 || playerNum >= static_cast<int>( players.size() ) ) {
+					return false;
+				}
+				if ( !players[playerNum]->fillFromDFStyle(input) ) {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		}
+		return false;
+	}
+
 	void Game::removeFromBoard( TileP tile ) {
 		tile->clearModifications();
 		tile->stopModifying();

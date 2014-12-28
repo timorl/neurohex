@@ -2,6 +2,20 @@
 
 namespace neuro {
 
+	TileP Tile::getDummy() {
+		return TileP(new Tile(
+			"",
+			TileType::INSTANT_ACTION,
+			Ability("", "", -1, Targetting(), 0, "", 0, AbilityGroup::PLACING),
+			0,
+			std::set<int>(),
+			Abilities(),
+			Abilities(),
+			Abilities(),
+			Abilities(),
+			Abilities()));
+	}
+
 	int Tile::terrorEndOnPlayer = -1;
 	bool Tile::battle = false;
 
@@ -347,6 +361,280 @@ namespace neuro {
 		for ( Ability & mod : modifiers ) {
 			mod.demodifyTiles( toDemod );
 		}
+	}
+
+	bool Tile::fillFromDFStyle(utility::DFStyleReader & input) {
+		onBattleStart.clear();
+		attacks.clear();
+		modifiers.clear();
+		activeAbilities.clear();
+		defensiveAbilities.clear();
+		while ( input.hasNextToken() ) {
+			std::vector< std::string > info = input.getNextToken();
+			if (  static_cast<int>( info.size() ) < 1 ) {
+				return false;
+			}
+			std::string tType = info[0];
+			if ( tType == "TILEEND" ) {
+				return true;
+			} else if ( tType == "ABILITYBEGIN" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				std::string & abilityType = info[1];
+				if ( abilityType == "placing" ) {
+					if ( !placing.fillFromDFStyle(input, AbilityGroup::PLACING) ) {
+						return false;
+					}
+				} else if ( abilityType == "battleStart" ) {
+					Ability toAdd = placing;
+					if ( !toAdd.fillFromDFStyle(input, AbilityGroup::BATTLE_START) ) {
+						return false;
+					}
+					onBattleStart.push_back(toAdd);
+				} else if ( abilityType == "attack" ) {
+					Ability toAdd = placing;
+					if ( !toAdd.fillFromDFStyle(input, AbilityGroup::ATTACK) ) {
+						return false;
+					}
+					attacks.push_back(toAdd);
+				} else if ( abilityType == "modifier" ) {
+					Ability toAdd = placing;
+					if ( !toAdd.fillFromDFStyle(input, AbilityGroup::MODIFIER) ) {
+						return false;
+					}
+					modifiers.push_back(toAdd);
+				} else if ( abilityType == "active" ) {
+					Ability toAdd = placing;
+					if ( !toAdd.fillFromDFStyle(input, AbilityGroup::ACTIVE) ) {
+						return false;
+					}
+					activeAbilities.push_back(toAdd);
+				} else if ( abilityType == "defensive" ) {
+					Ability toAdd = placing;
+					if ( !toAdd.fillFromDFStyle(input, AbilityGroup::DEFENSIVE) ) {
+						return false;
+					}
+					defensiveAbilities.push_back(toAdd);
+				} else {
+					return false;
+				}
+			} else if ( tType == "LIFEBEGIN" ) {
+				if ( !life.fillFromDFStyle(input) ) {
+					return false;
+				}
+			} else if ( tType == "INITIATIVEBEGIN" ) {
+				if ( !initiative.fillFromDFStyle(input) ) {
+					return false;
+				}
+			} else if ( tType == "TYPE" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				type = tileTypeStringMap.at(info[1]);
+			} else if ( tType == "OWNER" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				owner = std::stoi(info[1]);
+			} else if ( tType == "CONTROLLER" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				controller = std::stoi(info[1]);
+			} else if ( tType == "WEBBED" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				webbed = std::stoi(info[1]);
+			} else {
+				return false;
+			}
+		}
+		return false;
+	}
+
+	bool Tile::Ability::fillFromDFStyle(utility::DFStyleReader & input, AbilityGroup grp) {
+		group = grp;
+		while ( input.hasNextToken() ) {
+			std::vector< std::string > info = input.getNextToken();
+			if (  static_cast<int>( info.size() ) < 1 ) {
+				return false;
+			}
+			std::string tType = info[0];
+			if ( tType == "ABILITYEND" ) {
+				return true;
+			} else if ( tType == "NAME" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				name = info[1];
+			} else if ( tType == "DESCRIPTION" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				description = info[1];
+			} else if ( tType == "DIRECTION" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				direction = std::stoi(info[1]);
+			} else if ( tType == "TARGETTINGBEGIN" ) {
+				if ( !targetting.fillFromDFStyle(input) ) {
+					return false;
+				}
+			} else if ( tType == "STRENGTH" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				strength = std::stoi(info[1]);
+			} else if ( tType == "ACTIONS" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				abilityActions = info[1];
+			} else if ( tType == "ID" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				id = std::stoi(info[1]);
+			} else {
+				return false;
+			}
+		}
+		return false;
+	}
+
+	bool Tile::Life::fillFromDFStyle(utility::DFStyleReader & input) {
+		while ( input.hasNextToken() ) {
+			std::vector< std::string > info = input.getNextToken();
+			if (  static_cast<int>( info.size() ) < 1 ) {
+				return false;
+			}
+			std::string tType = info[0];
+			if ( tType == "LIFEEND" ) {
+				return true;
+			} else if ( tType == "HEALTH" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				health = std::stoi(info[1]);
+			} else if ( tType == "DAMAGE" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				damage = std::stoi(info[1]);
+			} else {
+				return false;
+			}
+		}
+		return false;
+	}
+
+	bool Tile::Initiative::fillFromDFStyle(utility::DFStyleReader & input) {
+		initiative.clear();
+		while ( input.hasNextToken() ) {
+			std::vector< std::string > info = input.getNextToken();
+			if (  static_cast<int>( info.size() ) < 1 ) {
+				return false;
+			}
+			std::string tType = info[0];
+			if ( tType == "INITIATIVEEND" ) {
+				return true;
+			} else if ( tType == "MODIFIABLE" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				if ( info[1] == "true" ) {
+					modifiable = true;
+				} else if ( info[1] == "false" ) {
+					modifiable = false;
+				} else {
+					return false;
+				}
+			} else if ( tType == "INITIATIVE" ) {
+				for ( int i = 1; i < static_cast<int>( info.size() ); i++ ) {
+					initiative.insert(std::stoi(info[i]));
+				}
+			} else {
+				return false;
+			}
+		}
+		return false;
+	}
+
+	bool Targetting::fillFromDFStyle(utility::DFStyleReader & input) {
+		validTargetTypes.clear();
+		while ( input.hasNextToken() ) {
+			std::vector< std::string > info = input.getNextToken();
+			if (  static_cast<int>( info.size() ) < 1 ) {
+				return false;
+			}
+			std::string tType = info[0];
+			if ( tType == "TARGETTINGEND" ) {
+				return true;
+			} else if ( tType == "TARGET_TILES" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				if ( info[1] == "true" ) {
+					targetTiles = true;
+				} else if ( info[1] == "false" ) {
+					targetTiles = false;
+				} else {
+					return false;
+				}
+			} else if ( tType == "TYPE" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				type = targettingTypeStringMap.at(info[1]);
+			} else if ( tType == "ACTUAL_TARGETS" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				actualTargets = std::stoi(info[1]);
+			} else if ( tType == "REQUIRED_TARGETS" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				requiredTargets = std::stoi(info[1]);
+			} else if ( tType == "RANGE" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				range = std::stoi(info[1]);
+			} else if ( tType == "TARGET_TYPES" ) {
+				for ( int i = 1; i < static_cast<int>( info.size() ); i++ ) {
+					validTargetTypes.insert(tileTypeStringMap.at(info[i]));
+				}
+			} else if ( tType == "ENEMY" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				if ( info[1] == "true" ) {
+					enemy = true;
+				} else if ( info[1] == "false" ) {
+					enemy = false;
+				} else {
+					return false;
+				}
+			} else if ( tType == "OWN" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				if ( info[1] == "true" ) {
+					own = true;
+				} else if ( info[1] == "false" ) {
+					own = false;
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		}
+		return false;
 	}
 
 	void Tile::addModified( TileP modified ) {

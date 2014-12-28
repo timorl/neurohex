@@ -139,6 +139,17 @@ namespace neuro {
 				* no tile is activated.
 				*/
 			TileP getActivatedTile();
+
+			/**
+				* @brief Make the board represent the one described.
+				* @details If this fails, the board might be in an illegal state, so this
+				* should be immiediately called again, before doing anything else.
+				* @param[in] input The description.
+				* @return True if this operation was successfull, false otherwise.
+				* @todo This probably should actually be in a different class representing
+				* the game for the client. Really needs work, but... after The Eduardo.
+				*/
+			bool fillFromDFStyle(utility::DFStyleReader & input);
 		private:
 			int width;
 			int height;
