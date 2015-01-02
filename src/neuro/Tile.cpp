@@ -2,22 +2,9 @@
 
 namespace neuro {
 
-	TileP Tile::getDummy() {
-		return TileP(new Tile(
-			"",
-			TileType::INSTANT_ACTION,
-			Ability("", "", -1, Targetting(), 0, "", 0, AbilityGroup::PLACING),
-			0,
-			std::set<int>(),
-			Abilities(),
-			Abilities(),
-			Abilities(),
-			Abilities(),
-			Abilities()));
-	}
-
 	int Tile::terrorEndOnPlayer = -1;
 	bool Tile::battle = false;
+	std::vector<Tile> Tile::allTiles;
 
 	bool isMelee( Tile::Ability atk ) {
 		return ( atk.getActionString()[0] == 'm' );
@@ -27,18 +14,18 @@ namespace neuro {
 		return ( atk.getActionString()[0] == 'r' );
 	}
 
-	Tile::Ability createSavior( TileP sacrifice, TileP recipient ) {
+	Tile::Ability createSavior( int sacrifice, int recipient ) {
 		const std::string name = "Being saved";
 		const std::string description = "This tile is being saved from damage. If anything tries to damage it, another will die instead.";
 		//TODO: This is a stub.
 		Targetting targetting;
 		std::string actions;
-		int saviorId = recipient->getDefensiveAbilities().size();
+		int saviorId = Tile::allTiles[recipient].getDefensiveAbilities().size();
 		AbilityGroup	group = AbilityGroup::DEFENSIVE;
 		return Tile::Ability( name, description, -1, targetting, 0, actions, saviorId, group );
 	}
 
-	Tile::Ability createMovement( TileP recipient ) {
+	Tile::Ability createMovement( int recipient ) {
 		const std::string name = "Moving";
 		const std::string description = "This tile is currently moving.";
 		Targetting targetting;
@@ -51,12 +38,12 @@ namespace neuro {
 		targetting.enemy = true;
 		targetting.own = true;
 		std::string actions("mx");
-		int id = recipient->getActiveAbilities().size();
+		int id = Tile::allTiles[recipient].getActiveAbilities().size();
 		AbilityGroup	group = AbilityGroup::ACTIVE;
 		return Tile::Ability( name, description, -1, targetting, 0, actions, id, group );
 	}
 
-	Tile::Ability createPush( TileP source, TileP recipient ) {
+	Tile::Ability createPush( int source, int recipient ) {
 		const std::string name = "Being pushed";
 		const std::string description = "This tile is currently being pushed away.";
 		Targetting targetting;
@@ -70,7 +57,7 @@ namespace neuro {
 		targetting.own = true;
 		targetting.importantTiles.push_back( source );
 		std::string actions("mx");
-		int id = recipient->getActiveAbilities().size();
+		int id = Tile::allTiles[recipient].getActiveAbilities().size();
 		AbilityGroup	group = AbilityGroup::ACTIVE;
 		return Tile::Ability( name, description, -1, targetting, 0, actions, id, group );
 	}
@@ -138,13 +125,13 @@ namespace neuro {
 
 	AbilityIdentifier	Tile::Ability::getIdentifier() const {
 		AbilityIdentifier	ai;
-		ai.tile = parent.lock();
+		ai.tile = parent;
 		ai.id = id;
 		ai.group = group;
 		return ai;
 	}
 
-	bool Tile::Ability::placeTile( std::list< TileP > targets ) {
+	bool Tile::Ability::placeTile( std::list< int > targets ) {
 		bool stayOnBoard = false;
 		for ( auto action = abilityActions.begin(); action != abilityActions.end(); action++ ) {
 			switch ( *action ) {
@@ -152,18 +139,18 @@ namespace neuro {
 					stayOnBoard	= true;
 					break;
 				case 'd':
-					for ( TileP trgt : targets ) {
-						trgt->dealDamage( 1 );
+					for ( int trgt : targets ) {
+						allTiles[trgt].dealDamage( 1 );
 					}
 					break;
 				case 'm':
-					for ( TileP trgt : targets ) {
-						trgt->move();
+					for ( int trgt : targets ) {
+						allTiles[trgt].move();
 					}
 					break;
 				case 'p':
-					for ( TileP trgt : targets ) {
-						trgt->push( parent.lock() );
+					for ( int trgt : targets ) {
+						allTiles[trgt].push(parent);
 					}
 					break;
 				case 'b':
@@ -174,7 +161,7 @@ namespace neuro {
 		return stayOnBoard;
 	}
 
-	bool Tile::Ability::useAbility( std::list< TileP > targets ) {
+	bool Tile::Ability::useAbility( std::list< int > targets ) {
 		bool placeTile = false;
 		for ( auto action = abilityActions.begin(); action != abilityActions.end(); action++ ) {
 			switch ( *action ) {
@@ -202,130 +189,128 @@ namespace neuro {
 		}
 	}
 
-	void Tile::Ability::executeAttack( std::list< TileP > targets ) {
+	void Tile::Ability::executeAttack( std::list< int > targets ) {
 		for ( auto action = abilityActions.begin(); action != abilityActions.end(); action++ ) {
 			switch ( *action ) {
 				case 'r':
-					for ( TileP trgt : targets ) {
-						trgt->dealDamage( strength, direction, true );
+					for ( int trgt : targets ) {
+						allTiles[trgt].dealDamage( strength, direction, true );
 					}
 					break;
 				case 'g': //For Gauss gun -- ranged damage, but not ranged attack.
-					for ( TileP trgt : targets ) {
-						trgt->dealDamage( strength, direction, true );
+					for ( int trgt : targets ) {
+						allTiles[trgt].dealDamage( strength, direction, true );
 					}
 					break;
 				case 'd':
-					for ( TileP trgt : targets ) {
-						trgt->dealDamage( strength, direction, false );
+					for ( int trgt : targets ) {
+						allTiles[trgt].dealDamage( strength, direction, false );
 					}
 					break;
 				case 'm':
-					for ( TileP trgt : targets ) {
-						trgt->dealDamage( strength, direction, false );
+					for ( int trgt : targets ) {
+						allTiles[trgt].dealDamage( strength, direction, false );
 					}
 					break;
 				case 'a':
-					parent.lock()->destroy( true );
+					allTiles[parent].destroy( true );
 					break;
 			}
 		}
 	}
 
-	void Tile::Ability::modifyTiles( std::list< TileP > targets ) {
+	void Tile::Ability::modifyTiles( std::list< int > targets ) {
 		AbilityIdentifier ai = getIdentifier();
 		for ( auto action = abilityActions.begin(); action != abilityActions.end(); action++ ) {
 			switch ( *action ) {
 				case 'w':
-					for ( TileP trgt : targets ) {
-						ai.tile->addModified( trgt );
-						trgt->web( ai );
+					for ( int trgt : targets ) {
+						allTiles[ai.tile].addModified( trgt );
+						allTiles[trgt].web( ai );
 					}
 					break;
 				case 'i':
-					for ( TileP trgt : targets ) {
-						ai.tile->addModified( trgt );
-						trgt->changeInitiative( ai, strength );
+					for ( int trgt : targets ) {
+						allTiles[ai.tile].addModified( trgt );
+						allTiles[trgt].changeInitiative( ai, strength );
 					}
 					break;
 				case 'm':
-					for ( TileP trgt : targets ) {
-						ai.tile->addModified( trgt );
-						trgt->changeMelee( ai, strength );
+					for ( int trgt : targets ) {
+						allTiles[ai.tile].addModified( trgt );
+						allTiles[trgt].changeMelee( ai, strength );
 					}
 					break;
 				case 'r':
-					for ( TileP trgt : targets ) {
-						ai.tile->addModified( trgt );
-						trgt->changeRanged( ai, strength );
+					for ( int trgt : targets ) {
+						allTiles[ai.tile].addModified( trgt );
+						allTiles[trgt].changeRanged( ai, strength );
 					}
 					break;
 				case 's':
-					{
-						for ( TileP trgt : targets ) {
-							ai.tile->addModified( trgt );
-							trgt->addDefensiveAbility( ai, createSavior( parent.lock(), trgt ) );
+						for ( int trgt : targets ) {
+							allTiles[ai.tile].addModified( trgt );
+							allTiles[trgt].addDefensiveAbility( ai, createSavior( parent, trgt ) );
 						}
 						break;
-					}
 				case 'M':
-					for ( TileP trgt : targets ) {
-						ai.tile->addModified( trgt );
-						trgt->motivate( ai );
+					for ( int trgt : targets ) {
+						allTiles[ai.tile].addModified( trgt );
+						allTiles[trgt].motivate( ai );
 					}
 					break;
 			}
 		}
 	}
 
-	void Tile::Ability::demodifyTiles( std::list< TileP > targets ) {
+	void Tile::Ability::demodifyTiles( std::list< int > targets ) {
 		AbilityIdentifier ai = getIdentifier();
 		for ( auto action = abilityActions.begin(); action != abilityActions.end(); action++ ) {
 			switch ( *action ) {
 				case 'w':
-					for ( TileP trgt : targets ) {
-						ai.tile->delModified( trgt );
-						trgt->deweb( ai );
+					for ( int trgt : targets ) {
+						allTiles[ai.tile].delModified( trgt );
+						allTiles[trgt].deweb( ai );
 					}
 					break;
 				case 'i':
-					for ( TileP trgt : targets ) {
-						ai.tile->delModified( trgt );
-						trgt->dechangeInitiative( ai, strength );
+					for ( int trgt : targets ) {
+						allTiles[ai.tile].delModified( trgt );
+						allTiles[trgt].dechangeInitiative( ai, strength );
 					}
 					break;
 				case 'm':
-					for ( TileP trgt : targets ) {
-						ai.tile->delModified( trgt );
-						trgt->dechangeMelee( ai, strength );
+					for ( int trgt : targets ) {
+						allTiles[ai.tile].delModified( trgt );
+						allTiles[trgt].dechangeMelee( ai, strength );
 					}
 					break;
 				case 'r':
-					for ( TileP trgt : targets ) {
-						ai.tile->delModified( trgt );
-						trgt->dechangeRanged( ai, strength );
+					for ( int trgt : targets ) {
+						allTiles[ai.tile].delModified( trgt );
+						allTiles[trgt].dechangeRanged( ai, strength );
 					}
 					break;
 				case 's':
 					{
-						for ( TileP trgt : targets ) {
-							ai.tile->delModified( trgt );
-							trgt->delDefensiveAbility( ai );
+						for ( int trgt : targets ) {
+							allTiles[ai.tile].delModified( trgt );
+							allTiles[trgt].delDefensiveAbility( ai );
 						}
 						break;
 					}
 				case 'M':
-					for ( TileP trgt : targets ) {
-						ai.tile->delModified( trgt );
-						trgt->demotivate( ai );
+					for ( int trgt : targets ) {
+						allTiles[ai.tile].delModified( trgt );
+						allTiles[trgt].demotivate( ai );
 					}
 					break;
 			}
 		}
 	}
 
-	void Tile::setParents( TileP thisTile ) {
-		thisP = thisTile;
+	void Tile::setId(int thisTile) {
+		globalID = thisTile;
 		placing.setParent( thisTile );
 		for ( auto atk : attacks ) {
 			atk.setParent( thisTile );
@@ -349,15 +334,15 @@ namespace neuro {
 	}
 
 	void Tile::clearModifications() {
-		std::list< TileP > toDemod;
-		toDemod.push_back( thisP.lock() );
+		std::list< int > toDemod;
+		toDemod.push_back( globalID );
 		for ( auto modif : modifications ) {
-			modif.first.tile->getModifier( modif.first.id ).demodifyTiles( toDemod );
+			allTiles[modif.first.tile].getModifier( modif.first.id ).demodifyTiles( toDemod );
 		}
 	}
 
 	void Tile::stopModifying() {
-		std::list< TileP > toDemod( modifieds.begin(), modifieds.end() );
+		std::list< int > toDemod( modifieds.begin(), modifieds.end() );
 		for ( Ability & mod : modifiers ) {
 			mod.demodifyTiles( toDemod );
 		}
@@ -427,6 +412,11 @@ namespace neuro {
 				if ( !initiative.fillFromDFStyle(input) ) {
 					return false;
 				}
+			} else if ( tType == "NAME" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				name = info[1];
 			} else if ( tType == "TYPE" ) {
 				if (  static_cast<int>( info.size() ) < 2 ) {
 					return false;
@@ -447,6 +437,11 @@ namespace neuro {
 					return false;
 				}
 				webbed = std::stoi(info[1]);
+			} else if ( tType == "ID" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				globalID = std::stoi(info[1]);
 			} else {
 				return false;
 			}
@@ -495,6 +490,9 @@ namespace neuro {
 		output.startToken("INITIATIVEBEGIN");
 		output.endToken();
 		initiative.encodeAsDFStyle(output);
+		output.startToken("NAME");
+		output.addToToken(name);
+		output.endToken();
 		output.startToken("TYPE");
 		output.addToToken(stringTileTypeMap.at(type));
 		output.endToken();
@@ -506,6 +504,9 @@ namespace neuro {
 		output.endToken();
 		output.startToken("WEBBED");
 		output.addToToken(webbed);
+		output.endToken();
+		output.startToken("ID");
+		output.addToToken(globalID);
 		output.endToken();
 		output.startToken("TILEEND");
 		output.endToken();
@@ -550,6 +551,11 @@ namespace neuro {
 					return false;
 				}
 				abilityActions = info[1];
+			} else if ( tType == "PARENT" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				parent = std::stoi(info[1]);
 			} else if ( tType == "ID" ) {
 				if (  static_cast<int>( info.size() ) < 2 ) {
 					return false;
@@ -580,6 +586,9 @@ namespace neuro {
 		output.endToken();
 		output.startToken("ACTIONS");
 		output.addToToken(abilityActions);
+		output.endToken();
+		output.startToken("PARENT");
+		output.addToToken(parent);
 		output.endToken();
 		output.startToken("ID");
 		output.addToToken(id);
@@ -672,6 +681,7 @@ namespace neuro {
 
 	bool Targetting::fillFromDFStyle(utility::DFStyleReader & input) {
 		validTargetTypes.clear();
+		importantTiles.clear();
 		while ( input.hasNextToken() ) {
 			std::vector< std::string > info = input.getNextToken();
 			if (  static_cast<int>( info.size() ) < 1 ) {
@@ -737,6 +747,10 @@ namespace neuro {
 				} else {
 					return false;
 				}
+			} else if ( tType == "IMPORTANT_TILES" ) {
+				for ( int i = 1; i < static_cast<int>( info.size() ); i++ ) {
+					importantTiles.push_back(std::stoi(info[i]));
+				}
 			} else {
 				return false;
 			}
@@ -771,15 +785,20 @@ namespace neuro {
 		output.startToken("OWN");
 		output.addToToken(own);
 		output.endToken();
+		output.startToken("IMPORTANT_TILES");
+		for ( const int & impTil : importantTiles ) {
+			output.addToToken(impTil);
+		}
+		output.endToken();
 		output.startToken("TARGETTINGEND");
 		output.endToken();
 	}
 
-	void Tile::addModified( TileP modified ) {
+	void Tile::addModified( int modified ) {
 		modifieds.insert( modified );
 	}
 
-	void Tile::delModified( TileP modified ) {
+	void Tile::delModified( int modified ) {
 		modifieds.erase( modified );
 	}
 
@@ -804,12 +823,12 @@ namespace neuro {
 	}
 
 	void Tile::move() {
-		activeAbilities.push_back( createMovement( thisP.lock() ) );
+		activeAbilities.push_back( createMovement(globalID) );
 		activatedAbilities.push( activeAbilities.back().getIdentifier() );
 	}
 
-	void Tile::push( TileP source ) {
-		activeAbilities.push_back( createPush( source, thisP.lock() ) );
+	void Tile::push( int source ) {
+		activeAbilities.push_back( createPush( source, globalID) );
 		activatedAbilities.push( activeAbilities.back().getIdentifier() );
 	}
 
@@ -819,7 +838,7 @@ namespace neuro {
 
 	void Tile::web( AbilityIdentifier ai ) {
 		AbilityIdentifier	target;
-		target.tile = thisP.lock();
+		target.tile = globalID;
 		target.id = -1;
 		modifications[ai].insert(target);
 		webbed++;
@@ -827,7 +846,7 @@ namespace neuro {
 
 	void Tile::deweb( AbilityIdentifier ai ) {
 		AbilityIdentifier	target;
-		target.tile = thisP.lock();
+		target.tile = globalID;
 		target.id = -1;
 		if ( modifications.count( ai ) > 0 ) {
 			modifications[ai].erase( target );
@@ -837,7 +856,7 @@ namespace neuro {
 
 	void Tile::motivate( AbilityIdentifier ai ) {
 		AbilityIdentifier	target;
-		target.tile = thisP.lock();
+		target.tile = globalID;
 		target.id = -1;
 		modifications[ai].insert(target);
 		initiative.motivate();
@@ -845,7 +864,7 @@ namespace neuro {
 
 	void Tile::demotivate( AbilityIdentifier ai ) {
 		AbilityIdentifier	target;
-		target.tile = thisP.lock();
+		target.tile = globalID;
 		target.id = -1;
 		if ( modifications.count( ai ) > 0 ) {
 			modifications[ai].erase( target );
@@ -855,7 +874,7 @@ namespace neuro {
 
 	void Tile::changeInitiative( AbilityIdentifier ai, int amount, bool fix ) {
 		AbilityIdentifier	target;
-		target.tile = thisP.lock();
+		target.tile = globalID;
 		target.id = -1;
 		modifications[ai].insert(target);
 		initiative.changeInitiative( amount, fix );
@@ -863,7 +882,7 @@ namespace neuro {
 
 	void Tile::dechangeInitiative( AbilityIdentifier ai, int amount, bool fix ) {
 		AbilityIdentifier	target;
-		target.tile = thisP.lock();
+		target.tile = globalID;
 		target.id = -1;
 		if ( modifications.count( ai ) > 0 ) {
 			modifications[ai].erase( target );

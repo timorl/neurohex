@@ -25,7 +25,7 @@ namespace viewmodel {
 				* @param[in] armyLoader A pointer to an ArmyLoader which has already loaded
 				* armies.
 				*/
-			MainMenu( BoardLoaderP boardLoader, ArmyLoaderP armyLoader ) : boardLoader(boardLoader), armyLoader(armyLoader) {}
+			MainMenu( BoardLoader & boardLoader, ArmyLoader & armyLoader ) : configurer(boardLoader, armyLoader) {}
 
 			/**
 				* @brief Creates a configurer and notifies listeners.
@@ -38,14 +38,12 @@ namespace viewmodel {
 			MenuEvent getEvent() const { return event; }
 
 			/**
-				* @brief Returns a pointer to the configurer created.
+				* @brief Returns a reference to the configurer created.
 				*/
-			ConfigurerP getConfigurer() const {	return configurer;	}
+			const Configurer & getConfigurer() const { return configurer; }
 		private:
-			ConfigurerP configurer;
-			BoardLoaderP	boardLoader;
-			ArmyLoaderP	armyLoader;
-			MenuEvent	event;
+			Configurer configurer;
+			MenuEvent event;
 	};
 
 	using MainMenuP = std::shared_ptr< MainMenu >;

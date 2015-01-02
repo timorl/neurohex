@@ -2,9 +2,9 @@
 
 namespace neuro {
 
-	Army::Army( const Army & other ) {
-		for ( auto tile : other.tiles ) {
-			tiles.emplace_back( new Tile( *tile ) );
+	Army::Army(std::vector<int> tiles, int owner) : owner(owner), tiles(tiles) {
+		for ( int tileID : tiles ) {
+			Tile::allTiles[tileID].setOwner( owner );
 		}
 	}
 
@@ -12,17 +12,8 @@ namespace neuro {
 		std::shuffle(std::begin(tiles), std::end(tiles), std::default_random_engine());
 	}
 
-	void Army::initialize(int player) {
-		owner = player;
-		for ( TileP tile : tiles ) {
-			tile->setOwner( player );
-			tile->setParents( tile );
-		}
-		sigModified(*this);
-	}
-
-	TileP Army::drawTile() {
-		TileP result;
+	int Army::drawTile() {
+		int result = -1;
 		if ( !isEmpty() ) {
 			result = tiles.back();
 			tiles.pop_back();
@@ -45,13 +36,10 @@ namespace neuro {
 					return false;
 				}
 				owner = std::stoi(info[1]);
-			} else if ( type == "TILEBEGIN" ) {
-				TileP tile = Tile::getDummy();
-				if ( !tile->fillFromDFStyle(input) ) {
-					return false;
+			} else if ( type == "TILES" ) {
+				for ( int i = 1; i < static_cast<int>( info.size() ); i++ ) {
+					tiles.push_back(std::stoi(info[i]));
 				}
-				tile->setParents(tile);
-				tiles.push_back(tile);
 			} else {
 				return false;
 			}
@@ -63,11 +51,11 @@ namespace neuro {
 		output.startToken("OWNER");
 		output.addToToken(owner);
 		output.endToken();
-		for ( TileP tile : tiles ) {
-			output.startToken("TILEBEGIN");
-			output.endToken();
-			tile->encodeAsDFStyle(output);
+		output.startToken("TILES");
+		for ( int tile : tiles ) {
+			output.addToToken(tile);
 		}
+		output.endToken();
 		output.startToken("ARMYEND");
 		output.endToken();
 	}

@@ -9,7 +9,7 @@
 
 namespace neuro {
 
-	using Players = std::vector< PlayerP >;
+	using Players = std::vector< Player >;
 
 	/**
 		* @brief The entity relaying instructions from the Contestant to the Game.
@@ -53,10 +53,10 @@ namespace neuro {
 				* @param[in] players A reference to a std::vector of players in the game.
 				* @param[in] board A reference to the board.
 				* @param[in] noArmy Whether any players army already ran out.
-				* @return A pointer to the tile the contestant wants to discard.
+				* @return The global ID of the tile the contestant wants to discard.
 				* @todo Actually validate the tile.
 				*/
-			TileP requestDiscard( int playerId, const Players & players, const Board & board, bool noArmy );
+			int requestDiscard( int playerId, const Players & players, const Board & board, bool noArmy );
 
 			/**
 				* @brief Starts requesting targets for a list of abilities from the

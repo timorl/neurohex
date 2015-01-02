@@ -2,14 +2,10 @@
 
 namespace neuro {
 
-	Player::Player(int id, ArmyP army, int health) : id(id), army(army), health(health) {
-		army->initialize(id);
-	}
-
 	void Player::drawTiles(int toDraw) {
 		for ( int i = 0; i < toDraw; i++ ) {
-			TileP drawn = army->drawTile();
-			if ( drawn ) {
+			int drawn = army.drawTile();
+			if ( drawn != -1 ) {
 				hand.insertTile(drawn);
 			} else {
 				break;
@@ -48,7 +44,7 @@ namespace neuro {
 					return false;
 				}
 			} else if ( type == "ARMYBEGIN" ) {
-				if ( !army->fillFromDFStyle(input) ) {
+				if ( !army.fillFromDFStyle(input) ) {
 					return false;
 				}
 			} else if ( type == "HEALTH" ) {
@@ -83,7 +79,7 @@ namespace neuro {
 		hand.encodeAsDFStyle(output);
 		output.startToken("ARMYBEGIN");
 		output.endToken();
-		army->encodeAsDFStyle(output);
+		army.encodeAsDFStyle(output);
 		output.startToken("HEALTH");
 		output.addToToken(health);
 		output.endToken();

@@ -6,18 +6,26 @@ namespace neuro {
 		board(options.board),
 		currentPlayer(0),
 		noArmy(false) {
+			Tile::allTiles.clear();
 			for ( int i = 0; i < static_cast<int>( options.contestants.size() ); i++ ) {
-				arbiters.emplace_back( options.contestants[i] );
+				arbiters.emplace_back(options.contestants[i]);
 			}
 			for ( int i = 0; i < static_cast<int>( options.armies.size() ); i++ ) {
-				players.push_back( PlayerP( new Player(i, options.armies[i], options.initialHealth) ) );
+				std::vector< int > army;
+				for ( Tile tile : options.armies[i] ) {
+					int curTileId = Tile::allTiles.size();
+					tile.setId(curTileId);
+					army.push_back(curTileId);
+					Tile::allTiles.push_back(tile);
+				}
+				players.emplace_back(i, army, options.initialHealth);
 			}
 		}
 
 	int Game::getNumberOfLivingPlayers() const {
 		int result = 0;
-		for ( const PlayerP & player : players ) {
-			if ( player->getHealth() > 0 ) {
+		for ( const Player & player : players ) {
+			if ( player.getHealth() > 0 ) {
 				result++;
 			}
 		}
@@ -25,7 +33,7 @@ namespace neuro {
 	}
 
 	bool Game::isFinished() const {
-		if ( (noArmy && players[currentPlayer]->getArmy().isEmpty()) || 
+		if ( (noArmy && players[currentPlayer].getArmy().isEmpty()) || 
 				( getNumberOfLivingPlayers() <= 1 ) ) {
 			return true;
 		}
@@ -35,16 +43,16 @@ namespace neuro {
 	void Game::play() {
 		int firstTurns = 2; //How many turns drawing less tiles.
 		while ( !isFinished() ) {
-			if ( players[currentPlayer]->getHealth() > 0 ) {
-				players[currentPlayer]->startTurn( firstTurns );
-				noArmy = noArmy || players[currentPlayer]->armyEmpty();
+			if ( players[currentPlayer].getHealth() > 0 ) {
+				players[currentPlayer].startTurn( firstTurns );
+				noArmy = noArmy || players[currentPlayer].armyEmpty();
 				Move move;
 				do {
 					move = arbiters[currentPlayer].getMove( currentPlayer, players, board, noArmy );
 					if ( !move.endTurn ) {
-						if ( players[currentPlayer]->getHand().containsTile( move.abilityIdentifier.tile ) ) {
+						if ( players[currentPlayer].getHand().containsTile( move.abilityIdentifier.tile ) ) {
 							if ( move.discard ) {
-								players[currentPlayer]->discardTile( move.abilityIdentifier.tile );
+								players[currentPlayer].discardTile( move.abilityIdentifier.tile );
 							} else if ( move.abilityIdentifier.group == AbilityGroup::PLACING ) {
 								tilePlacing( move.abilityIdentifier.tile );
 							}
@@ -65,8 +73,8 @@ namespace neuro {
 		runBattle(); //The final battle.
 	}
 
-	void Game::updateTile( Coordinates coords, Orientation orientation, TileP tile ) {
-		tile->clearModifications();
+	void Game::updateTile( Coordinates coords, Orientation orientation, int tile ) {
+		Tile::allTiles[tile].clearModifications();
 		Targets theTarget;
 		Target trgt;
 		trgt.tiles.push_back( tile );
@@ -77,11 +85,11 @@ namespace neuro {
 		for ( auto tileColumn : tiles ) {
 			for ( auto tileList : tileColumn ) {
 				for ( auto tileOnBoard : tileList ) {
-					TileP tile = tileOnBoard.first;
-					if ( tile->isWebbed() ) {
+					int tile = tileOnBoard.first;
+					if ( Tile::allTiles[tile].isWebbed() ) {
 						continue;
 					}
-					const Tile::Abilities & mdfrs = tile->getModifiers();
+					const Tile::Abilities & mdfrs = Tile::allTiles[tile].getModifiers();
 					for ( const Tile::Ability & mdfr : mdfrs ) {
 						AbilityIdentifier curModIdent = mdfr.getIdentifier();
 						if ( Arbiter::purgeTargets( theTarget, board, curModIdent ) ) {
@@ -133,7 +141,18 @@ namespace neuro {
 				if ( playerNum < 0 || playerNum >= static_cast<int>( players.size() ) ) {
 					return false;
 				}
-				if ( !players[playerNum]->fillFromDFStyle(input) ) {
+				if ( !players[playerNum].fillFromDFStyle(input) ) {
+					return false;
+				}
+			} else if ( type == "TILEBEGIN" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				int tileNum = std::stoi(info[1]);
+				if ( tileNum < 0 || tileNum >= static_cast<int>( Tile::allTiles.size() ) ) {
+					return false;
+				}
+				if ( !Tile::allTiles[tileNum].fillFromDFStyle(input) ) {
 					return false;
 				}
 			} else {
@@ -157,19 +176,25 @@ namespace neuro {
 			output.startToken("PLAYERBEGIN");
 			output.addToToken(i);
 			output.endToken();
-			players[i]->encodeAsDFStyle(output);
+			players[i].encodeAsDFStyle(output);
+		}
+		for ( int i = 0; i < static_cast<int>( Tile::allTiles.size() ); i++ ) {
+			output.startToken("TILEBEGIN");
+			output.addToToken(i);
+			output.endToken();
+			Tile::allTiles[i].encodeAsDFStyle(output);
 		}
 		output.startToken("GAMEEND");
 		output.endToken();
 	}
 
-	void Game::removeFromBoard( TileP tile ) {
-		tile->clearModifications();
-		tile->stopModifying();
+	void Game::removeFromBoard( int tile ) {
+		Tile::allTiles[tile].clearModifications();
+		Tile::allTiles[tile].stopModifying();
 		board.removeTile( tile );
 	}
 
-	void Game::placeOnBoard( TileP tile, Coordinates coords, Orientation orientation ) {
+	void Game::placeOnBoard( int tile, Coordinates coords, Orientation orientation ) {
 		board.placeTile( coords, orientation, tile );
 		updateTile( coords, orientation, tile );
 		useModifications( tile );
@@ -178,27 +203,27 @@ namespace neuro {
 		}
 	}
 
-	void Game::tilePlacing( TileP tile ) {
-		int tilePlacer = tile->getController();
+	void Game::tilePlacing( int tile ) {
+		int tilePlacer = Tile::allTiles[tile].getController();
 		AbilityIdentifier ai;
 		ai.tile = tile;
 		ai.group = AbilityGroup::PLACING;
 		ai.id = 0;
 		Targets targets = arbiters[tilePlacer].getTargets( tilePlacer, players, board, noArmy, ai );
-		std::list< TileP > affectedTiles;
+		std::list< int > affectedTiles;
 		Target curTarget;
 		for ( auto tpl : targets ) {
 			curTarget = tpl;
 			affectedTiles.splice( affectedTiles.end(), curTarget.tiles );
 		}
-		Tile::Ability & placing = tile->getPlacing();
+		Tile::Ability & placing = Tile::allTiles[tile].getPlacing();
 		if ( placing.placeTile( affectedTiles ) ) {
 			placeOnBoard( tile, curTarget.coords, curTarget.orientation );
 		}
 	}
 
 	void Game::executeAbility( AbilityIdentifier & abilityIdentifier, Targets & targets ) {
-		std::list< TileP > affectedTiles;
+		std::list< int > affectedTiles;
 		Coordinates coords;
 		Orientation orientation;
 		for ( auto tpl : targets ) {
@@ -208,37 +233,37 @@ namespace neuro {
 		}
 		switch ( abilityIdentifier.group ) {
 			case AbilityGroup::PLACING:
-				abilityIdentifier.tile->getPlacing().useAbility( affectedTiles );
+				Tile::allTiles[abilityIdentifier.tile].getPlacing().useAbility( affectedTiles );
 				break;
 			case AbilityGroup::BATTLE_START:
-				abilityIdentifier.tile->getOnBattleStart( abilityIdentifier.id ).useAbility( affectedTiles );
+				Tile::allTiles[abilityIdentifier.tile].getOnBattleStart( abilityIdentifier.id ).useAbility( affectedTiles );
 				break;
 			case AbilityGroup::ATTACK:
-				abilityIdentifier.tile->getAttack( abilityIdentifier.id ).executeAttack( affectedTiles );
+				Tile::allTiles[abilityIdentifier.tile].getAttack( abilityIdentifier.id ).executeAttack( affectedTiles );
 				break;
 			case AbilityGroup::MODIFIER:
-				abilityIdentifier.tile->getModifier( abilityIdentifier.id ).modifyTiles( affectedTiles );
+				Tile::allTiles[abilityIdentifier.tile].getModifier( abilityIdentifier.id ).modifyTiles( affectedTiles );
 				break;
 			case AbilityGroup::ACTIVE:
-				if ( abilityIdentifier.tile->getActiveAbility( abilityIdentifier.id ).useAbility( affectedTiles ) ) {
+				if ( Tile::allTiles[abilityIdentifier.tile].getActiveAbility( abilityIdentifier.id ).useAbility( affectedTiles ) ) {
 					removeFromBoard( abilityIdentifier.tile );
 					placeOnBoard( abilityIdentifier.tile, coords, orientation );
 				}
 				break;
 			case AbilityGroup::DEFENSIVE:
-				abilityIdentifier.tile->getDefensiveAbility( abilityIdentifier.id ).useAbility( affectedTiles );
+				Tile::allTiles[abilityIdentifier.tile].getDefensiveAbility( abilityIdentifier.id ).useAbility( affectedTiles );
 				break;
 		}
 	}
 
 	void Game::abilityUsing( AbilityIdentifier & abilityIdentifier ) {
-		int abilityUser = abilityIdentifier.tile->getController();
+		int abilityUser = Tile::allTiles[abilityIdentifier.tile].getController();
 		Targets targets = arbiters[abilityUser].getTargets( abilityUser, players, board, noArmy, abilityIdentifier );
 		executeAbility( abilityIdentifier, targets );
 	}
 
-	void Game::useModifications( TileP tile ) {
-		Tile::Abilities mods = tile->getModifiers();
+	void Game::useModifications( int tile ) {
+		Tile::Abilities mods = Tile::allTiles[tile].getModifiers();
 		for ( const Tile::Ability & mod : mods ) {
 			AbilityIdentifier ai = mod.getIdentifier();
 			Targets trgts = Arbiter::generateTargets( board, ai );
@@ -251,7 +276,7 @@ namespace neuro {
 		for ( auto tileColumn : tiles ) {
 			for ( auto tileList : tileColumn ) {
 				for ( auto tileOnBoard : tileList ) {
-					if ( !tileOnBoard.first->isAlive() ) {
+					if ( !Tile::allTiles[tileOnBoard.first].isAlive() ) {
 						removeFromBoard( tileOnBoard.first );
 					}
 				}
@@ -268,12 +293,12 @@ namespace neuro {
 				for ( auto tileOnBoard : tileList ) {
 					AbilityIdentifier	ai;
 					ai.tile = tileOnBoard.first;
-					if ( ai.tile->isWebbed() ) {
+					if ( Tile::allTiles[ai.tile].isWebbed() ) {
 						continue;
 					}
 					ai.group = AbilityGroup::BATTLE_START;
-					int numOnBattleStart = ai.tile->getOnBattleStart().size();
-					int controller = ai.tile->getController();
+					int numOnBattleStart = Tile::allTiles[ai.tile].getOnBattleStart().size();
+					int controller = Tile::allTiles[ai.tile].getController();
 					for ( ai.id = 0; ai.id < numOnBattleStart; ai.id++ ) {
 						toRun[controller].push_back( ai );
 					}
@@ -293,18 +318,18 @@ namespace neuro {
 	}
 
 	void Game::battlePhase( int curInitiative ) {
-		const std::list< TileP > tiles = board.getTilesWithInitiative( curInitiative );
+		const std::list< int > tiles = board.getTilesWithInitiative( curInitiative );
 		std::vector< std::vector< AbilityIdentifier > > toRun;
 		toRun.resize( getNumberOfPlayers() );
-		for ( TileP tile : tiles ) {
-			if ( tile->isWebbed() ) {
+		for ( int tile : tiles ) {
+			if ( Tile::allTiles[tile].isWebbed() ) {
 				continue;
 			}
 			AbilityIdentifier ai;
 			ai.tile = tile;
 			ai.group = AbilityGroup::ATTACK;
-			int numAttacks = tile->getAttacks().size();
-			int controller = tile->getController();
+			int numAttacks = Tile::allTiles[tile].getAttacks().size();
+			int controller = Tile::allTiles[tile].getController();
 			for ( ai.id = 0; ai.id < numAttacks; ai.id++ ) {
 				toRun[controller].push_back( ai );
 			}
@@ -322,9 +347,9 @@ namespace neuro {
 	}
 
 	void Game::runBattle() {
-		if ( !players[currentPlayer]->hasDiscardedTile() ) {
-			TileP toDiscard = arbiters[currentPlayer].requestDiscard( currentPlayer, players, board, noArmy );
-			players[currentPlayer]->discardTile( toDiscard );
+		if ( !players[currentPlayer].hasDiscardedTile() ) {
+			int toDiscard = arbiters[currentPlayer].requestDiscard( currentPlayer, players, board, noArmy );
+			players[currentPlayer].discardTile( toDiscard );
 		}
 		battleStart();
 		int curInitiative = board.getMaxInitiative();
@@ -335,9 +360,9 @@ namespace neuro {
 	}
 
 	void Game::resolveActivated() {
-		TileP tile = board.getActivatedTile();
-		while ( tile ) {
-			AbilityIdentifier ai = tile->getActivatedAbility();
+		int tile = board.getActivatedTile();
+		while ( tile != -1 ) {
+			AbilityIdentifier ai = Tile::allTiles[tile].getActivatedAbility();
 			abilityUsing( ai );
 			tile = board.getActivatedTile();
 		}

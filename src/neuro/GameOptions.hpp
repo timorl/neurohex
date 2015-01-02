@@ -21,9 +21,9 @@ namespace neuro {
 		Contestants contestants;
 
 		/**
-			* @brief Pointers to armies of players in order of players.
+			* @brief Tiles in armies of players in order of players.
 			*/
-		std::vector< ArmyP > armies;
+		std::vector< std::vector<Tile> > armies;
 
 		/**
 			* @brief The health all the players will be starting with.

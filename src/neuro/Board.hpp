@@ -13,7 +13,7 @@ namespace neuro {
 
 	using Coordinates = std::pair<int, int>;
 	using Orientation = int;
-	using TileOnBoard = std::pair< TileP, Orientation >;
+	using TileOnBoard = std::pair< int, Orientation >;
 	using Tiles = std::vector< std::vector< std::list< TileOnBoard > > >;
 
 	/**
@@ -68,7 +68,7 @@ namespace neuro {
 				* @brief Returns a list of tiles with the specified initiative on board.
 				* @param[in] initiative The initiative of the tiles to find.
 				*/
-			std::list< TileP > getTilesWithInitiative( int initiative ) const;
+			std::list< int > getTilesWithInitiative( int initiative ) const;
 
 			/**
 				* @brief Returns a list of tiles with their orientation 
@@ -87,11 +87,11 @@ namespace neuro {
 
 			/**
 				* @brief Looks up the specified tile on the board.
-				* @param[in] tile A shared_ptr to the tile to look up.
+				* @param[in] tile The global ID of the tile to look up.
 				* @return A std::pair<int, int> containing the coordinates of the tile if it
 				* is on the board or (-1, -1) otherwise.
 				*/
-			Coordinates findTile(TileP tile) const;
+			Coordinates findTile(int tile) const;
 
 			/**
 				* @brief Returns the highest initiative any tile currently on the board has.
@@ -124,23 +124,23 @@ namespace neuro {
 				* @param[in] coord Coordinates of the field on which the tile is placed as a std::pair<int, int>.
 				* @param[in] orientation The initial orientation with which the tile is
 				* placed.
-				* @param[in] tile A pointer to the Tile to place at the coordinates.
+				* @param[in] tile The global ID of the Tile to place at the coordinates.
 				*/
-			void placeTile(Coordinates coord, Orientation orientation, TileP tile);
+			void placeTile(Coordinates coord, Orientation orientation, int tile);
 
 			/**
 				* @brief Removes a tile from the board.
 				* @param[in] tile The tile to be removed.
 				* @return true if the removal was completed successfully, false otherwise.
 				*/
-			bool removeTile(TileP tile);
+			bool removeTile(int tile);
 
 			/**
 				* @brief Get any activated tile on the board.
-				* @return A pointer to an activated tile on the board or an empty pointer if
+				* @return The global if of an activated tile on the board or -1 if
 				* no tile is activated.
 				*/
-			TileP getActivatedTile();
+			int getActivatedTile();
 
 			/**
 				* @brief Make the board represent the one described.

@@ -2,8 +2,8 @@
 
 namespace neuro {
 
-	bool Hand::containsTile( TileP tile ) const {
-		for ( TileP tp : tiles ) {
+	bool Hand::containsTile( int tile ) const {
+		for ( int tp : tiles ) {
 			if ( tp == tile ) {
 				return true;
 			}
@@ -21,13 +21,10 @@ namespace neuro {
 			std::string type = info[0];
 			if ( type == "HANDEND" ) {
 				return true;
-			} else if ( type == "TILEBEGIN" ) {
-				TileP tile = Tile::getDummy();
-				if ( !tile->fillFromDFStyle(input) ) {
-					return false;
+			} else if ( type == "TILES" ) {
+				for ( int i = 1; i < static_cast<int>( info.size() ); i++ ) {
+					tiles.push_back(std::stoi(info[i]));
 				}
-				tile->setParents(tile);
-				tiles.push_back(tile);
 			} else {
 				return false;
 			}
@@ -36,11 +33,11 @@ namespace neuro {
 	}
 
 	void Hand::encodeAsDFStyle(utility::DFStyleCreator & output) {
-		for ( TileP & tile : tiles ) {
-			output.startToken("TILEBEGIN");
-			output.endToken();
-			tile->encodeAsDFStyle(output);
+		output.startToken("TILES");
+		for ( int tile : tiles ) {
+			output.addToToken(tile);
 		}
+		output.endToken();
 		output.startToken("HANDEND");
 		output.endToken();
 	}

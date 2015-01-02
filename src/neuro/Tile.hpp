@@ -13,9 +13,6 @@
 
 namespace neuro {
 
-	class Tile;
-	using TileP = std::shared_ptr< Tile >;
-
 	/**
 		* @brief All the possible types of tiles.
 		*/
@@ -122,7 +119,7 @@ namespace neuro {
 			* @todo Not the best way of identifying tiles, since it's hard to communicate
 			* it over a network or something.
 			*/
-		std::list< TileP > importantTiles;
+		std::list< int > importantTiles;
 
 		/**
 			* @brief Make the targetting represent the one described.
@@ -163,7 +160,7 @@ namespace neuro {
 		/**
 			* @brief The tile owning the ability.
 			*/
-		TileP tile;
+		int tile;
 
 		/**
 			* @brief The group containing the ability.
@@ -307,19 +304,19 @@ namespace neuro {
 
 					/**
 						* @brief Use the ability on the specified tiles.
-						* @param[in] targets A std::list of pointers to tiles to be affected by the
+						* @param[in] targets A std::list of global IDs of tiles to be affected by the
 						* ability.
 						* @returns Whether to place this tile at the last coordinate provided.
 						*/
-					bool useAbility( std::list< TileP > targets );
+					bool useAbility( std::list< int > targets );
 
 					/**
 						* @brief Use the ability on the specified tiles.
-						* @param[in] targets A std::list of pointers to tiles to be affected by the
+						* @param[in] targets A std::list of global IDs of tiles to be affected by the
 						* ability.
 						* @returns Whether to place this tile at the last coordinate provided.
 						*/
-					bool placeTile( std::list< TileP > targets );
+					bool placeTile( std::list< int > targets );
 
 					/**
 						* @brief Use the ability as a defence against an attack.
@@ -331,27 +328,27 @@ namespace neuro {
 
 					/**
 						* @brief Execute the attack against the specified targets.
-						* @param[in] targets A std::list of pointers to tiles to be affected by the
+						* @param[in] targets A std::list of global IDs of tiles to be affected by the
 						* attack.
 						*/
-					void executeAttack( std::list< TileP > targets );
+					void executeAttack( std::list< int > targets );
 
 					/**
 						* @brief Modify the given tiles.
 						* @param[in] targets The tiles to modify.
 						*/
-					void modifyTiles( std::list< TileP > targets );
+					void modifyTiles( std::list< int > targets );
 
 					/**
 						* @brief Remove modifications from the given tiles.
 						* @param[in] targets The tiles to modify.
 						*/
-					void demodifyTiles( std::list< TileP > targets );
+					void demodifyTiles( std::list< int > targets );
 
 					/**
 						* @brief Sets the parent of this tile.
 						*/
-					void setParent( TileP par ) { parent = par; }
+					void setParent( int par ) { parent = par; }
 
 					/**
 						* @brief Modify the strength of the ability.
@@ -388,7 +385,7 @@ namespace neuro {
 					Targetting	targetting;
 					int strength;
 					std::string abilityActions;
-					std::weak_ptr< Tile > parent;
+					int parent;
 					int id;
 					AbilityGroup	group;
 			};
@@ -479,8 +476,8 @@ namespace neuro {
 				* @param[in] activeAbilities Active abilities the tile possesses.
 				* @param[in] defensiveAbilities Defensive abilities the tile possesses.
 				*/
-			Tile( std::string name, TileType type, Ability placing, int health,
-					std::set< int > initiative, Abilities onBattleStart,
+			Tile(std::string name, TileType type,	Ability placing,
+					int health,	std::set< int > initiative,	Abilities onBattleStart,
 					Abilities attacks, Abilities modifiers,
 					Abilities activeAbilities, Abilities defensiveAbilities) :
 				placing(placing),
@@ -569,10 +566,10 @@ namespace neuro {
 			bool hasInitiative( int battleStage ) const { return initiative.hasInitiative(battleStage); }
 
 			/**
-				* @brief Set parents for this tile's abilities.
-				* @param thisTile A shared_ptr to this tile.
+				* @brief Set the globalID of this tile.
+				* @param thisTile The globalID of this tile.
 				*/
-			void setParents( TileP thisTile );
+			void setId( int thisTile );
 
 			/**
 				* @brief Get the object responsible for placing this tile.
@@ -673,13 +670,6 @@ namespace neuro {
 			void encodeAsDFStyle(utility::DFStyleCreator & output);
 
 			/**
-				* @brief Returns a pointer to a dummy Tile, only useful when filled later.
-				* @todo Again, this probably means there should be two tiles -- server and
-				* client.
-				*/
-			static TileP getDummy();
-
-			/**
 				* @brief At which player's turn should terror end. No terror if -1.
 				*/
 			static int terrorEndOnPlayer;
@@ -688,6 +678,11 @@ namespace neuro {
 				* @brief Whether to start a battle because of tile effects.
 				*/
 			static bool battle;
+
+			/**
+				* @brief A vector of all tiles in the game.
+				*/
+			static std::vector<Tile> allTiles;
 		private:
 			Ability placing;
 			Abilities onBattleStart;
@@ -701,22 +696,22 @@ namespace neuro {
 			TileType type;
 			int owner;
 			int controller;
-			std::weak_ptr< Tile > thisP;
+			int globalID;
 
 			std::map< AbilityIdentifier, std::set< AbilityIdentifier > > modifications;
-			std::set< TileP > modifieds;
+			std::set< int > modifieds;
 
 			std::queue< AbilityIdentifier > activatedAbilities;
 
 			int webbed;
 
-			void addModified( TileP modified );
-			void delModified( TileP modified );
+			void addModified( int modified );
+			void delModified( int modified );
 
 			void dealDamage( int strength, int direction = -1, bool ranged = false );
 			void destroy( bool noRedirect = false );
 			void move();
-			void push( TileP source );
+			void push(int source);
 			void castle();
 			void web( AbilityIdentifier ai );
 			void deweb( AbilityIdentifier ai );
@@ -735,8 +730,6 @@ namespace neuro {
 			static void terrorize( int terrorist );
 			static void startBattle();
 	};
-
-	using TileP = std::shared_ptr< Tile >;
 
 }
 

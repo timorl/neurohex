@@ -53,8 +53,6 @@ namespace viewmodel {
 			std::map< std::string, std::string > descriptions;
 	};
 
-	using BoardLoaderP = std::shared_ptr< BoardLoader >;
-
 }
 
 #endif

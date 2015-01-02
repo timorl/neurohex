@@ -18,11 +18,23 @@ namespace neuro {
 			/**
 				* @brief Constructs a player with the specified army and amount of health.
 				* @param[in] id The id of the player.
-				* @param[in] army The Army the player will own.
+				* @param[in] army The tiles in the army the player will own.
 				* @param[in] health The initial amount of health the player will have.
-				* Defaults to 20.
 				*/
-			Player(int id, ArmyP army, int health = 20);
+			Player(int id, std::vector<int> army, int health) :
+				id(id),
+				army(army, id),
+				health(health) {}
+
+			/**
+				* @brief Move a player.
+				*/
+			Player(Player && orig) :
+				id(orig.id),
+				hand(std::move(orig.hand)),
+				army(std::move(orig.army)),
+				health(orig.health),
+				discardedTile(orig.discardedTile) {}
 
 			/**
 				* @brief Returns the id of the player.
@@ -37,7 +49,7 @@ namespace neuro {
 			/**
 				* @brief Returns the army of the player.
 				*/
-			const Army & getArmy() const { return *army; }
+			const Army & getArmy() const { return army; }
 
 			/**
 				* @brief Returns the health of the player.
@@ -52,12 +64,12 @@ namespace neuro {
 			/**
 				* @brief Returns the number of tiles left in the players army.
 				*/
-			int getNumberOfTilesInArmy() const { return army->tilesLeft(); }
+			int getNumberOfTilesInArmy() const { return army.tilesLeft(); }
 
 			/**
 				* @brief Whether the players army is empty.
 				*/
-			bool armyEmpty() const { return army->isEmpty(); }
+			bool armyEmpty() const { return army.isEmpty(); }
 
 			/**
 				* @brief Whether the player has discarded the required tile this turn.
@@ -80,13 +92,13 @@ namespace neuro {
 				* @brief Remove the specified tile from your hand.
 				* @param[in] tile The tile to remove.
 				*/
-			void removeTile(TileP tile) { hand.removeTile(tile); sigModified(*this); }
+			void removeTile(int tile) { hand.removeTile(tile); sigModified(*this); }
 
 			/**
 				* @brief Discard the specified tile from your hand.
 				* @param[in] tile The tile to discard.
 				*/
-			void discardTile(TileP tile) { discardedTile = true; removeTile(tile); }
+			void discardTile(int tile) { discardedTile = true; removeTile(tile); }
 
 			/**
 				* @brief Do everything that should be done with the player on turn start.
@@ -114,12 +126,10 @@ namespace neuro {
 		private:
 			int id;
 			Hand hand;
-			ArmyP army;
+			Army army;
 			int health;
 			bool discardedTile;
 	};
-
-	using PlayerP = std::shared_ptr< Player >;
 
 }
 

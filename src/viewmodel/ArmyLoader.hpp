@@ -28,16 +28,13 @@ namespace viewmodel {
 			/**
 				* @brief Get an army with the specified name.
 				* @param[in] name The name of the army we are looking for.
-				* @return A pointer to a new copy of the army with the specified name. If no
-				* army has such name the pointer is empty.
+				* @return A reference to a vector containing tiles in the requested army.
 				*/
-			neuro::ArmyP	getArmy(std::string name) const;
+			const std::vector<neuro::Tile> &	getArmy(std::string name) const { return armies.at(name); }
 		private:
-			std::map< std::string, neuro::ArmyP > armies;
+			std::map< std::string, std::vector<neuro::Tile> > armies;
 			std::map< std::string, std::string > descriptions;
 	};
-
-	using ArmyLoaderP = std::shared_ptr< ArmyLoader >;
 
 }
 

@@ -15,7 +15,7 @@
 
 namespace neuro {
 
-	using Players = std::vector<PlayerP>;
+	using Players = std::vector<Player>;
 	using Arbiters = std::vector<Arbiter>;
 	using Contestants = std::vector<ContestantP>;
 
@@ -62,7 +62,7 @@ namespace neuro {
 				* @param[in] orientation The orientation of the tile.
 				* @param[in] tile The tile to update.
 				*/
-			void updateTile( Coordinates coords, Orientation orientation, TileP tile );
+			void updateTile( Coordinates coords, Orientation orientation, int tile );
 
 			/**
 				* @brief Make the game represent the one described.
@@ -87,21 +87,19 @@ namespace neuro {
 			int currentPlayer;
 			bool noArmy;
 
-			void removeFromBoard( TileP tile );
-			void placeOnBoard( TileP tile, Coordinates coords, Orientation orientation );
+			void removeFromBoard( int tile );
+			void placeOnBoard( int tile, Coordinates coords, Orientation orientation );
 
-			void tilePlacing( TileP tile );
+			void tilePlacing( int tile );
 			void executeAbility( AbilityIdentifier & abilityIdentifier, Targets & targets );
 			void abilityUsing( AbilityIdentifier & abilityIdentifier );
-			void useModifications( TileP tile );
+			void useModifications( int tile );
 			void clearDead();
 			void battleStart();
 			void battlePhase( int initiative );
 			void runBattle();
 			void resolveActivated();
 	};
-
-	using GameP = std::shared_ptr< Game >;
 
 }
 

@@ -12,7 +12,7 @@ namespace neuro {
 		return contestant->getTargets(playerId, players, board, noArmy, abilityIdentifier);
 	}
 
-	TileP Arbiter::requestDiscard(int playerId, const Players & players, const Board & board, bool noArmy) {
+	int Arbiter::requestDiscard(int playerId, const Players & players, const Board & board, bool noArmy) {
 		//TODO: Actually validate the tile.
 		return contestant->requestDiscard(playerId, players, board, noArmy);
 	}

@@ -16,16 +16,16 @@ namespace neuro {
 	class Army : public ui::Observable<Army> {
 		public:
 			/**
-				* @brief Provides a deep copy of the given army, but with no owner or observer.
-				* @param[in] other The object to be copied.
-				*/
-			Army( const Army & other );
-
-			/**
 				* @brief Construct an army from a vector of tiles.
 				* @param[in] tiles The vector to initialize the army with.
+				* @param[in] owner The id of the player to own the army.
 				*/
-			Army( std::vector< TileP > tiles ) : tiles(tiles) {}
+			Army(std::vector<int> tiles, int owner);
+
+			/**
+				* @brief Move an army.
+				*/
+			Army(Army && orig) : owner(orig.owner), tiles(orig.tiles) {}
 
 			/**
 				* @brief Returns the number of tiles left in the army.
@@ -48,17 +48,11 @@ namespace neuro {
 			void shuffle();
 
 			/**
-				* @brief Sets the owner of the army and sets parents for tile abilities.
-				* @param[in] player The id of the player to own the army.
-				*/
-			void initialize(int player);
-
-			/**
 				* @brief Draw one tile from the army.
-				* @returns A std::shared_ptr to the Tile drawn. It is empty if the army was
+				* @returns The global ID of the Tile drawn. It is -1 if the army was
 				* empty.
 				*/
-			TileP drawTile();
+			int drawTile();
 
 			/**
 				* @brief Make the army represent the one described.
@@ -78,10 +72,8 @@ namespace neuro {
 			void encodeAsDFStyle(utility::DFStyleCreator & output);
 		private:
 			int owner;
-			std::vector< TileP > tiles;
+			std::vector< int > tiles;
 	};
-
-	using ArmyP = std::shared_ptr< Army >;
 
 }
 

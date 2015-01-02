@@ -9,7 +9,7 @@
 
 namespace neuro {
 
-	using Players = std::vector< PlayerP >;
+	using Players = std::vector< Player >;
 
 	/**
 		* @brief A move one may request from a player during his turn.
@@ -50,7 +50,7 @@ namespace neuro {
 		/**
 			* @brief A list of tiles on the field being targetted.
 			*/
-		std::list< TileP > tiles;
+		std::list< int > tiles;
 	};
 
 	using Targets = std::list< Target > ;
@@ -63,10 +63,10 @@ namespace neuro {
 		public:
 			virtual Move getMove(int playerId, const Players & players, const Board & board, bool noArmy) = 0;
 			virtual Targets getTargets(int playerId, const Players & players, const Board & board, bool noArmy, AbilityIdentifier & abilityIdentifier) = 0;
-			virtual TileP requestDiscard(int playerId, const Players & players, const Board & board, bool noArmy) = 0;
+			virtual int requestDiscard(int playerId, const Players & players, const Board & board, bool noArmy) = 0;
 	};
 
-	using ContestantP = std::shared_ptr< Contestant >;
+	using ContestantP = std::shared_ptr<Contestant>;
 
 }
 

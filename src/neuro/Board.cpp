@@ -35,7 +35,7 @@ namespace neuro {
 		}
 	}
 
-	Board::Board( BoardDescription desc ) : fields(desc) {
+	Board::Board(BoardDescription desc) : fields(desc) {
 		width = fields.size();
 		if ( width == 0 ) {
 			height = 0;
@@ -56,12 +56,12 @@ namespace neuro {
 		}
 	}
 
-	std::list< TileP > Board::getTilesWithInitiative( int initiative ) const {
-		std::list< TileP > result;
+	std::list< int > Board::getTilesWithInitiative( int initiative ) const {
+		std::list< int > result;
 		for ( auto tileColumn : tiles ) {
 			for ( auto tileList : tileColumn ) {
 				for ( auto tileOnBoard : tileList ) {
-					if ( tileOnBoard.first->hasInitiative( initiative ) ) {
+					if ( Tile::allTiles[tileOnBoard.first].hasInitiative( initiative ) ) {
 						result.push_back( tileOnBoard.first );
 					}
 				}
@@ -81,14 +81,14 @@ namespace neuro {
 	bool Board::containsSolid( Coordinates coord ) const {
 		auto tls = getTiles( coord );
 		for ( auto t : tls ) {
-			if ( t.first->isSolid() ) {
+			if ( Tile::allTiles[t.first].isSolid() ) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	Coordinates Board::findTile(TileP tile) const {
+	Coordinates Board::findTile(int tile) const {
 		Coordinates result(-1, -1);
 		for ( int x = 0; x < static_cast<int>( tiles.size() ); x++ ) {
 			for ( int y = 0; y < static_cast<int>( tiles[x].size() ); y++ ) {
@@ -120,8 +120,8 @@ namespace neuro {
 		for ( auto tileColumn : tiles ) {
 			for ( auto tileList : tileColumn ) {
 				for ( auto tileOnBoard : tileList ) {
-					if ( tileOnBoard.first->getHighestInitiative() > result ) {
-						result = tileOnBoard.first->getHighestInitiative();
+					if ( Tile::allTiles[tileOnBoard.first].getHighestInitiative() > result ) {
+						result = Tile::allTiles[tileOnBoard.first].getHighestInitiative();
 					}
 				}
 			}
@@ -135,7 +135,7 @@ namespace neuro {
 		while ( insideBoard(coord) ) {
 			bool foundSolid = false;
 			for ( TileOnBoard tob : tiles[coord.first][coord.second] ) {
-				if ( tob.first->isSolid() ) {
+				if ( Tile::allTiles[tob.first].isSolid() ) {
 					result.push_back( tob );
 					foundSolid	= true;
 					break;
@@ -149,12 +149,12 @@ namespace neuro {
 		return result;
 	}
 
-	void Board::placeTile( Coordinates coord, Orientation orientation, TileP tile ) {
+	void Board::placeTile( Coordinates coord, Orientation orientation, int tile ) {
 		tiles[coord.first][coord.second].push_front( std::make_pair( tile, orientation ) );
 		sigModified(*this);
 	}
 
-	bool Board::removeTile(TileP tile) {
+	bool Board::removeTile(int tile) {
 		Coordinates toRem = findTile(tile);
 		if ( toRem.first == -1 ) {
 			return false;
@@ -167,12 +167,12 @@ namespace neuro {
 		}
 	}
 
-	TileP Board::getActivatedTile() {
-		TileP result;
+	int Board::getActivatedTile() {
+		int result = -1;
 		for ( auto tileColumn : tiles ) {
 			for ( auto tileList : tileColumn ) {
 				for ( auto tileOnBoard : tileList ) {
-					if ( tileOnBoard.first->isActivated() ) {
+					if ( Tile::allTiles[tileOnBoard.first].isActivated() ) {
 						return tileOnBoard.first;
 					}
 				}
@@ -205,7 +205,7 @@ namespace neuro {
 					tiles[i].resize(height);
 				}
 			} else if ( type == "TILEBEGIN" ) {
-				if (  static_cast<int>( info.size() ) < 4 ) {
+				if (  static_cast<int>( info.size() ) < 5 ) {
 					return false;
 				}
 				Coordinates coords;
@@ -217,11 +217,7 @@ namespace neuro {
 				if ( !insideBoard(coords) || ori < 0 || ori > 5 ) {
 					return false;
 				}
-				TileP tile = Tile::getDummy();
-				if ( !tile->fillFromDFStyle(input) ) {
-					return false;
-				}
-				tile->setParents(tile);
+				int tile = std::stoi(info[4]);
 				tiles[x][y].push_back(std::make_pair(tile, ori));
 			} else if ( type == "FIELD" ) {
 				if (  static_cast<int>( info.size() ) < 4 ) {
@@ -261,8 +257,8 @@ namespace neuro {
 					output.addToToken(i);
 					output.addToToken(j);
 					output.addToToken(curTOB.second);
+					output.addToToken(curTOB.first);
 					output.endToken();
-					curTOB.first->encodeAsDFStyle(output);
 				}
 				output.startToken("FIELD");
 				output.addToToken(i);

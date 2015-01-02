@@ -225,7 +225,7 @@ namespace viewmodel {
 		return true;
 	}
 
-	bool parseTile( utility::DFStyleReader & parser, std::vector< neuro::TileP > & tiles, int amount ) {
+	bool parseTile( utility::DFStyleReader & parser, std::vector< neuro::Tile > & tiles, int amount ) {
 		const std::string abortMessage = "Aborting tile parse: ";
 		const std::string abilityFailedMessage = "Loading of ability failed.";
 		std::string name;
@@ -317,12 +317,12 @@ namespace viewmodel {
 			return false;
 		}
 		for ( int i = 0; i < amount; i++ ) {
-			tiles.emplace_back( new neuro::Tile( name, tileType, *placing.begin(), health, initiative, onBattleStart, attacks, modifiers, activeAbilities, defensiveAbilities ) );
+			tiles.emplace_back( name, tileType, *placing.begin(), health, initiative, onBattleStart, attacks, modifiers, activeAbilities, defensiveAbilities );
 		}
 		return true;
 	}
 
-	bool parseArmy( utility::DFStyleReader & parser, std::string & armyName, std::string & armyDescription, std::vector< neuro::TileP > & tiles ) {
+	bool parseArmy( utility::DFStyleReader & parser, std::string & armyName, std::string & armyDescription, std::vector< neuro::Tile > & tiles ) {
 		const std::string abortMessage = "Aborting army load: ";
 		const std::string tileFailedMessage = "Loading of tile failed.";
 		while ( parser.hasNextToken() ) {
@@ -372,10 +372,10 @@ namespace viewmodel {
 			utility::DFStyleReader parser = reader.getCurrentFileReader();
 			std::string armyName;
 			std::string armyDescription;
-			std::vector< neuro::TileP > tiles;
+			std::vector< neuro::Tile > tiles;
 			if ( parseArmy( parser, armyName, armyDescription, tiles ) && armies.count(armyName) == 0 ) {
 				armyCount++;
-				armies[armyName] = neuro::ArmyP( new neuro::Army(tiles) );
+				armies[armyName] = std::move(tiles);
 				descriptions[armyName] = armyDescription;
 			}
 		}
@@ -384,14 +384,6 @@ namespace viewmodel {
 		} else {
 			std::clog << "Loaded " << armyCount << " new arm" << ( (armyCount > 1)?"ies":"y" ) << " from directory " << directory << std::endl;
 		}
-	}
-
-	neuro::ArmyP ArmyLoader::getArmy( std::string name ) const {
-		neuro::ArmyP result;
-		if ( armies.count( name ) != 0 ) {
-			result.reset( new neuro::Army( *( armies.at(name) ) ) );
-		}
-		return result;
 	}
 
 }

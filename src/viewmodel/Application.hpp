@@ -15,6 +15,11 @@ namespace viewmodel {
 	class Application : public ui::Observable<Application> {
 		public:
 			/**
+				* @brief Create a new application object.
+				*/
+			Application() : mainMenu(boardLoader, armyLoader) {}
+
+			/**
 				* @brief Loads resources and starts the main menu.
 				*/
 			void start();
@@ -22,17 +27,17 @@ namespace viewmodel {
 			/**
 				* @brief Returns the BoardLoader used.
 				*/
-			const BoardLoader & getBoardLoader() const {	return *boardLoader;	}
+			const BoardLoader & getBoardLoader() const {	return boardLoader;	}
 
 			/**
 				* @brief Returns the ArmyLoader used.
 				*/
-			const ArmyLoader & getArmyLoader() const {	return *armyLoader;	}
+			const ArmyLoader & getArmyLoader() const {	return armyLoader;	}
 
 			/**
 				* @brief Returns a pointer to the main menu.
 				*/
-			MainMenuP getMainMenu() { return mainMenu; }
+			MainMenu & getMainMenu() { return mainMenu; }
 
 			/**
 				* @brief The global directory containing all the application data.
@@ -45,12 +50,10 @@ namespace viewmodel {
 				*/
 			static std::string localDataDirectory;
 		private:
-			MainMenuP mainMenu;
-			BoardLoaderP boardLoader;
-			ArmyLoaderP armyLoader;
+			MainMenu mainMenu;
+			BoardLoader boardLoader;
+			ArmyLoader armyLoader;
 	};
-
-	using ApplicationP = std::shared_ptr< Application >;
 
 }
 
