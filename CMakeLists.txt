@@ -27,43 +27,61 @@ file(MAKE_DIRECTORY ${PROJECT_DOC_DIR})
 file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX})
 file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin)
 
-set(HDRS
+set(COMMON_HDRS
 	${PROJECT_SOURCE_DIR}/ui/Observable.hpp
 	${PROJECT_SOURCE_DIR}/neuro/Tile.hpp
 	${PROJECT_SOURCE_DIR}/neuro/Board.hpp
 	${PROJECT_SOURCE_DIR}/neuro/Army.hpp
 	${PROJECT_SOURCE_DIR}/neuro/Hand.hpp
 	${PROJECT_SOURCE_DIR}/neuro/Player.hpp
-	${PROJECT_SOURCE_DIR}/neuro/Contestant.hpp
-	${PROJECT_SOURCE_DIR}/neuro/Arbiter.hpp
-	${PROJECT_SOURCE_DIR}/neuro/Game.hpp
-	${PROJECT_SOURCE_DIR}/neuro/GameOptions.hpp
 	${PROJECT_SOURCE_DIR}/utility/DFStyleReader.hpp
 	${PROJECT_SOURCE_DIR}/utility/DFStyleCreator.hpp
 	${PROJECT_SOURCE_DIR}/utility/DFDirectoryReader.hpp
-	${PROJECT_SOURCE_DIR}/viewmodel/BoardLoader.hpp
-	${PROJECT_SOURCE_DIR}/viewmodel/ArmyLoader.hpp
-	${PROJECT_SOURCE_DIR}/viewmodel/Configurer.hpp
-	${PROJECT_SOURCE_DIR}/viewmodel/MainMenu.hpp
-	${PROJECT_SOURCE_DIR}/viewmodel/Application.hpp
 	)
 
-set(SRCS
+set(COMMON_SRCS
 	${PROJECT_SOURCE_DIR}/neuro/Tile.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Board.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Army.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Hand.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Player.cpp
-	${PROJECT_SOURCE_DIR}/neuro/Arbiter.cpp
-	${PROJECT_SOURCE_DIR}/neuro/Game.cpp
 	${PROJECT_SOURCE_DIR}/utility/DFStyleReader.cpp
 	${PROJECT_SOURCE_DIR}/utility/DFStyleCreator.cpp
 	${PROJECT_SOURCE_DIR}/utility/DFDirectoryReader.cpp
-	${PROJECT_SOURCE_DIR}/viewmodel/BoardLoader.cpp
-	${PROJECT_SOURCE_DIR}/viewmodel/ArmyLoader.cpp
-	${PROJECT_SOURCE_DIR}/viewmodel/Configurer.cpp
-	${PROJECT_SOURCE_DIR}/viewmodel/MainMenu.cpp
-	${PROJECT_SOURCE_DIR}/viewmodel/Application.cpp
+	)
+
+set(NEUROSERVER_HDRS
+	${COMMON_HDRS}
+	${PROJECT_SOURCE_DIR}/neuroServer/Contestant.hpp
+	${PROJECT_SOURCE_DIR}/neuroServer/Arbiter.hpp
+	${PROJECT_SOURCE_DIR}/neuroServer/Game.hpp
+	${PROJECT_SOURCE_DIR}/neuroServer/GameOptions.hpp
+	${PROJECT_SOURCE_DIR}/neuroServer/BoardLoader.hpp
+	${PROJECT_SOURCE_DIR}/neuroServer/ArmyLoader.hpp
+	${PROJECT_SOURCE_DIR}/neuroServer/Configurer.hpp
+	${PROJECT_SOURCE_DIR}/neuroServer/Application.hpp
+	)
+
+set(NEUROSERVER_SRCS
+	${COMMON_SRCS}
+	${PROJECT_SOURCE_DIR}/neuroServer/Arbiter.cpp
+	${PROJECT_SOURCE_DIR}/neuroServer/Game.cpp
+	${PROJECT_SOURCE_DIR}/neuroServer/BoardLoader.cpp
+	${PROJECT_SOURCE_DIR}/neuroServer/ArmyLoader.cpp
+	${PROJECT_SOURCE_DIR}/neuroServer/Configurer.cpp
+	${PROJECT_SOURCE_DIR}/neuroServer/Application.cpp
+	)
+
+set(NEUROCLIENT_HDRS
+	${COMMON_HDRS}
+	${PROJECT_SOURCE_DIR}/neuroClient/Application.hpp
+	${PROJECT_SOURCE_DIR}/neuroClient/Game.hpp
+	)
+
+set(NEUROCLIENT_SRCS
+	${COMMON_SRCS}
+	${PROJECT_SOURCE_DIR}/neuroClient/Application.cpp
+	${PROJECT_SOURCE_DIR}/neuroClient/Game.cpp
 	)
 
 pkg_search_module(SDL2 REQUIRED sdl2)
@@ -80,9 +98,16 @@ set(LIBS ${LIBS} ${SDL2_LIBRARIES} ${Boost_LIBRARIES})
 
 link_libraries(${LIBS} ${CMAKE_THREAD_LIBS_INIT})
 
-add_executable(Neurohex ${HDRS} ${SRCS} ${PROJECT_SOURCE_DIR}/Main.cpp)
+add_executable(NeurohexServer ${NEUROSERVER_HDRS} ${NEUROSERVER_SRCS} ${PROJECT_SOURCE_DIR}/NeuroServer.cpp)
 
-install(TARGETS Neurohex
+install(TARGETS NeurohexServer
+	RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
+	CONFIGURATIONS Relase
+	)
+
+add_executable(NeurohexClient ${NEUROCLIENT_HDRS} ${NEUROCLIENT_SRCS} ${PROJECT_SOURCE_DIR}/NeuroClient.cpp)
+
+install(TARGETS NeurohexClient
 	RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
 	CONFIGURATIONS Relase
 	)
@@ -96,7 +121,7 @@ if(GTEST_FOUND)
 	
 	set(NEURO_TEST_DIR ${PROJECT_SOURCE_DIR}/neuro/test)
 	set(NEURO_TEST_SRCS
-		${SRCS}
+		${COMMON_SRCS}
 		${NEURO_TEST_DIR}/BoardTest.cpp
 		${NEURO_TEST_DIR}/TileTest.cpp
 		)
@@ -106,17 +131,17 @@ if(GTEST_FOUND)
 	add_test(NAME neuroTest
 		COMMAND neuroTest)
 
-	set(VIEWMODEL_TEST_DIR ${PROJECT_SOURCE_DIR}/viewmodel/test)
-	set(VIEWMODEL_TEST_SRCS
-		${SRCS}
-		${VIEWMODEL_TEST_DIR}/ArmyLoaderTest.cpp
-		${VIEWMODEL_TEST_DIR}/BoardLoaderTest.cpp
+	set(NEUROSERVER_TEST_DIR ${PROJECT_SOURCE_DIR}/neuroServer/test)
+	set(NEUROSERVER_TEST_SRCS
+		${NEUROSERVER_SRCS}
+		${NEUROSERVER_TEST_DIR}/ArmyLoaderTest.cpp
+		${NEUROSERVER_TEST_DIR}/BoardLoaderTest.cpp
 		)
-	add_executable(viewmodelTest ${VIEWMODEL_TEST_SRCS})
-	target_link_libraries(viewmodelTest
+	add_executable(neuroServerTest ${NEUROSERVER_TEST_SRCS})
+	target_link_libraries(neuroServerTest
 		${GTEST_LIBRARY}	${GTEST_MAIN_LIBRARY})
-	add_test(NAME viewmodelTest
-		COMMAND viewmodelTest)
+	add_test(NAME neuroServerTest
+		COMMAND neuroServerTest)
 
 endif()
 # Use doxygen for documentation.

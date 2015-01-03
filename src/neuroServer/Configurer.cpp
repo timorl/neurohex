@@ -1,6 +1,6 @@
-#include"viewmodel/Configurer.hpp"
+#include"neuroServer/Configurer.hpp"
 
-namespace viewmodel {
+namespace neuroServer {
 
 	bool Configurer::verifySettings() const {
 		//FIXME: Actually chack something.
@@ -9,7 +9,7 @@ namespace viewmodel {
 
  bool Configurer::startGame() {
 		if ( verifySettings() ) {
-			game = GameP( new neuro::Game( config ) );
+			game = GameP( new Game( config ) );
 			sigModified(*this);
 			game->play();
 			game.reset();

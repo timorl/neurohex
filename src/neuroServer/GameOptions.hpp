@@ -1,13 +1,13 @@
-#ifndef NEURO_GAMEOPTIONS_HPP
-#define NEURO_GAMEOPTIONS_HPP
+#ifndef NEUROSERVER_GAMEOPTIONS_HPP
+#define NEUROSERVER_GAMEOPTIONS_HPP
 
 #include<memory>
 #include<vector>
 #include"neuro/Army.hpp"
 #include"neuro/Board.hpp"
-#include"neuro/Contestant.hpp"
+#include"neuroServer/Contestant.hpp"
 
-namespace neuro {
+namespace neuroServer {
 
 	using Contestants = std::vector<ContestantP>;
 
@@ -23,7 +23,7 @@ namespace neuro {
 		/**
 			* @brief Tiles in armies of players in order of players.
 			*/
-		std::vector< std::vector<Tile> > armies;
+		std::vector< std::vector<neuro::Tile> > armies;
 
 		/**
 			* @brief The health all the players will be starting with.
@@ -33,7 +33,7 @@ namespace neuro {
 		/**
 			* @brief The description of the Board to play on.
 			*/
-		BoardDescription board;
+		neuro::BoardDescription board;
 	};
 
 }

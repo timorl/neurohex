@@ -1,7 +1,7 @@
 #include<gtest/gtest.h>
-#include"viewmodel/ArmyLoader.hpp"
+#include"neuroServer/ArmyLoader.hpp"
 
-namespace viewmodel {
+namespace neuroServer {
 
 	class ArmyLoaderTest : public ::testing::Test {
 		public:

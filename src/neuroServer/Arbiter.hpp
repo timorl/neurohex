@@ -1,15 +1,15 @@
-#ifndef NEURO_ARBITER_HPP
-#define NEURO_ARBITER_HPP
+#ifndef NEUROSERVER_ARBITER_HPP
+#define NEUROSERVER_ARBITER_HPP
 
 #include<memory>
 #include<vector>
 #include"neuro/Board.hpp"
 #include"neuro/Player.hpp"
-#include"neuro/Contestant.hpp"
+#include"neuroServer/Contestant.hpp"
 
-namespace neuro {
+namespace neuroServer {
 
-	using Players = std::vector< Player >;
+	using Players = std::vector< neuro::Player >;
 
 	/**
 		* @brief The entity relaying instructions from the Contestant to the Game.
@@ -31,7 +31,7 @@ namespace neuro {
 				* @return A validated move the contestant wants to make.
 				* @todo Actually validate the moves.
 				*/
-			Move getMove( int playerId, const Players & players, const Board & board, bool noArmy );
+			Move getMove( int playerId, const Players & players, const neuro::Board & board, bool noArmy );
 
 			/**
 				* @brief Returns a validated list of targets the contestant wants to affect
@@ -45,7 +45,7 @@ namespace neuro {
 				* @return A validated list of targets.
 				* @todo Actually validate the targets.
 				*/
-			Targets getTargets( int playerId, const Players & players, const Board & board, bool noArmy, AbilityIdentifier & abilityIdentifier );
+			Targets getTargets( int playerId, const Players & players, const neuro::Board & board, bool noArmy, neuro::AbilityIdentifier & abilityIdentifier );
 
 			/**
 				* @brief Returns a tile the contestant wants to discard.
@@ -56,7 +56,7 @@ namespace neuro {
 				* @return The global ID of the tile the contestant wants to discard.
 				* @todo Actually validate the tile.
 				*/
-			int requestDiscard( int playerId, const Players & players, const Board & board, bool noArmy );
+			int requestDiscard( int playerId, const Players & players, const neuro::Board & board, bool noArmy );
 
 			/**
 				* @brief Starts requesting targets for a list of abilities from the
@@ -68,7 +68,7 @@ namespace neuro {
 				* @param[in] abilities The abilities for whose targets to ask.
 				* @todo This is a stub, implement.
 				*/
-			void requestTargetsForAbilities( int playerId, const Players & players, const Board & board, bool noArmy, std::vector< AbilityIdentifier > abilities );
+			void requestTargetsForAbilities( int playerId, const Players & players, const neuro::Board & board, bool noArmy, std::vector< neuro::AbilityIdentifier > abilities );
 
 			/**
 				* @brief Get the targets for one of previously requested abilities.
@@ -88,7 +88,7 @@ namespace neuro {
 				* @return A list of targets for the ability.
 				* @todo Actually do anything of the above.
 				*/
-			static Targets generateTargets( const Board & board, AbilityIdentifier & abilityIdentifier );
+			static Targets generateTargets( const neuro::Board & board, neuro::AbilityIdentifier & abilityIdentifier );
 
 			/**
 				* @brief Removes from the provided targets those, which would not be
@@ -100,7 +100,7 @@ namespace neuro {
 				* acceptable false.
 				* @todo Actually do anything of the above.
 				*/
-			static bool purgeTargets( Targets & targets, const Board & board, AbilityIdentifier identifier );
+			static bool purgeTargets( Targets & targets, const neuro::Board & board, neuro::AbilityIdentifier identifier );
 		private:
 			ContestantP contestant;
 	};

@@ -1,16 +1,16 @@
-#ifndef VIEWMODEL_CONFIGURER_HPP
-#define VIEWMODEL_CONFIGURER_HPP
+#ifndef NEUROSERVER_CONFIGURER_HPP
+#define NEUROSERVER_CONFIGURER_HPP
 
 #include<memory>
 #include<vector>
-#include"viewmodel/BoardLoader.hpp"
-#include"viewmodel/ArmyLoader.hpp"
-#include"neuro/GameOptions.hpp"
-#include"neuro/Game.hpp"
+#include"neuroServer/BoardLoader.hpp"
+#include"neuroServer/ArmyLoader.hpp"
+#include"neuroServer/GameOptions.hpp"
+#include"neuroServer/Game.hpp"
 
-namespace viewmodel {
+namespace neuroServer {
 
-	using GameP = std::unique_ptr<neuro::Game>;
+	using GameP = std::unique_ptr<Game>;
 
 	/**
 		* @brief A class for crating a game configuration.
@@ -42,7 +42,7 @@ namespace viewmodel {
 			/**
 				* @brief Returns the created GameOptions.
 				*/
-			neuro::GameOptions getConfiguration() const { return config; }
+			GameOptions getConfiguration() const { return config; }
 
 			/**
 				* @brief Returns a list of available boards with short descriptions.
@@ -59,7 +59,7 @@ namespace viewmodel {
 				* @param[in] contestant A pointer to the contestant to add.
 				* @return The contestants ID.
 				*/
-			int addContestant(neuro::ContestantP contestant) { config.contestants.push_back(contestant), config.armies.push_back( std::vector<neuro::Tile>() ); sigModified(*this); return config.contestants.size() - 1; };
+			int addContestant(ContestantP contestant) { config.contestants.push_back(contestant), config.armies.push_back( std::vector<neuro::Tile>() ); sigModified(*this); return config.contestants.size() - 1; };
 
 			/**
 				* @brief Sets an army for the specified contestant.
@@ -95,7 +95,7 @@ namespace viewmodel {
 		private:
 			BoardLoader & boardLoader;
 			ArmyLoader & armyLoader;
-			neuro::GameOptions config;
+			GameOptions config;
 			GameP game;
 	};
 

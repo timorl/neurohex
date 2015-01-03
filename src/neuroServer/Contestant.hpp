@@ -1,5 +1,5 @@
-#ifndef NEURO_CONTESTANT_HPP
-#define NEURO_CONTESTANT_HPP
+#ifndef NEUROSERVER_CONTESTANT_HPP
+#define NEUROSERVER_CONTESTANT_HPP
 
 #include<memory>
 #include<vector>
@@ -7,9 +7,9 @@
 #include"neuro/Player.hpp"
 #include"neuro/Tile.hpp"
 
-namespace neuro {
+namespace neuroServer {
 
-	using Players = std::vector< Player >;
+	using Players = std::vector< neuro::Player >;
 
 	/**
 		* @brief A move one may request from a player during his turn.
@@ -30,7 +30,7 @@ namespace neuro {
 			* @brief The identifier of the ability to use, if discard is true everything
 			* but the tile is ignored.
 			*/
-		AbilityIdentifier abilityIdentifier;
+		neuro::AbilityIdentifier abilityIdentifier;
 	};
 
 	/**
@@ -40,12 +40,12 @@ namespace neuro {
 		/**
 			* @brief The coordinates of the field.
 			*/
-		Coordinates coords;
+		neuro::Coordinates coords;
 
 		/**
 			* @brief An orientation, if applicable for targetting.
 			*/
-		Orientation orientation;
+		neuro::Orientation orientation;
 
 		/**
 			* @brief A list of tiles on the field being targetted.
@@ -61,9 +61,9 @@ namespace neuro {
 		*/
 	class Contestant {
 		public:
-			virtual Move getMove(int playerId, const Players & players, const Board & board, bool noArmy) = 0;
-			virtual Targets getTargets(int playerId, const Players & players, const Board & board, bool noArmy, AbilityIdentifier & abilityIdentifier) = 0;
-			virtual int requestDiscard(int playerId, const Players & players, const Board & board, bool noArmy) = 0;
+			virtual Move getMove(int playerId, const Players & players, const neuro::Board & board, bool noArmy) = 0;
+			virtual Targets getTargets(int playerId, const Players & players, const neuro::Board & board, bool noArmy, neuro::AbilityIdentifier & abilityIdentifier) = 0;
+			virtual int requestDiscard(int playerId, const Players & players, const neuro::Board & board, bool noArmy) = 0;
 	};
 
 	using ContestantP = std::shared_ptr<Contestant>;

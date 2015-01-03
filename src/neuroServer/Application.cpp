@@ -1,6 +1,6 @@
-#include"Application.hpp"
+#include"neuroServer/Application.hpp"
 
-namespace viewmodel {
+namespace neuroServer {
 
 	std::string Application::globalDataDirectory = "";
 	std::string Application::localDataDirectory = "";

@@ -1,13 +1,13 @@
-#ifndef VIEWMODEL_APPLICATION_HPP
-#define VIEWMODEL_APPLICATION_HPP
+#ifndef NEUROSERVER_APPLICATION_HPP
+#define NEUROSERVER_APPLICATION_HPP
 
 #include<memory>
 #include"ui/Observable.hpp"
-#include"viewmodel/BoardLoader.hpp"
-#include"viewmodel/ArmyLoader.hpp"
-#include"viewmodel/MainMenu.hpp"
+#include"neuroServer/BoardLoader.hpp"
+#include"neuroServer/ArmyLoader.hpp"
+#include"neuroServer/Configurer.hpp"
 
-namespace viewmodel {
+namespace neuroServer {
 
 	/**
 		* @brief The class to start the whole application.
@@ -17,10 +17,10 @@ namespace viewmodel {
 			/**
 				* @brief Create a new application object.
 				*/
-			Application() : mainMenu(boardLoader, armyLoader) {}
+			Application() : configurer(boardLoader, armyLoader) {}
 
 			/**
-				* @brief Loads resources and starts the main menu.
+				* @brief Loads resources.
 				*/
 			void start();
 
@@ -35,9 +35,9 @@ namespace viewmodel {
 			const ArmyLoader & getArmyLoader() const {	return armyLoader;	}
 
 			/**
-				* @brief Returns a pointer to the main menu.
+				* @brief Returns a reference to the game configurer.
 				*/
-			MainMenu & getMainMenu() { return mainMenu; }
+			Configurer & getConfigurer() { return configurer; }
 
 			/**
 				* @brief The global directory containing all the application data.
@@ -50,9 +50,9 @@ namespace viewmodel {
 				*/
 			static std::string localDataDirectory;
 		private:
-			MainMenu mainMenu;
 			BoardLoader boardLoader;
 			ArmyLoader armyLoader;
+			Configurer configurer;
 	};
 
 }

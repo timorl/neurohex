@@ -1,5 +1,5 @@
-#ifndef VIEWMODEL_ARMYLOADER_HPP
-#define VIEWMODEL_ARMYLOADER_HPP
+#ifndef NEUROSERVER_ARMYLOADER_HPP
+#define NEUROSERVER_ARMYLOADER_HPP
 
 #include<vector>
 #include"ui/Observable.hpp"
@@ -7,7 +7,7 @@
 #include"utility/DFStyleReader.hpp"
 #include"neuro/Army.hpp"
 
-namespace viewmodel {
+namespace neuroServer {
 
 	/**
 		* @brief A class for loading files with army descriptions.

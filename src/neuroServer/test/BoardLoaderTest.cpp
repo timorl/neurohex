@@ -1,7 +1,7 @@
 #include<gtest/gtest.h>
-#include"viewmodel/BoardLoader.hpp"
+#include"neuroServer/BoardLoader.hpp"
 
-namespace viewmodel {
+namespace neuroServer {
 
 	class BoardLoaderTest : public ::testing::Test {
 		public:

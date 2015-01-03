@@ -1,21 +1,21 @@
-#ifndef NEURO_GAME_HPP
-#define NEURO_GAME_HPP
+#ifndef NEUROSERVER_GAME_HPP
+#define NEUROSERVER_GAME_HPP
 
 #include<memory>
 #include<vector>
-#include"neuro/Arbiter.hpp"
 #include"neuro/Board.hpp"
-#include"neuro/Contestant.hpp"
-#include"neuro/GameOptions.hpp"
 #include"neuro/Player.hpp"
 #include"neuro/Tile.hpp"
+#include"neuroServer/Arbiter.hpp"
+#include"neuroServer/Contestant.hpp"
+#include"neuroServer/GameOptions.hpp"
 #include"ui/Observable.hpp"
 #include"utility/DFStyleReader.hpp"
 #include"utility/DFStyleCreator.hpp"
 
-namespace neuro {
+namespace neuroServer {
 
-	using Players = std::vector<Player>;
+	using Players = std::vector<neuro::Player>;
 	using Arbiters = std::vector<Arbiter>;
 	using Contestants = std::vector<ContestantP>;
 
@@ -62,18 +62,7 @@ namespace neuro {
 				* @param[in] orientation The orientation of the tile.
 				* @param[in] tile The tile to update.
 				*/
-			void updateTile( Coordinates coords, Orientation orientation, int tile );
-
-			/**
-				* @brief Make the game represent the one described.
-				* @details If this fails, the game might be in an illegal state, so this
-				* should be immiediately called again, before doing anything else.
-				* @param[in] input The description.
-				* @return True if this operation was successfull, false otherwise.
-				* @todo This probably should actually be in a different class representing
-				* the game for the client. Really needs work, but... after The Eduardo.
-				*/
-			bool fillFromDFStyle(utility::DFStyleReader & input);
+			void updateTile( neuro::Coordinates coords, neuro::Orientation orientation, int tile );
 
 			/**
 				* @brief Encode the game as DFStyle.
@@ -83,16 +72,16 @@ namespace neuro {
 		private:
 			Arbiters arbiters;
 			Players players;
-			Board board;
+			neuro::Board board;
 			int currentPlayer;
 			bool noArmy;
 
 			void removeFromBoard( int tile );
-			void placeOnBoard( int tile, Coordinates coords, Orientation orientation );
+			void placeOnBoard( int tile, neuro::Coordinates coords, neuro::Orientation orientation );
 
 			void tilePlacing( int tile );
-			void executeAbility( AbilityIdentifier & abilityIdentifier, Targets & targets );
-			void abilityUsing( AbilityIdentifier & abilityIdentifier );
+			void executeAbility( neuro::AbilityIdentifier & abilityIdentifier, Targets & targets );
+			void abilityUsing( neuro::AbilityIdentifier & abilityIdentifier );
 			void useModifications( int tile );
 			void clearDead();
 			void battleStart();

@@ -1,5 +1,5 @@
-#ifndef VIEWMODEL_BOARDLOADER_HPP
-#define VIEWMODEL_BOARDLOADER_HPP
+#ifndef NEUROSERVER_BOARDLOADER_HPP
+#define NEUROSERVER_BOARDLOADER_HPP
 
 #include<vector>
 #include"ui/Observable.hpp"
@@ -7,7 +7,7 @@
 #include"utility/DFStyleReader.hpp"
 #include"neuro/Board.hpp"
 
-namespace viewmodel {
+namespace neuroServer {
 
 	/**
 		* @brief A class for loading files with board descriptions.

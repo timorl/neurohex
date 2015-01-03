@@ -116,8 +116,6 @@ namespace neuro {
 
 		/**
 			* @brief A list of tiles important for some targetting types, e.g. AWAY.
-			* @todo Not the best way of identifying tiles, since it's hard to communicate
-			* it over a network or something.
 			*/
 		std::list< int > importantTiles;
 
@@ -127,10 +125,6 @@ namespace neuro {
 			* should be immiediately called again, before doing anything else.
 			* @param[in] input The description.
 			* @return True if this operation was successfull, false otherwise.
-			* @todo This probably should actually be in a different class representing
-			* the game for the client. Really needs work, but... after The Eduardo.
-			* @todo This won't really work now, because we have a pointer here. Maybe we
-			* should identify tiles in some other way...?
 			*/
 		bool fillFromDFStyle(utility::DFStyleReader & input);
 
@@ -223,8 +217,6 @@ namespace neuro {
 						* should be immiediately called again, before doing anything else.
 						* @param[in] input The description.
 						* @return True if this operation was successfull, false otherwise.
-						* @todo This probably should actually be in a different class representing
-						* the game for the client. Really needs work, but... after The Eduardo.
 						*/
 					bool fillFromDFStyle(utility::DFStyleReader & input);
 
@@ -368,8 +360,6 @@ namespace neuro {
 						* @param[in] input The description.
 						* @param[in] grp The ability group of the ability.
 						* @return True if this operation was successfull, false otherwise.
-						* @todo This probably should actually be in a different class representing
-						* the game for the client. Really needs work, but... after The Eduardo.
 						*/
 					bool fillFromDFStyle(utility::DFStyleReader & input, AbilityGroup grp);
 
@@ -447,8 +437,6 @@ namespace neuro {
 						* should be immiediately called again, before doing anything else.
 						* @param[in] input The description.
 						* @return True if this operation was successfull, false otherwise.
-						* @todo This probably should actually be in a different class representing
-						* the game for the client. Really needs work, but... after The Eduardo.
 						*/
 					bool fillFromDFStyle(utility::DFStyleReader & input);
 
@@ -506,7 +494,8 @@ namespace neuro {
 				life(other.life),
 				initiative(other.initiative),
 				name(other.name),
-				type(other.type) {}
+				type(other.type),
+				globalID(other.globalID) {}
 
 
 			/**
@@ -658,8 +647,6 @@ namespace neuro {
 				* should be immiediately called again, before doing anything else.
 				* @param[in] input The description.
 				* @return True if this operation was successfull, false otherwise.
-				* @todo This probably should actually be in a different class representing
-				* the game for the client. Really needs work, but... after The Eduardo.
 				*/
 			bool fillFromDFStyle(utility::DFStyleReader & input);
 

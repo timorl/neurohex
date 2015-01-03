@@ -1,7 +1,7 @@
 #include<iostream>
-#include"viewmodel/BoardLoader.hpp"
+#include"neuroServer/BoardLoader.hpp"
 
-namespace viewmodel {
+namespace neuroServer {
 
 	const std::string unrecognizedTokenMessage = "Ignoring unrecognized token: ";
 	const std::string emptyTokenMessage = "Empty token.";

@@ -1,6 +1,6 @@
 #include<cstdlib>
 #include<iostream>
-#include"viewmodel/Application.hpp"
+#include"neuroServer/Application.hpp"
 
 bool setEnvironmentVariables() {
 	char * tmp;
@@ -27,9 +27,9 @@ bool setEnvironmentVariables() {
 void setApplicationVariables() {
 	std::string programDirectory("/neurohex");
 	std::string globalDataDirectories( std::getenv("XDG_DATA_DIRS") );
-	viewmodel::Application::globalDataDirectory = globalDataDirectories.substr( 0, globalDataDirectories.find_first_of(':') ) + programDirectory;
+	neuroServer::Application::globalDataDirectory = globalDataDirectories.substr( 0, globalDataDirectories.find_first_of(':') ) + programDirectory;
 	std::string localDataDirectories( std::getenv("XDG_DATA_HOME") );
-	viewmodel::Application::localDataDirectory = localDataDirectories.substr( 0, localDataDirectories.find_first_of(':') ) + programDirectory;
+	neuroServer::Application::localDataDirectory = localDataDirectories.substr( 0, localDataDirectories.find_first_of(':') ) + programDirectory;
 }
 
 int main() {
@@ -38,7 +38,7 @@ int main() {
 		return 1;
 	}
 	setApplicationVariables();
-	viewmodel::Application application;
+	neuroServer::Application application;
 	application.start();
 	return 0;
 }
