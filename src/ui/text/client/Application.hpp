@@ -1,7 +1,7 @@
 #ifndef UI_TEXT_CLIENT_APPLICATION_HPP
 #define UI_TEXT_CLIENT_APPLICATION_HPP
 
-#include<cstdio>
+#include<iostream>
 #include"ui/Observable.hpp"
 #include"neuroClient/Application.hpp"
 
