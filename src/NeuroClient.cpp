@@ -1,6 +1,7 @@
 #include<cstdlib>
 #include<iostream>
 #include"neuroClient/Application.hpp"
+#include"ui/text/client/Application.hpp"
 
 bool setEnvironmentVariables() {
 	char * tmp;
@@ -39,6 +40,7 @@ int main() {
 	}
 	setApplicationVariables();
 	neuroClient::Application application;
+	ui::text::client::Application applicationUI(application);
 	application.start();
 	return 0;
 }
