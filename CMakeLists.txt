@@ -52,6 +52,8 @@ set(COMMON_SRCS
 
 set(NEUROSERVER_HDRS
 	${COMMON_HDRS}
+	${PROJECT_SOURCE_DIR}/network/Connection.hpp
+	${PROJECT_SOURCE_DIR}/network/Acceptor.hpp
 	${PROJECT_SOURCE_DIR}/neuroServer/Contestant.hpp
 	${PROJECT_SOURCE_DIR}/neuroServer/Arbiter.hpp
 	${PROJECT_SOURCE_DIR}/neuroServer/Game.hpp
@@ -64,6 +66,8 @@ set(NEUROSERVER_HDRS
 
 set(NEUROSERVER_SRCS
 	${COMMON_SRCS}
+	${PROJECT_SOURCE_DIR}/network/Connection.cpp
+	${PROJECT_SOURCE_DIR}/network/Acceptor.cpp
 	${PROJECT_SOURCE_DIR}/neuroServer/Arbiter.cpp
 	${PROJECT_SOURCE_DIR}/neuroServer/Game.cpp
 	${PROJECT_SOURCE_DIR}/neuroServer/BoardLoader.cpp
@@ -74,6 +78,7 @@ set(NEUROSERVER_SRCS
 
 set(NEUROCLIENT_HDRS
 	${COMMON_HDRS}
+	${PROJECT_SOURCE_DIR}/network/Connection.hpp
 	${PROJECT_SOURCE_DIR}/neuroClient/Application.hpp
 	${PROJECT_SOURCE_DIR}/neuroClient/Game.hpp
 	${PROJECT_SOURCE_DIR}/ui/text/client/Application.hpp
@@ -81,6 +86,7 @@ set(NEUROCLIENT_HDRS
 
 set(NEUROCLIENT_SRCS
 	${COMMON_SRCS}
+	${PROJECT_SOURCE_DIR}/network/Connection.cpp
 	${PROJECT_SOURCE_DIR}/neuroClient/Application.cpp
 	${PROJECT_SOURCE_DIR}/neuroClient/Game.cpp
 	${PROJECT_SOURCE_DIR}/ui/text/client/Application.cpp
