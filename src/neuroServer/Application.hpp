@@ -27,12 +27,12 @@ namespace neuroServer {
 			/**
 				* @brief Returns the BoardLoader used.
 				*/
-			const BoardLoader & getBoardLoader() const {	return boardLoader;	}
+			BoardLoader & getBoardLoader() {	return boardLoader;	}
 
 			/**
 				* @brief Returns the ArmyLoader used.
 				*/
-			const ArmyLoader & getArmyLoader() const {	return armyLoader;	}
+			ArmyLoader & getArmyLoader() {	return armyLoader;	}
 
 			/**
 				* @brief Returns a reference to the game configurer.

@@ -1,6 +1,7 @@
 #include<cstdlib>
 #include<iostream>
 #include"neuroServer/Application.hpp"
+#include"ui/text/gameServer/Application.hpp"
 
 bool setEnvironmentVariables() {
 	char * tmp;
@@ -39,6 +40,7 @@ int main() {
 	}
 	setApplicationVariables();
 	neuroServer::Application application;
+	ui::text::gameServer::Application applicationUI(application);
 	application.start();
 	return 0;
 }

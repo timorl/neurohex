@@ -377,6 +377,7 @@ namespace neuroServer {
 				armyCount++;
 				armies[armyName] = std::move(tiles);
 				descriptions[armyName] = armyDescription;
+				sigModified(*this);
 			}
 		}
 		if ( armyCount == 0 ) {

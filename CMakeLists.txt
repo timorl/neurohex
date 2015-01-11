@@ -62,6 +62,10 @@ set(NEUROSERVER_HDRS
 	${PROJECT_SOURCE_DIR}/neuroServer/ArmyLoader.hpp
 	${PROJECT_SOURCE_DIR}/neuroServer/Configurer.hpp
 	${PROJECT_SOURCE_DIR}/neuroServer/Application.hpp
+	${PROJECT_SOURCE_DIR}/ui/text/CommandShell.hpp
+	${PROJECT_SOURCE_DIR}/ui/text/gameServer/Application.hpp
+	${PROJECT_SOURCE_DIR}/ui/text/gameServer/ArmyLoader.hpp
+	${PROJECT_SOURCE_DIR}/ui/text/gameServer/BoardLoader.hpp
 	)
 
 set(NEUROSERVER_SRCS
@@ -74,6 +78,10 @@ set(NEUROSERVER_SRCS
 	${PROJECT_SOURCE_DIR}/neuroServer/ArmyLoader.cpp
 	${PROJECT_SOURCE_DIR}/neuroServer/Configurer.cpp
 	${PROJECT_SOURCE_DIR}/neuroServer/Application.cpp
+	${PROJECT_SOURCE_DIR}/ui/text/CommandShell.cpp
+	${PROJECT_SOURCE_DIR}/ui/text/gameServer/Application.cpp
+	${PROJECT_SOURCE_DIR}/ui/text/gameServer/ArmyLoader.cpp
+	${PROJECT_SOURCE_DIR}/ui/text/gameServer/BoardLoader.cpp
 	)
 
 set(NEUROCLIENT_HDRS

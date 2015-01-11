@@ -104,6 +104,7 @@ namespace neuroServer {
 		if ( boards.count( name ) == 0 ) {
 			boards[name] = board;
 			descriptions[name] = description;
+			sigModified(*this);
 		}
 	}
 
