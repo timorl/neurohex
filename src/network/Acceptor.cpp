@@ -10,11 +10,6 @@ namespace network {
 		//TODO: This is a stub.
 	}
 
-	bool Acceptor::hasNextConnection() const {
-		//TODO: This is a stub.
-		return false;
-	}
-
 	Connection Acceptor::getNextConnection() {
 		//TODO: This is a stub.
 		return Connection();

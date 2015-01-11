@@ -24,13 +24,8 @@ namespace network {
 			~Acceptor();
 
 			/**
-				* @brief Whether there is a connection waiting to be processed.
-				*/
-			bool hasNextConnection() const;
-
-			/**
 				* @brief Returns the first available connection. If there are no
-				* connections the behaviour is unspecified.
+				* connections wait for one.
 				*/
 			Connection getNextConnection();
 
