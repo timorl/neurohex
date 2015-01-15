@@ -5,7 +5,7 @@
 #include"ui/Observable.hpp"
 #include"neuroServer/BoardLoader.hpp"
 #include"neuroServer/ArmyLoader.hpp"
-#include"neuroServer/Configurer.hpp"
+#include"neuroServer/Server.hpp"
 
 namespace neuroServer {
 
@@ -17,7 +17,7 @@ namespace neuroServer {
 			/**
 				* @brief Create a new application object.
 				*/
-			Application() : configurer(boardLoader, armyLoader) {}
+			Application() : server(boardLoader, armyLoader) {}
 
 			/**
 				* @brief Loads resources.
@@ -35,9 +35,9 @@ namespace neuroServer {
 			ArmyLoader & getArmyLoader() {	return armyLoader;	}
 
 			/**
-				* @brief Returns a reference to the game configurer.
+				* @brief Returns a reference to the game server pointer.
 				*/
-			Configurer & getConfigurer() { return configurer; }
+			Server & getServer() { return server; }
 
 			/**
 				* @brief The global directory containing all the application data.
@@ -52,7 +52,7 @@ namespace neuroServer {
 		private:
 			BoardLoader boardLoader;
 			ArmyLoader armyLoader;
-			Configurer configurer;
+			Server server;
 	};
 
 }

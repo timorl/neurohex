@@ -13,6 +13,8 @@ namespace neuroServer {
 		armyLoader.loadArmies(globalDataDirectory + armySubdirectory);
 		armyLoader.loadArmies(localDataDirectory + armySubdirectory);
 		sigModified(*this);
+		server.beginConfiguration();
+		sigModified(*this);
 	}
 
 }

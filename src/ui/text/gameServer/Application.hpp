@@ -5,6 +5,7 @@
 #include"ui/Observable.hpp"
 #include"neuroServer/Application.hpp"
 #include"ui/text/CommandShell.hpp"
+#include"ui/text/gameServer/Server.hpp"
 #include"ui/text/gameServer/ArmyLoader.hpp"
 #include"ui/text/gameServer/BoardLoader.hpp"
 
@@ -25,6 +26,7 @@ namespace gameServer {
 			neuroServer::Application & application;
 			ArmyLoader armyLoader;
 			BoardLoader boardLoader;
+			Server server;
 	};
 
 }
