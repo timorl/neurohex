@@ -11,13 +11,14 @@ namespace network {
 		return false;
 	}
 
-	std::string Connection::nextMessage() {
+	bool Connection::setResponseHandler(ResponseHandler handler) {
 		//TODO: This is a stub.
-		return "";
+		return false;
 	}
 
-	void Connection::sendMessage(std::string message) {
+	bool Connection::sendMessage(std::string message, ResponseHandler handler) {
 		//TODO: This is a stub.
+		return false;
 	}
 
 	Connection Connection::connectTo(std::string address) {

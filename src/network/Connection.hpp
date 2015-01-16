@@ -5,6 +5,8 @@
 
 namespace network {
 
+	using ResponseHandler = std::function<void(std::string)>;
+
 	/**
 		* @brief A representation of a single network connection to which you can write
 		* and from which you can read.
@@ -25,17 +27,22 @@ namespace network {
 			bool isClosed() const;
 
 			/**
-				* @brief Returns the next message we got from this connection. Might block
-				* and wait for something to return. Returns an empty string if closed.
+				* @brief Sets a function to call after we got the next full response.
+				* @param[in] handler The function to handle the response.
+				* @return Whether it was possible to set the handler -- it is impossible if
+				* the Connection is currently used for some other communication.
 				*/
-			std::string nextMessage();
+			bool setResponseHandler(ResponseHandler handler);
 
 			/**
 				* @brief Sends the specified message to the other side of this connection.
-				* No guarantee as to whether the message has been send.
 				* @param[in] message The message to be send.
+				* @param[in] handler The handler to set for receiving responces after
+				* sending the message. This should be empty, if no response is anticipated.
+				* @return Whether it was possible to send the message -- it is impossible if
+				* the Connection is currently used for some other communication.
 				*/
-			void sendMessage(std::string message);
+			bool sendMessage(std::string message, ResponseHandler handler);
 
 			/**
 				* @brief Create a connection to the specified address.
