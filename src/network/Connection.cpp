@@ -21,6 +21,14 @@ namespace network {
 		return false;
 	}
 
+	void Connection::wait() {
+		//TODO: This is a stub.
+	}
+
+	void Connection::close() {
+		//TODO: This is a stub.
+	}
+
 	Connection Connection::connectTo(std::string address) {
 		//TODO: This is a stub.
 		return Connection();

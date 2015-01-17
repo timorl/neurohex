@@ -30,15 +30,10 @@ namespace network {
 			Connection getNextConnection();
 
 			/**
-				* @brief Stop accepting connections on the port. If there are any pending
-				* connections, close them.
-				*/
-			void stopAccepting();
-
-			/**
 				* @brief Start accepting connections on the port.
+				* @param[in] max The maximum number of connections to keep open.
 				*/
-			void startAccepting();
+			void startAccepting(int max);
 		private:
 	};
 

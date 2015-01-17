@@ -15,11 +15,7 @@ namespace network {
 		return Connection();
 	}
 
-	void Acceptor::stopAccepting() {
-		//TODO: This is a stub.
-	}
-
-	void Acceptor::startAccepting() {
+	void Acceptor::startAccepting(int max) {
 		//TODO: This is a stub.
 	}
 

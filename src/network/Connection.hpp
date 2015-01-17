@@ -46,6 +46,17 @@ namespace network {
 			bool sendMessage(std::string message, ResponseHandler handler);
 
 			/**
+				* @brief Blocks until the next communication sequence ends or the connection
+				* is closed for some reason.
+				*/
+			void wait();
+
+			/**
+				* @brief Closes the connection.
+				*/
+			void close();
+
+			/**
 				* @brief Create a connection to the specified address.
 				* @param[in] address The address to which to connect.
 				* @todo Either specify properly the format of the address string or change
