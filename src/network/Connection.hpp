@@ -2,6 +2,7 @@
 #define NETWORK_CONNECTION_HPP
 
 #include<string>
+#include<functional>
 
 namespace network {
 
