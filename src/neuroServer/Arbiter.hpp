@@ -9,6 +9,7 @@
 
 namespace neuroServer {
 
+	class Game;
 	using Players = std::vector< neuro::Player >;
 
 	/**
@@ -25,50 +26,42 @@ namespace neuroServer {
 			/**
 				* @brief Returns a validated move the contestant wants to make.
 				* @param[in] playerId The id of the Player the contestant controls.
-				* @param[in] players A reference to a std::vector of players in the game.
-				* @param[in] board A reference to the board.
-				* @param[in] noArmy Whether any players army already ran out.
+				* @param[in] game A reference to the game.
 				* @return A validated move the contestant wants to make.
 				* @todo Actually validate the moves.
 				*/
-			Move getMove( int playerId, const Players & players, const neuro::Board & board, bool noArmy );
+			Move getMove(int playerId, const Game & game);
 
 			/**
 				* @brief Returns a validated list of targets the contestant wants to affect
 				* with the specified ability.
 				* @param[in] playerId The id of the Player the contestant controls.
-				* @param[in] players A reference to a std::vector of players in the game.
-				* @param[in] board A reference to the board.
-				* @param[in] noArmy Whether any players army already ran out.
+				* @param[in] game A reference to the game.
 				* @param[in] abilityIdentifier The ability for which the target is being
 				* requested.
 				* @return A validated list of targets.
 				* @todo Actually validate the targets.
 				*/
-			Targets getTargets( int playerId, const Players & players, const neuro::Board & board, bool noArmy, neuro::AbilityIdentifier & abilityIdentifier );
+			Targets getTargets(int playerId, const Game & game, neuro::AbilityIdentifier & abilityIdentifier );
 
 			/**
 				* @brief Returns a tile the contestant wants to discard.
 				* @param[in] playerId The id of the Player the contestant controls.
-				* @param[in] players A reference to a std::vector of players in the game.
-				* @param[in] board A reference to the board.
-				* @param[in] noArmy Whether any players army already ran out.
+				* @param[in] game A reference to the game.
 				* @return The global ID of the tile the contestant wants to discard.
 				* @todo Actually validate the tile.
 				*/
-			int requestDiscard( int playerId, const Players & players, const neuro::Board & board, bool noArmy );
+			int getDiscard(int playerId, const Game & game);
 
 			/**
 				* @brief Starts requesting targets for a list of abilities from the
 				* contestant until it gets valid ones. Does not block.
 				* @param[in] playerId The id of the Player the contestant controls.
-				* @param[in] players A reference to a std::vector of players in the game.
-				* @param[in] board A reference to the board.
-				* @param[in] noArmy Whether any players army already ran out.
+				* @param[in] game A reference to the game.
 				* @param[in] abilities The abilities for whose targets to ask.
 				* @todo This is a stub, implement.
 				*/
-			void requestTargetsForAbilities( int playerId, const Players & players, const neuro::Board & board, bool noArmy, std::vector< neuro::AbilityIdentifier > abilities );
+			void requestTargetsForAbilities( int playerId, const Game & game, std::vector< neuro::AbilityIdentifier > abilities );
 
 			/**
 				* @brief Get the targets for one of previously requested abilities.

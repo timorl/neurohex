@@ -6,9 +6,12 @@
 #include"neuro/Board.hpp"
 #include"neuro/Player.hpp"
 #include"neuro/Tile.hpp"
+#include"utility/DFStyleReader.hpp"
+#include"utility/DFStyleCreator.hpp"
 
 namespace neuroServer {
 
+	class Game;
 	using Players = std::vector< neuro::Player >;
 
 	/**
@@ -31,6 +34,21 @@ namespace neuroServer {
 			* but the tile is ignored.
 			*/
 		neuro::AbilityIdentifier abilityIdentifier;
+
+		/**
+			* @brief Make the move represent the one described.
+			* @details If this fails, the move might be in an illegal state, so this
+			* should be immiediately called again, before doing anything else.
+			* @param[in] input The description.
+			* @return True if this operation was successfull, false otherwise.
+			*/
+		bool fillFromDFStyle(utility::DFStyleReader & input);
+
+		/**
+			* @brief Encode the move as DFStyle.
+			* @param[out] output The encoder to which to write.
+			*/
+		void encodeAsDFStyle(utility::DFStyleCreator & output) const;
 	};
 
 	/**
@@ -51,9 +69,24 @@ namespace neuroServer {
 			* @brief A list of tiles on the field being targetted.
 			*/
 		std::list< int > tiles;
+
+		/**
+			* @brief Make the target represent the one described.
+			* @details If this fails, the target might be in an illegal state, so this
+			* should be immiediately called again, before doing anything else.
+			* @param[in] input The description.
+			* @return True if this operation was successfull, false otherwise.
+			*/
+		bool fillFromDFStyle(utility::DFStyleReader & input);
+
+		/**
+			* @brief Encode the target as DFStyle.
+			* @param[out] output The encoder to which to write.
+			*/
+		void encodeAsDFStyle(utility::DFStyleCreator & output) const;
 	};
 
-	using Targets = std::list< Target > ;
+	using Targets = std::vector< Target > ;
 
 	/**
 		* @brief The interface any contestant (i.e. bot or player ui) should
@@ -61,9 +94,12 @@ namespace neuroServer {
 		*/
 	class Contestant {
 		public:
-			virtual Move getMove(int playerId, const Players & players, const neuro::Board & board, bool noArmy) = 0;
-			virtual Targets getTargets(int playerId, const Players & players, const neuro::Board & board, bool noArmy, neuro::AbilityIdentifier & abilityIdentifier) = 0;
-			virtual int requestDiscard(int playerId, const Players & players, const neuro::Board & board, bool noArmy) = 0;
+			virtual void requestMove(int playerId, const Game & game) = 0;
+			virtual Move getMove(int playerId, const Game & game) = 0;
+			virtual void requestTargets(int playerId, const Game & game, std::vector< neuro::AbilityIdentifier > abilities) = 0;
+			virtual Targets getTargets(int playerId, const Game & game, std::vector< neuro::AbilityIdentifier > abilities) = 0;
+			virtual void requestDiscard(int playerId, const Game & game) = 0;
+			virtual int getDiscard(int playerId, const Game & game) = 0;
 	};
 
 	using ContestantP = std::shared_ptr<Contestant>;

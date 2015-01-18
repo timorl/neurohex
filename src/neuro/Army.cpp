@@ -47,7 +47,7 @@ namespace neuro {
 		return false;
 	}
 
-	void Army::encodeAsDFStyle(utility::DFStyleCreator & output) {
+	void Army::encodeAsDFStyle(utility::DFStyleCreator & output) const {
 		output.startToken("OWNER");
 		output.addToToken(owner);
 		output.endToken();

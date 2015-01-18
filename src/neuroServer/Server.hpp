@@ -7,6 +7,7 @@
 #include"neuroServer/BoardLoader.hpp"
 #include"neuroServer/ArmyLoader.hpp"
 #include"neuroServer/Configurer.hpp"
+#include"neuroServer/NetworkContestant.hpp"
 
 namespace neuroServer {
 
@@ -67,6 +68,10 @@ namespace neuroServer {
 			Configurer configurer;
 			int port;
 			int maxConnections;
+
+			std::vector< NetworkContestantP > contestants;
+
+			void configureGlobal();
 	};
 
 }

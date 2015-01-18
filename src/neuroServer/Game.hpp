@@ -68,7 +68,7 @@ namespace neuroServer {
 				* @brief Encode the game as DFStyle.
 				* @param[out] output The encoder to which to write.
 				*/
-			void encodeAsDFStyle(utility::DFStyleCreator & output);
+			void encodeAsDFStyle(utility::DFStyleCreator & output) const;
 		private:
 			Arbiters arbiters;
 			Players players;

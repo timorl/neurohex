@@ -155,7 +155,7 @@ namespace neuro {
 				* @brief Encode the board as DFStyle.
 				* @param[out] output The encoder to which to write.
 				*/
-			void encodeAsDFStyle(utility::DFStyleCreator & output);
+			void encodeAsDFStyle(utility::DFStyleCreator & output) const;
 		private:
 			int width;
 			int height;

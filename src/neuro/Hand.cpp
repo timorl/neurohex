@@ -32,7 +32,7 @@ namespace neuro {
 		return false;
 	}
 
-	void Hand::encodeAsDFStyle(utility::DFStyleCreator & output) {
+	void Hand::encodeAsDFStyle(utility::DFStyleCreator & output) const {
 		output.startToken("TILES");
 		for ( int tile : tiles ) {
 			output.addToToken(tile);
