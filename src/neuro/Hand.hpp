@@ -6,6 +6,7 @@
 #include"neuro/Tile.hpp"
 #include"utility/DFStyleReader.hpp"
 #include"utility/DFStyleCreator.hpp"
+#include"iostream"
 
 namespace neuro {
 
@@ -66,6 +67,12 @@ namespace neuro {
 				* @param[out] output The encoder to which to write.
 				*/
 			void encodeAsDFStyle(utility::DFStyleCreator & output) const;
+
+			/**
+				* @brief Print the current hand state.
+                * @todo Make the printed things more meaningful.
+				*/
+            void printHand() const;
 		private:
 			std::list< int > tiles;
 	};

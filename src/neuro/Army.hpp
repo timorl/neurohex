@@ -7,6 +7,7 @@
 #include"neuro/Tile.hpp"
 #include"utility/DFStyleReader.hpp"
 #include"utility/DFStyleCreator.hpp"
+#include"iostream"
 
 namespace neuro {
 
@@ -70,6 +71,13 @@ namespace neuro {
 				* public information.
 				*/
 			void encodeAsDFStyle(utility::DFStyleCreator & output) const;
+
+
+			/**
+				* @brief Print army description.
+                * @todo Make the printed things more meaningful.
+				*/
+            void printArmy() const;
 		private:
 			int owner;
 			std::vector< int > tiles;

@@ -90,4 +90,13 @@ namespace neuro {
 		output.endToken();
 	}
 
+    void Player::printPlayer() const {
+        std::cout << "Players id: " << id << std::endl;
+        std::cout << "Players hand:\n";
+        hand.printHand();
+        //TODO print army
+        std::cout << "Players health: " << health << std::endl;
+        std::cout << "Discarded Tile = " << (discardedTile ? "true" : "false") << std::endl; 
+    }
+
 }
