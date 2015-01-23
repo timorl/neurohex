@@ -1,5 +1,5 @@
-#ifndef UI_TEXT_CLIENT_GAMESTATE_HPP
-#define UI_TEXT_CLIENT_GAMESTATE_HPP
+#ifndef UI_TEXT_CLIENT_GAME_HPP
+#define UI_TEXT_CLIENT_GAME_HPP
 
 #include<iostream>
 #include"ui/Observable.hpp"
@@ -15,9 +15,24 @@ namespace client {
 	class Game {
 		public:
 			/**
-				* @brief Print wether the game has ended. 
+				* @brief Print whether the game has ended. 
 				*/
             void gameEnded() const;
+
+			/**
+				* @brief Print the player to which the current move belongs.
+				*/
+            void currentPlayer() const;
+
+			/**
+				* @brief Print the amount of living players.
+				*/
+            void numberOfLivingPlayers() const;
+
+			/**
+				* @brief Print the amount of players in the whole game.
+				*/
+            void numberOfPlayers() const;
 
 			/**
 				* @brief Initialize with neuroClient/Game.
@@ -31,6 +46,6 @@ namespace client {
 }
 }
 
-#endif /* UI_TEXT_CLIENT_GAMESTATE_HPP */
+#endif /* UI_TEXT_CLIENT_GAME_HPP */
 
 

@@ -1,5 +1,5 @@
-#ifndef UI_TEXT_CLIENT_GAMESTATE_CPP
-#define UI_TEXT_CLIENT_GAMESTATE_CPP
+#ifndef UI_TEXT_CLIENT_GAME_CPP
+#define UI_TEXT_CLIENT_GAME_CPP
 
 namespace ui {
 namespace text {
@@ -10,7 +10,7 @@ namespace client {
         //TODO register signal
     }
 
-    void Game::gameEnded() {
+    void Game::gameEnded() const {
         if ( game_state.isFinished() ) {
             std::cout << "Game has finished!" << endl;
         } else {
@@ -18,9 +18,21 @@ namespace client {
         }
     }
 
+    void Game::currentPlayer() const {
+        std::cout << game_state.getCurrentPlayer() << endl;
+    }
+
+    void Game::numberOfLivingPlayers() const {
+        std::cout << game_state.getNumberOfLivingPlayers() << endl;
+    }
+
+    void Game::numberOfPlayers() const {
+        std::cout << game_state.getNumberOfPlayers() << endl;
+    }
+
 }
 }
 }
 
-#endif /* UI_TEXT_CLIENT_GAMESTATE_CPP */
+#endif /* UI_TEXT_CLIENT_GAME_CPP */
 

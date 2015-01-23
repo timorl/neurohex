@@ -20,6 +20,14 @@ namespace neuroClient {
 		return false;
 	}
 
+    std::vector<neuro::Player> Game::getPlayers() const {
+        std::vector< shared_pointer<neuro::Player> > tmp;
+        for ( auto p : players ) {
+            tmp.pb(&p);
+        }
+        return tmp;
+    }
+
 	bool Game::fillFromDFStyle(utility::DFStyleReader & input) {
 		while ( input.hasNextToken() ) {
 			std::vector< std::string > info = input.getNextToken();
@@ -80,5 +88,6 @@ namespace neuroClient {
 		}
 		return false;
 	}
+
 
 }
