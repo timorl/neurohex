@@ -45,13 +45,13 @@ namespace network {
 		(*sockPointer.get()).close();
 	}
 
-	Connection Connection::connectTo(std::string address, std::string portNumber) {
+    std::shared_ptr<Connection> Connection::connectTo(std::string address, std::string portNumber) {
 		tcp::resolver resolver(Connection::io_service);
 		tcp::resolver::query query(address, portNumber);
 		SocketP sockPointer(new tcp::socket(Connection::io_service));
 		resolver.async_resolve(query, boost::bind(Connection::handle_resolve, boost::asio::placeholders::error, boost::asio::placeholders::iterator, sockPointer));
 
-		return Connection(sockPointer);
+		return std::shared_ptr<Connection>(new Connection(sockPointer));
 	}
 
 	void Connection::handle_resolve(const boost::system::error_code& err, tcp::resolver::iterator endpoint_iterator, SocketP sockPointer){

@@ -75,7 +75,7 @@ namespace network {
 				* the arguments for this function and then specify it anyway, but for the
 				* new arguments.
 				*/
-			static Connection connectTo(std::string address, std::string portNumber);
+			static std::shared_ptr<Connection> connectTo(std::string address, std::string portNumber);
 			static void runAll();
 		private:
 			static void runIO_service();
