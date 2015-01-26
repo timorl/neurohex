@@ -128,7 +128,7 @@ namespace neuroServer {
 		private:
 			network::Acceptor & acceptor;
 
-			network::Connection contestant;
+			std::shared_ptr<network::Connection> contestant;
 
 			void requestNick();
 			RequestState	nickRequested;

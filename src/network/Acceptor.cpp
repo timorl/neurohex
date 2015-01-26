@@ -12,9 +12,9 @@ namespace network {
 	Acceptor::~Acceptor() {
 	}
 
-	Connection Acceptor::getNextConnection() {
+	std::shared_ptr<Connection> Acceptor::getNextConnection() {
 		startAccepting(1);
-		return Connection(arraySocketsP[firstUnusedSocket]);
+		return std::shared_ptr<Connection>(new Connection(arraySocketsP[firstUnusedSocket]));
 	}
 	
 	void Acceptor::accept_handler(const boost::system::error_code& error, SocketP sockPointer){

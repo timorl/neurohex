@@ -4,15 +4,15 @@ namespace neuroServer {
 
 	void NetworkContestant::requestNick() {
 		nickRequested	= RequestState::IN_PROGRESS;
-		while ( !contestant.setResponseHandler([this](std::string resp) {
+		while ( !contestant->setResponseHandler([this](std::string resp) {
 					nick = resp;
 					nickRequested	= RequestState::DONE;
 				}) ) {
-			if ( contestant.isClosed() ) {
+			if ( contestant->isClosed() ) {
 				requestContestant();
 				return;
 			} else {
-				contestant.wait();
+				contestant->wait();
 			}
 		}
 	}
@@ -20,26 +20,26 @@ namespace neuroServer {
 	void NetworkContestant::requestContestant() {
 		do {
 			contestant = acceptor.getNextConnection();
-		} while (contestant.isClosed());
+		} while (contestant->isClosed());
 		requestNick();
 	}
 
 	bool NetworkContestant::validateContestant() {
 		std::string contNick;
-		while ( !contestant.setResponseHandler([&contNick](std::string resp) {
+		while ( !contestant->setResponseHandler([&contNick](std::string resp) {
 					contNick = resp;
 				}) ) {
-			if ( contestant.isClosed() ) {
+			if ( contestant->isClosed() ) {
 				return false;
 			} else {
-				contestant.wait();
+				contestant->wait();
 			}
 		}
-		contestant.wait();
+		contestant->wait();
 		if ( contNick == nick ) {
 			return true;
 		} else {
-			contestant.close();
+			contestant->close();
 			return false;
 		}
 	}
@@ -53,7 +53,7 @@ namespace neuroServer {
 			nickRequested	= RequestState::IN_PROGRESS;
 			do {
 				contestant = acceptor.getNextConnection();
-			} while (contestant.isClosed() || !validateContestant());
+			} while (contestant->isClosed() || !validateContestant());
 		}
 	}
 
@@ -68,11 +68,11 @@ namespace neuroServer {
 			return;
 		}
 		initialHealthRequested	= RequestState::IN_PROGRESS;
-		while ( !contestant.sendMessage(initialHealthRequestMessage, std::bind(&NetworkContestant::initialHealthRequestResponseHandler, this, std::placeholders::_1)) ) {
-			if ( contestant.isClosed() ) {
+		while ( !contestant->sendMessage(initialHealthRequestMessage, std::bind(&NetworkContestant::initialHealthRequestResponseHandler, this, std::placeholders::_1)) ) {
+			if ( contestant->isClosed() ) {
 				reestablishContestant();
 			} else {
-				contestant.wait();
+				contestant->wait();
 			}
 		}
 	}
@@ -80,7 +80,7 @@ namespace neuroServer {
 	int NetworkContestant::getInitialHealthChoice() {
 		requestInitialHealthChoice();
 		while ( initialHealthRequested == RequestState::IN_PROGRESS ) {
-			contestant.wait();
+			contestant->wait();
 		}
 		return initialHealthChoice;
 	}
@@ -115,11 +115,11 @@ namespace neuroServer {
 		requestCreator.endToken();
 		makeOptions(requestCreator, boards);
 		std::string requestMessage = request.str();
-		while ( !contestant.sendMessage(requestMessage, std::bind(&NetworkContestant::boardRequestResponseHandler, this, std::placeholders::_1)) ) {
-			if ( contestant.isClosed() ) {
+		while ( !contestant->sendMessage(requestMessage, std::bind(&NetworkContestant::boardRequestResponseHandler, this, std::placeholders::_1)) ) {
+			if ( contestant->isClosed() ) {
 				reestablishContestant();
 			} else {
-				contestant.wait();
+				contestant->wait();
 			}
 		}
 	}
@@ -127,7 +127,7 @@ namespace neuroServer {
 	std::string NetworkContestant::getBoardChoice(const std::map<std::string, std::string> & boards) {
 		requestBoardChoice(boards);
 		while ( boardRequested == RequestState::IN_PROGRESS ) {
-			contestant.wait();
+			contestant->wait();
 		}
 		return board;
 	}
@@ -149,11 +149,11 @@ namespace neuroServer {
 		requestCreator.endToken();
 		makeOptions(requestCreator, armies);
 		std::string requestMessage = request.str();
-		while ( !contestant.sendMessage(requestMessage, std::bind(&NetworkContestant::armyRequestResponseHandler, this, std::placeholders::_1)) ) {
-			if ( contestant.isClosed() ) {
+		while ( !contestant->sendMessage(requestMessage, std::bind(&NetworkContestant::armyRequestResponseHandler, this, std::placeholders::_1)) ) {
+			if ( contestant->isClosed() ) {
 				reestablishContestant();
 			} else {
-				contestant.wait();
+				contestant->wait();
 			}
 		}
 	}
@@ -161,7 +161,7 @@ namespace neuroServer {
 	std::string NetworkContestant::getArmyChoice(const std::map<std::string, std::string> & armies) {
 		requestArmyChoice(armies);
 		while ( armyRequested == RequestState::IN_PROGRESS ) {
-			contestant.wait();
+			contestant->wait();
 		}
 		return army;
 	}
@@ -190,11 +190,11 @@ namespace neuroServer {
 		requestCreator.endToken();
 		game.encodeAsDFStyle(requestCreator);
 		std::string requestMessage = request.str();
-		while ( !contestant.sendMessage(requestMessage, std::bind(&NetworkContestant::moveRequestResponseHandler, this, std::placeholders::_1)) ) {
-			if ( contestant.isClosed() ) {
+		while ( !contestant->sendMessage(requestMessage, std::bind(&NetworkContestant::moveRequestResponseHandler, this, std::placeholders::_1)) ) {
+			if ( contestant->isClosed() ) {
 				reestablishContestant();
 			} else {
-				contestant.wait();
+				contestant->wait();
 			}
 		}
 	}
@@ -202,7 +202,7 @@ namespace neuroServer {
 	Move NetworkContestant::getMove(int playerId, const Game & game) {
 		requestMove(playerId, game);
 		while ( moveRequested == RequestState::IN_PROGRESS ) {
-			contestant.wait();
+			contestant->wait();
 		}
 		moveRequested	= RequestState::NONE;
 		return move;
@@ -243,11 +243,11 @@ namespace neuroServer {
 			a.encodeAsDFStyle(requestCreator);
 		}
 		std::string requestMessage = request.str();
-		while ( !contestant.sendMessage(requestMessage, std::bind(&NetworkContestant::targetsRequestResponseHandler, this, std::placeholders::_1)) ) {
-			if ( contestant.isClosed() ) {
+		while ( !contestant->sendMessage(requestMessage, std::bind(&NetworkContestant::targetsRequestResponseHandler, this, std::placeholders::_1)) ) {
+			if ( contestant->isClosed() ) {
 				reestablishContestant();
 			} else {
-				contestant.wait();
+				contestant->wait();
 			}
 		}
 	}
@@ -255,7 +255,7 @@ namespace neuroServer {
 	Targets NetworkContestant::getTargets(int playerId, const Game & game, std::vector<neuro::AbilityIdentifier> abilities) {
 		requestTargets(playerId, game, abilities);
 		while ( targetsRequested == RequestState::IN_PROGRESS ) {
-			contestant.wait();
+			contestant->wait();
 		}
 		targetsRequested	= RequestState::NONE;
 		return targets;
@@ -283,11 +283,11 @@ namespace neuroServer {
 		requestCreator.endToken();
 		game.encodeAsDFStyle(requestCreator);
 		std::string requestMessage = request.str();
-		while ( !contestant.sendMessage(requestMessage, std::bind(&NetworkContestant::discardRequestResponseHandler, this, std::placeholders::_1)) ) {
-			if ( contestant.isClosed() ) {
+		while ( !contestant->sendMessage(requestMessage, std::bind(&NetworkContestant::discardRequestResponseHandler, this, std::placeholders::_1)) ) {
+			if ( contestant->isClosed() ) {
 				reestablishContestant();
 			} else {
-				contestant.wait();
+				contestant->wait();
 			}
 		}
 	}
@@ -295,7 +295,7 @@ namespace neuroServer {
 	int NetworkContestant::getDiscard(int playerId, const Game & game) {
 		requestDiscard(playerId, game);
 		while ( discardRequested == RequestState::IN_PROGRESS ) {
-			contestant.wait();
+			contestant->wait();
 		}
 		discardRequested	= RequestState::NONE;
 		return discard;

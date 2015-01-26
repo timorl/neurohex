@@ -62,7 +62,7 @@ namespace network {
 			(*sockPointer.get()).async_connect(endpoint, boost::bind(Connection::handle_connect, boost::asio::placeholders::error, ++endpoint_iterator, sockPointer));
     		}
 		else{
-		      std::cout << "Error: " << err.message() << "\n";
+		      //std::cout << "Error: " << err.message() << "\n";
 		}
 	}
 
@@ -77,7 +77,7 @@ namespace network {
 			(*sockPointer.get()).async_connect(endpoint, boost::bind(Connection::handle_connect, boost::asio::placeholders::error, ++endpoint_iterator, sockPointer));
 		}
 		else{
-			std::cout << "Error: " << err.message() << "\n";
+			//std::cout << "Error: " << err.message() << "\n";
 		}
 	}
 
@@ -86,7 +86,7 @@ namespace network {
 			Connection::io_service.run();
 		}
  		catch (std::exception& e){
-			std::cerr << e.what() << std::endl;
+			//std::cerr << e.what() << std::endl;
 		}
 	}
 

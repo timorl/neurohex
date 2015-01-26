@@ -36,7 +36,7 @@ namespace network {
 				* @brief Returns the first available connection. If there are no
 				* connections wait for one.
 				*/
-			Connection getNextConnection();
+			std::shared_ptr<Connection> getNextConnection();
 
 			/**
 				* @brief Start accepting connections on the port.

@@ -16,6 +16,7 @@ namespace network {
 	using SocketP = std::shared_ptr<tcp::socket>;
 	using HandlerP = std::shared_ptr<ResponseHandler>;
 	using MutexP = std::shared_ptr<std::mutex>;
+	//using ConnectionP = std::shared_ptr<Connection>;
 
 	/**
 		* @brief A representation of a single network connection to which you can write
