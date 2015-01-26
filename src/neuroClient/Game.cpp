@@ -1,4 +1,6 @@
 #include"neuroClient/Game.hpp"
+#include"neuro/Player.hpp"
+#include<vector>
 
 namespace neuroClient {
 
@@ -20,12 +22,8 @@ namespace neuroClient {
 		return false;
 	}
 
-    std::vector<neuro::Player> Game::getPlayers() const {
-        std::vector< shared_pointer<neuro::Player> > tmp;
-        for ( auto p : players ) {
-            tmp.pb(&p);
-        }
-        return tmp;
+    std::vector<neuro::Player> & Game::getPlayers() {
+        return players;
     }
 
 	bool Game::fillFromDFStyle(utility::DFStyleReader & input) {

@@ -42,7 +42,7 @@ namespace neuroClient {
 			/**
 				* @brief Getter for players.
 				*/
-            std::vector< shared_pointer<neuro::Player> > getPlayers() const;
+            std::vector<neuro::Player> & getPlayers();
 
 			/**
 				* @brief Make the game represent the one described.
