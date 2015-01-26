@@ -7,6 +7,7 @@
 #include<boost/bind.hpp>
 #include<memory>
 #include<mutex>
+#include<string>
 
 using boost::asio::ip::tcp;
 
@@ -75,15 +76,18 @@ namespace network {
 				* the arguments for this function and then specify it anyway, but for the
 				* new arguments.
 				*/
-			static Connection connectTo(std::string address, std::string portNumber);
+			static std::shared_ptr<Connection> connectTo(std::string address, std::string portNumber);
 			static void runAll();
 		private:
 			static void runIO_service();
 			static void handle_resolve(const boost::system::error_code& err, tcp::resolver::iterator endpoint_iterator, SocketP sockPointer);
 			static void handle_connect(const boost::system::error_code& err, tcp::resolver::iterator endpoint_iterator, SocketP sockPointer);
+			void handle_send(const boost::system::error_code& err, std::size_t bytes_transferred);
+			void execResponseHandler(const boost::system::error_code& err, std::size_t bytes_transferred);
 			SocketP sockPointer;
 			HandlerP handlerPointer;
-			MutexP mutexPointer;
+			std::mutex mutex;
+			std::string buffer;
 	};
 }
 

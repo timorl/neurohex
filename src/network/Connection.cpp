@@ -9,7 +9,6 @@ namespace network {
 	Connection::Connection(SocketP sockPointer){
 		this->sockPointer = sockPointer;
 		this->handlerPointer = NULL;
-		//this->mutexPointer = mutexPointer(new std::mutex());
 	}
 
 	Connection::~Connection() {
@@ -17,41 +16,63 @@ namespace network {
 	}
 
 	bool Connection::isClosed() const {
-		return !(*sockPointer.get()).is_open();
+		return !sockPointer->is_open();
 	}
 
 	bool Connection::setResponseHandler(ResponseHandler handler) {
-		if((*mutexPointer.get()).try_lock()){
-			
-			(*mutexPointer.get()).unlock();
+		if(mutex.try_lock()){
+			handlerPointer = HandlerP(&handler);
+			//sockPointer->async_receive(boost::asio::buffer(buffer, 1024), boost::bind(&Connection::execResponseHandler, this,  boost::asio::placeholders::error, 1024));
+			return true;
 		}
 		else return false;
 	}
 
-	bool Connection::sendMessage(std::string message, ResponseHandler handler) {
-		if((*mutexPointer.get()).try_lock()){
-			
-			(*mutexPointer.get()).unlock();
+	bool Connection::sendMessage(std:: string message, ResponseHandler handler) {
+		if(mutex.try_lock()){
+			handlerPointer = HandlerP(&handler);
+			sockPointer->async_send(boost::asio::buffer(message, 1024), boost::bind(&Connection::handle_send, this,  boost::asio::placeholders::error, 1024));
+			return true;
 		}
 		else return false;
+	}
+
+	void Connection::handle_send(const boost::system::error_code& err, std::size_t bytes_transferred){
+		if (!err){
+		}
+		else {
+			handlerPointer = NULL;
+			mutex.unlock();
+		}
+	}
+
+	void Connection::execResponseHandler(const boost::system::error_code& err, std::size_t bytes_transferred) {
+		if (!err){
+			(*handlerPointer)(buffer);
+		}
+		else {
+		}
+
+		handlerPointer = NULL;
+		mutex.unlock();
 	}
 
 	void Connection::wait() {
-		(*mutexPointer.get()).lock();
-		(*mutexPointer.get()).unlock();
+		mutex.lock();
+		mutex.unlock();
 	}
 
 	void Connection::close() {
-		(*sockPointer.get()).close();
+		sockPointer->close();
 	}
 
-	Connection Connection::connectTo(std::string address, std::string portNumber) {
+	std::shared_ptr<Connection> Connection::connectTo(std::string address, std::string portNumber) {
 		tcp::resolver resolver(Connection::io_service);
 		tcp::resolver::query query(address, portNumber);
 		SocketP sockPointer(new tcp::socket(Connection::io_service));
 		resolver.async_resolve(query, boost::bind(Connection::handle_resolve, boost::asio::placeholders::error, boost::asio::placeholders::iterator, sockPointer));
 
-		return Connection(sockPointer);
+		return std::shared_ptr<Connection>(new Connection(sockPointer));
 	}
 
 	void Connection::handle_resolve(const boost::system::error_code& err, tcp::resolver::iterator endpoint_iterator, SocketP sockPointer){
@@ -59,7 +80,7 @@ namespace network {
       			// Attempt a connection to the first endpoint in the list. Each endpoint
       			// will be tried until we successfully establish a connection.
       			tcp::endpoint endpoint = *endpoint_iterator;
-			(*sockPointer.get()).async_connect(endpoint, boost::bind(Connection::handle_connect, boost::asio::placeholders::error, ++endpoint_iterator, sockPointer));
+			sockPointer->async_connect(endpoint, boost::bind(Connection::handle_connect, boost::asio::placeholders::error, ++endpoint_iterator, sockPointer));
     		}
 		else{
 		      //std::cout << "Error: " << err.message() << "\n";
@@ -72,9 +93,9 @@ namespace network {
 		}
 		else if (endpoint_iterator != tcp::resolver::iterator()){
 			// The connection failed. Try the next endpoint in the list.
-			(*sockPointer.get()).close();
+			sockPointer->close();
 			tcp::endpoint endpoint = *endpoint_iterator;
-			(*sockPointer.get()).async_connect(endpoint, boost::bind(Connection::handle_connect, boost::asio::placeholders::error, ++endpoint_iterator, sockPointer));
+			sockPointer->async_connect(endpoint, boost::bind(Connection::handle_connect, boost::asio::placeholders::error, ++endpoint_iterator, sockPointer));
 		}
 		else{
 			//std::cout << "Error: " << err.message() << "\n";
