@@ -7,6 +7,7 @@
 #include"ui/Observable.hpp"
 #include"utility/DFStyleReader.hpp"
 #include"utility/DFStyleCreator.hpp"
+#include"iostream"
 
 namespace neuro {
 
@@ -121,6 +122,12 @@ namespace neuro {
 				* @param[out] output The encoder to which to write.
 				*/
 			void encodeAsDFStyle(utility::DFStyleCreator & output) const;
+
+			/**
+				* @brief Print the current player state.
+                * @todo Make the printed things more meaningful.
+				*/
+            void printPlayer() const;
 		private:
 			int id;
 			Hand hand;
