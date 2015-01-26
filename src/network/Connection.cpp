@@ -66,11 +66,7 @@ namespace network {
 		sockPointer->close();
 	}
 
-<<<<<<< HEAD
 	std::shared_ptr<Connection> Connection::connectTo(std::string address, std::string portNumber) {
-=======
-    std::shared_ptr<Connection> Connection::connectTo(std::string address, std::string portNumber) {
->>>>>>> origin
 		tcp::resolver resolver(Connection::io_service);
 		tcp::resolver::query query(address, portNumber);
 		SocketP sockPointer(new tcp::socket(Connection::io_service));
