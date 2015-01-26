@@ -40,6 +40,11 @@ namespace neuroClient {
 			bool isFinished() const;
 
 			/**
+				* @brief Getter for players.
+				*/
+            std::vector<neuro::Player> & getPlayers();
+
+			/**
 				* @brief Make the game represent the one described.
 				* @details If this fails, the game might be in an illegal state, so this
 				* should be immiediately called again, before doing anything else.

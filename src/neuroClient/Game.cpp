@@ -1,4 +1,6 @@
 #include"neuroClient/Game.hpp"
+#include"neuro/Player.hpp"
+#include<vector>
 
 namespace neuroClient {
 
@@ -19,6 +21,10 @@ namespace neuroClient {
 		}
 		return false;
 	}
+
+    std::vector<neuro::Player> & Game::getPlayers() {
+        return players;
+    }
 
 	bool Game::fillFromDFStyle(utility::DFStyleReader & input) {
 		while ( input.hasNextToken() ) {
@@ -80,5 +86,6 @@ namespace neuroClient {
 		}
 		return false;
 	}
+
 
 }
