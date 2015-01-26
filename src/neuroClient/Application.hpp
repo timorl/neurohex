@@ -3,6 +3,7 @@
 
 #include<memory>
 #include"ui/Observable.hpp"
+#include"network/Connection.hpp"
 
 namespace neuroClient {
 
@@ -28,7 +29,21 @@ namespace neuroClient {
 				* user.
 				*/
 			static std::string localDataDirectory;
+
+			/**
+				* @brief Command to join server and send it your username.
+                * @todo Change the handler which this function sets
+				*/
+            bool joinServer(std::string address, std::string portNumber, std::string username);
+
+			/**
+				* @brief Sends and message to server and sets handler to dump
+                * everything got from server on stderr.
+                * @todo Delete in final release.
+				*/
+            bool sendAndDump(std::string message);
 		private:
+            std::shared_ptr< network::Connection > lineToServer;
 	};
 
 }

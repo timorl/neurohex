@@ -1,5 +1,3 @@
-#ifndef UI_TEXT_CLIENT_GAME_CPP
-#define UI_TEXT_CLIENT_GAME_CPP
 
 namespace ui {
 namespace text {
@@ -34,5 +32,4 @@ namespace client {
 }
 }
 
-#endif /* UI_TEXT_CLIENT_GAME_CPP */
 

@@ -1,6 +1,3 @@
-#ifndef UI_TEXT_CLIENT_GAME_HPP
-#define UI_TEXT_CLIENT_GAME_HPP
-
 #include<iostream>
 #include"ui/Observable.hpp"
 #include"neuroClient/Game.hpp"
@@ -46,6 +43,5 @@ namespace client {
 }
 }
 
-#endif /* UI_TEXT_CLIENT_GAME_HPP */
 
 

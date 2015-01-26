@@ -15,6 +15,11 @@ namespace client {
 		*/
 	class Application {
 		public:
+            /**
+                * @brief Start the command line interface.
+                */
+            void applicationStarted();
+
 			/**
 				* @brief Create an application watching the given application.
 				*/
