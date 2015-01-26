@@ -3,10 +3,19 @@
 
 #include<string>
 #include<functional>
+#include<boost/asio.hpp>
+#include<boost/bind.hpp>
+#include<memory>
+#include<mutex>
+
+using boost::asio::ip::tcp;
 
 namespace network {
 
 	using ResponseHandler = std::function<void(std::string)>;
+	using SocketP = std::shared_ptr<tcp::socket>;
+	using HandlerP = std::shared_ptr<ResponseHandler>;
+	using MutexP = std::shared_ptr<std::mutex>;
 
 	/**
 		* @brief A representation of a single network connection to which you can write
@@ -16,6 +25,8 @@ namespace network {
 		*/
 	class Connection {
 		public:
+			static boost::asio::io_service io_service;
+			Connection(SocketP sockpointer);
 			/**
 				* @brief Destroys the object and closes the connection.
 				*/
@@ -63,10 +74,16 @@ namespace network {
 				* the arguments for this function and then specify it anyway, but for the
 				* new arguments.
 				*/
-			static Connection connectTo(std::string address);
+			static Connection connectTo(std::string address, std::string portNumber);
+			static void runAll();
 		private:
+			static void runIO_service();
+			static void handle_resolve(const boost::system::error_code& err, tcp::resolver::iterator endpoint_iterator, SocketP sockPointer);
+			static void handle_connect(const boost::system::error_code& err, tcp::resolver::iterator endpoint_iterator, SocketP sockPointer);
+			SocketP sockPointer;
+			HandlerP handlerPointer;
+			MutexP mutexPointer;
 	};
-
 }
 
 #endif
