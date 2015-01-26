@@ -245,14 +245,14 @@ namespace neuro {
 		return false;
 	}
 
-	void Board::encodeAsDFStyle(utility::DFStyleCreator & output) {
+	void Board::encodeAsDFStyle(utility::DFStyleCreator & output) const {
 		output.startToken("DIMENSIONS");
 		output.addToToken(width);
 		output.addToToken(height);
 		output.endToken();
 		for ( int i = 0; i < width; i++ ) {
 			for ( int j = 0; j < height; j++ ) {
-				for ( TileOnBoard & curTOB : tiles[i][j] ) {
+				for ( const TileOnBoard & curTOB : tiles[i][j] ) {
 					output.startToken("TILEBEGIN");
 					output.addToToken(i);
 					output.addToToken(j);

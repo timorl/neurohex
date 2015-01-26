@@ -449,36 +449,36 @@ namespace neuro {
 		return false;
 	}
 
-	void Tile::encodeAsDFStyle(utility::DFStyleCreator & output) {
+	void Tile::encodeAsDFStyle(utility::DFStyleCreator & output) const {
 		output.startToken("ABILITYBEGIN");
 		output.addToToken(std::string("placing"));
 		output.endToken();
 		placing.encodeAsDFStyle(output);
-		for ( Ability & ablt : onBattleStart ) {
+		for ( const Ability & ablt : onBattleStart ) {
 			output.startToken("ABILITYBEGIN");
 			output.addToToken(std::string("battleStart"));
 			output.endToken();
 			ablt.encodeAsDFStyle(output);
 		}
-		for ( Ability & ablt : attacks ) {
+		for ( const Ability & ablt : attacks ) {
 			output.startToken("ABILITYBEGIN");
 			output.addToToken(std::string("attack"));
 			output.endToken();
 			ablt.encodeAsDFStyle(output);
 		}
-		for ( Ability & ablt : modifiers ) {
+		for ( const Ability & ablt : modifiers ) {
 			output.startToken("ABILITYBEGIN");
 			output.addToToken(std::string("modifier"));
 			output.endToken();
 			ablt.encodeAsDFStyle(output);
 		}
-		for ( Ability & ablt : activeAbilities ) {
+		for ( const Ability & ablt : activeAbilities ) {
 			output.startToken("ABILITYBEGIN");
 			output.addToToken(std::string("active"));
 			output.endToken();
 			ablt.encodeAsDFStyle(output);
 		}
-		for ( Ability & ablt : defensiveAbilities ) {
+		for ( const Ability & ablt : defensiveAbilities ) {
 			output.startToken("ABILITYBEGIN");
 			output.addToToken(std::string("defensive"));
 			output.endToken();
@@ -568,7 +568,7 @@ namespace neuro {
 		return false;
 	}
 
-	void Tile::Ability::encodeAsDFStyle(utility::DFStyleCreator & output) {
+	void Tile::Ability::encodeAsDFStyle(utility::DFStyleCreator & output) const {
 		output.startToken("NAME");
 		output.addToToken(name);
 		output.endToken();
@@ -623,7 +623,7 @@ namespace neuro {
 		return false;
 	}
 
-	void Tile::Life::encodeAsDFStyle(utility::DFStyleCreator & output) {
+	void Tile::Life::encodeAsDFStyle(utility::DFStyleCreator & output) const {
 		output.startToken("HEALTH");
 		output.addToToken(health);
 		output.endToken();
@@ -666,7 +666,7 @@ namespace neuro {
 		return false;
 	}
 
-	void Tile::Initiative::encodeAsDFStyle(utility::DFStyleCreator & output) {
+	void Tile::Initiative::encodeAsDFStyle(utility::DFStyleCreator & output) const {
 		output.startToken("MODIFIABLE");
 		output.addToToken(modifiable);
 		output.endToken();
@@ -758,7 +758,7 @@ namespace neuro {
 		return false;
 	}
 
-	void Targetting::encodeAsDFStyle(utility::DFStyleCreator & output) {
+	void Targetting::encodeAsDFStyle(utility::DFStyleCreator & output) const {
 		output.startToken("TARGET_TILES");
 		output.addToToken(targetTiles);
 		output.endToken();
@@ -791,6 +791,51 @@ namespace neuro {
 		}
 		output.endToken();
 		output.startToken("TARGETTINGEND");
+		output.endToken();
+	}
+
+	bool AbilityIdentifier::fillFromDFStyle(utility::DFStyleReader & input) {
+		while ( input.hasNextToken() ) {
+			std::vector< std::string > info = input.getNextToken();
+			if (  static_cast<int>( info.size() ) < 1 ) {
+				return false;
+			}
+			std::string tType = info[0];
+			if ( tType == "ABILITYIDENTIFIEREND" ) {
+				return true;
+			} else if ( tType == "TILE" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				tile = std::stoi(info[1]);
+			} else if ( tType == "GROUP" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				group = abilityGroupStringMap.at(info[1]);
+			} else if ( tType == "ID" ) {
+				if (  static_cast<int>( info.size() ) < 2 ) {
+					return false;
+				}
+				id = std::stoi(info[1]);
+			} else {
+				return false;
+			}
+		}
+		return false;
+	}
+
+	void AbilityIdentifier::encodeAsDFStyle(utility::DFStyleCreator & output) const {
+		output.startToken("TILE");
+		output.addToToken(tile);
+		output.endToken();
+		output.startToken("GROUP");
+		output.addToToken(stringAbilityGroupMap.at(group));
+		output.endToken();
+		output.startToken("ID");
+		output.addToToken(id);
+		output.endToken();
+		output.startToken("ABILITYIDENTIFIEREND");
 		output.endToken();
 	}
 

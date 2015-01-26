@@ -2,22 +2,24 @@
 
 namespace neuroServer {
 
-	Move Arbiter::getMove(int playerId, const Players & players, const neuro::Board & board, bool noArmy) {
+	Move Arbiter::getMove(int playerId, const Game & game) {
 		//TODO: Actually validate the move.
-		return contestant->getMove(playerId, players, board, noArmy);
+		return contestant->getMove(playerId, game);
 	}
 
-	Targets Arbiter::getTargets(int playerId, const Players & players, const neuro::Board & board, bool noArmy, neuro::AbilityIdentifier & abilityIdentifier ) {
+	Targets Arbiter::getTargets(int playerId, const Game & game, neuro::AbilityIdentifier & abilityIdentifier ) {
 		//TODO: Actually validate the targets.
-		return contestant->getTargets(playerId, players, board, noArmy, abilityIdentifier);
+		std::vector<neuro::AbilityIdentifier> abilities;
+		abilities.push_back(abilityIdentifier);
+		return contestant->getTargets(playerId, game, abilities);
 	}
 
-	int Arbiter::requestDiscard(int playerId, const Players & players, const neuro::Board & board, bool noArmy) {
+	int Arbiter::getDiscard(int playerId, const Game & game) {
 		//TODO: Actually validate the tile.
-		return contestant->requestDiscard(playerId, players, board, noArmy);
+		return contestant->getDiscard(playerId, game);
 	}
 
-	void Arbiter::requestTargetsForAbilities( int playerId, const Players & players, const neuro::Board & board, bool noArmy, std::vector< neuro::AbilityIdentifier > abilities ) {
+	void Arbiter::requestTargetsForAbilities( int playerId, const Game & game, std::vector< neuro::AbilityIdentifier > abilities ) {
 		//TODO: This is a stub.
 	}
 

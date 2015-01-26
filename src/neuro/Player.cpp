@@ -70,7 +70,7 @@ namespace neuro {
 		return false;
 	}
 
-	void Player::encodeAsDFStyle(utility::DFStyleCreator & output) {
+	void Player::encodeAsDFStyle(utility::DFStyleCreator & output) const {
 		output.startToken("ID");
 		output.addToToken(id);
 		output.endToken();

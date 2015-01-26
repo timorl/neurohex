@@ -48,7 +48,7 @@ namespace neuroServer {
 				noArmy = noArmy || players[currentPlayer].armyEmpty();
 				Move move;
 				do {
-					move = arbiters[currentPlayer].getMove( currentPlayer, players, board, noArmy );
+					move = arbiters[currentPlayer].getMove( currentPlayer, *this);
 					if ( !move.endTurn ) {
 						if ( players[currentPlayer].getHand().containsTile( move.abilityIdentifier.tile ) ) {
 							if ( move.discard ) {
@@ -101,7 +101,7 @@ namespace neuroServer {
 		}
 	}
 
-	void Game::encodeAsDFStyle(utility::DFStyleCreator & output) {
+	void Game::encodeAsDFStyle(utility::DFStyleCreator & output) const {
 		output.startToken("BOARDBEGIN");
 		output.endToken();
 		board.encodeAsDFStyle(output);
@@ -148,7 +148,7 @@ namespace neuroServer {
 		ai.tile = tile;
 		ai.group = neuro::AbilityGroup::PLACING;
 		ai.id = 0;
-		Targets targets = arbiters[tilePlacer].getTargets( tilePlacer, players, board, noArmy, ai );
+		Targets targets = arbiters[tilePlacer].getTargets( tilePlacer, *this, ai );
 		std::list< int > affectedTiles;
 		Target curTarget;
 		for ( auto tpl : targets ) {
@@ -197,7 +197,7 @@ namespace neuroServer {
 
 	void Game::abilityUsing( neuro::AbilityIdentifier & abilityIdentifier ) {
 		int abilityUser = neuro::Tile::allTiles[abilityIdentifier.tile].getController();
-		Targets targets = arbiters[abilityUser].getTargets( abilityUser, players, board, noArmy, abilityIdentifier );
+		Targets targets = arbiters[abilityUser].getTargets( abilityUser, *this, abilityIdentifier );
 		executeAbility( abilityIdentifier, targets );
 	}
 
@@ -245,7 +245,7 @@ namespace neuroServer {
 			}
 		}
 		for ( int i = 0; i < getNumberOfPlayers(); i++ ) {
-			arbiters[i].requestTargetsForAbilities( i, players, board, noArmy, toRun[i] );
+			arbiters[i].requestTargetsForAbilities( i, *this, toRun[i] );
 		}
 		for ( int i = 0; i < getNumberOfPlayers(); i++ ) {
 			for ( int j = 0; j < static_cast<int>( toRun[i].size() ); j++ ) {
@@ -274,7 +274,7 @@ namespace neuroServer {
 			}
 		}
 		for ( int i = 0; i < getNumberOfPlayers(); i++ ) {
-			arbiters[i].requestTargetsForAbilities( i, players, board, noArmy, toRun[i] );
+			arbiters[i].requestTargetsForAbilities( i, *this, toRun[i] );
 		}
 		for ( int i = 0; i < getNumberOfPlayers(); i++ ) {
 			for ( int j = 0; j < static_cast<int>( toRun[i].size() ); j++ ) {
@@ -287,7 +287,7 @@ namespace neuroServer {
 
 	void Game::runBattle() {
 		if ( !players[currentPlayer].hasDiscardedTile() ) {
-			int toDiscard = arbiters[currentPlayer].requestDiscard( currentPlayer, players, board, noArmy );
+			int toDiscard = arbiters[currentPlayer].getDiscard( currentPlayer, *this);
 			players[currentPlayer].discardTile( toDiscard );
 		}
 		battleStart();

@@ -132,7 +132,7 @@ namespace neuro {
 			* @brief Encode the targetting as DFStyle.
 			* @param[out] output The encoder to which to write.
 			*/
-		void encodeAsDFStyle(utility::DFStyleCreator & output);
+		void encodeAsDFStyle(utility::DFStyleCreator & output) const;
 	};
 
 	/**
@@ -146,6 +146,21 @@ namespace neuro {
 		ACTIVE,
 		DEFENSIVE
 	};
+
+	const std::map< std::string, AbilityGroup > abilityGroupStringMap = {
+		{"PLACING", AbilityGroup::PLACING},
+		{"BATTLE_START", AbilityGroup::BATTLE_START},
+		{"ATTACK", AbilityGroup::ATTACK},
+		{"MODIFIER", AbilityGroup::MODIFIER},
+		{"ACTIVE", AbilityGroup::ACTIVE},
+		{"DEFENSIVE", AbilityGroup::DEFENSIVE} };
+	const std::map< AbilityGroup, std::string > stringAbilityGroupMap = {
+		{AbilityGroup::PLACING, "PLACING"},
+		{AbilityGroup::BATTLE_START, "BATTLE_START"},
+		{AbilityGroup::ATTACK, "ATTACK"},
+		{AbilityGroup::MODIFIER, "MODIFIER"},
+		{AbilityGroup::ACTIVE, "ACTIVE"},
+		{AbilityGroup::DEFENSIVE, "DEFENSIVE"} };
 
 	/**
 		* @brief A structure exactly identifying a ability or another part of a tile.
@@ -165,6 +180,21 @@ namespace neuro {
 			* @brief The id of the ability, -1 if not applicable.
 			*/
 		int id;
+
+		/**
+			* @brief Make the ability identifier represent the one described.
+			* @details If this fails, the ability identifier might be in an illegal state, so this
+			* should be immiediately called again, before doing anything else.
+			* @param[in] input The description.
+			* @return True if this operation was successfull, false otherwise.
+			*/
+		bool fillFromDFStyle(utility::DFStyleReader & input);
+
+		/**
+			* @brief Encode the ability identifier as DFStyle.
+			* @param[out] output The encoder to which to write.
+			*/
+		void encodeAsDFStyle(utility::DFStyleCreator & output) const;
 
 		/**
 			* @brief Provides an ordering on AbilityIdentifier objects, so they can be in
@@ -224,7 +254,7 @@ namespace neuro {
 						* @brief Encode the life as DFStyle.
 						* @param[out] output The encoder to which to write.
 						*/
-					void encodeAsDFStyle(utility::DFStyleCreator & output);
+					void encodeAsDFStyle(utility::DFStyleCreator & output) const;
 				private:
 					int health;
 					int damage;
@@ -367,7 +397,7 @@ namespace neuro {
 						* @brief Encode the ability as DFStyle.
 						* @param[out] output The encoder to which to write.
 						*/
-					void encodeAsDFStyle(utility::DFStyleCreator & output);
+					void encodeAsDFStyle(utility::DFStyleCreator & output) const;
 				private:
 					std::string name;
 					std::string description;
@@ -444,7 +474,7 @@ namespace neuro {
 						* @brief Encode the initiative as DFStyle.
 						* @param[out] output The encoder to which to write.
 						*/
-					void encodeAsDFStyle(utility::DFStyleCreator & output);
+					void encodeAsDFStyle(utility::DFStyleCreator & output) const;
 				private:
 					bool modifiable;
 					std::set< int > initiative;
@@ -654,7 +684,7 @@ namespace neuro {
 				* @brief Encode the tile as DFStyle.
 				* @param[out] output The encoder to which to write.
 				*/
-			void encodeAsDFStyle(utility::DFStyleCreator & output);
+			void encodeAsDFStyle(utility::DFStyleCreator & output) const;
 
 			/**
 				* @brief At which player's turn should terror end. No terror if -1.

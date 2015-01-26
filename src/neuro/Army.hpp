@@ -69,7 +69,7 @@ namespace neuro {
 				* @todo SECURITY: shuffle tiles as they are being encoded, since this is not
 				* public information.
 				*/
-			void encodeAsDFStyle(utility::DFStyleCreator & output);
+			void encodeAsDFStyle(utility::DFStyleCreator & output) const;
 		private:
 			int owner;
 			std::vector< int > tiles;

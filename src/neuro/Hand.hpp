@@ -65,7 +65,7 @@ namespace neuro {
 				* @brief Encode the hand as DFStyle.
 				* @param[out] output The encoder to which to write.
 				*/
-			void encodeAsDFStyle(utility::DFStyleCreator & output);
+			void encodeAsDFStyle(utility::DFStyleCreator & output) const;
 		private:
 			std::list< int > tiles;
 	};
