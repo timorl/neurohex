@@ -13,19 +13,26 @@ namespace network {
 	}
 
 	std::shared_ptr<Connection> Acceptor::getNextConnection() {
-		startAccepting(1);
-		return std::shared_ptr<Connection>(new Connection(arraySocketsP[firstUnusedSocket]));
+		if (firstUnusedSocket == arraySocketsP.size()) startAccepting(1);
+		arrayMutex[firstUnusedSocket].lock();
+		arrayMutex[firstUnusedSocket].unlock();
+		return std::shared_ptr<Connection>(new Connection(arraySocketsP[firstUnusedSocket++]));
 	}
 	
 	void Acceptor::accept_handler(const boost::system::error_code& error, SocketP sockPointer){
 		if (!error){
 			arraySocketsP.push_back(sockPointer);
+			arrayMutex[arraySocketsP.size()-1].unlock();
 		}
-
-		//startAccepting(1);
+		else{
+			arrayMutex[arraySocketsP.size()].unlock();
+			startAccepting(1);
+		}
 	}
 	void Acceptor::startAccepting(int max) {
-		for(int i=0; i<max; i++){		
+		for(int i=0; i<max; i++){
+			arrayMutex.push_back(new boost::mutex);
+			arrayMutex.back().lock();
 			SocketP sockPointer(new tcp::socket(Connection::io_service));
 			tcp::acceptor acceptor(Connection::io_service, tcp::endpoint(tcp::v4(), portNumber));
 

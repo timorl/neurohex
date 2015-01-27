@@ -9,6 +9,8 @@
 #include<vector>
 #include<mutex>
 #include <memory>
+#include <boost/thread.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 
 
 using boost::asio::ip::tcp;
@@ -49,6 +51,7 @@ namespace network {
 			int portNumber;
 			int firstUnusedSocket;
 			std::vector<SocketP> arraySocketsP;
+			boost::ptr_vector<boost::mutex> arrayMutex;
 	};
 
 }
