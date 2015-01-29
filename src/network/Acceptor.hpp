@@ -6,8 +6,11 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 //#include <boost/asio/ip/tcp.hpp>
-#include<vector>
+#include<atomic>
+#include<queue>
+#include<set>
 #include<mutex>
+#include<condition_variable>
 #include <memory>
 #include <boost/thread.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
@@ -46,12 +49,14 @@ namespace network {
 				*/
 			void startAccepting(int max);
 
-			void accept_handler(const boost::system::error_code& error, SocketP SockPointer);
 		private:
 			int portNumber;
-			int firstUnusedSocket;
-			std::vector<SocketP> arraySocketsP;
-			boost::ptr_vector<boost::mutex> arrayMutex;
+			std::queue<SocketP> readySockets;
+			std::atomic<int> waitingSockets;
+			std::mutex mtx;
+			std::condition_variable cv;
+
+			void acceptHandler(const boost::system::error_code& error, SocketP SockPointer);
 	};
 
 }
