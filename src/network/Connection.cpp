@@ -20,7 +20,7 @@ namespace network {
 	bool Connection::setResponseHandler(ResponseHandler handler) {
 		if(mutex.try_lock()){
 			curHandler = handler;
-			//sockPointer->async_receive(boost::asio::buffer(buffer, 1024), boost::bind(&Connection::execResponseHandler, this,  boost::asio::placeholders::error, 1024));
+			sockPointer->async_receive(boost::asio::buffer(buffer, BUF_SIZE), std::bind(&Connection::execResponseHandler, this,  std::placeholders::_1, std::placeholders::_2));
 			return true;
 		}
 		else return false;
@@ -29,7 +29,7 @@ namespace network {
 	bool Connection::sendMessage(std:: string message, ResponseHandler handler) {
 		if(mutex.try_lock()){
 			curHandler = handler;
-			sockPointer->async_send(boost::asio::buffer(message, 1024), boost::bind(&Connection::handle_send, this,  boost::asio::placeholders::error, 1024));
+			sockPointer->async_send(boost::asio::buffer(message), std::bind(&Connection::handle_send, this,  std::placeholders::_1, std::placeholders::_2));
 			return true;
 		}
 		else return false;
@@ -39,16 +39,19 @@ namespace network {
 		if (!err){
 		}
 		else {
-			curHandler = ResponseHandler();
-			mutex.unlock();
+			curHandler("");
 		}
+
+		curHandler = ResponseHandler();
+		mutex.unlock();
 	}
 
 	void Connection::execResponseHandler(const boost::system::error_code& err, std::size_t bytes_transferred) {
 		if (!err){
-			curHandler(buffer);
+			curHandler(std::string(buffer));
 		}
 		else {
+			curHandler("");
 		}
 
 		curHandler = ResponseHandler();
@@ -56,8 +59,8 @@ namespace network {
 	}
 
 	void Connection::wait() {
-		mutex.lock();
-		mutex.unlock();
+		//mutex.lock();
+		//mutex.unlock();
 	}
 
 	void Connection::close() {

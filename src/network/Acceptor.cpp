@@ -35,12 +35,9 @@ namespace network {
 			lk.unlock();
 			cv.notify_one();
 		}
-		else{
-			waitingSockets--;
-			startAccepting(1);
-		}
+
 		if ( waitingSockets > 0 ) {
-			acceptor.async_accept(*sockPointer, std::bind(&Acceptor::acceptHandler, this, std::placeholders::_1, sockPointer));
+			startAccepting(0);
 		}
 	}
 

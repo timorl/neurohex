@@ -87,7 +87,9 @@ namespace network {
 			SocketP sockPointer;
 			ResponseHandler	curHandler;
 			std::mutex mutex;
-			std::string buffer;
+
+			static const int BUF_SIZE = 2048;
+			char buffer[BUF_SIZE];
 	};
 }
 
