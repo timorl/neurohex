@@ -20,6 +20,10 @@ namespace text {
 		descriptions[name] = description;
 		commands[name] = command;
 	}
+    
+    void CommandShell::write(std::string message) {
+        std::cout << message << std::endl;
+    }
 
 	void CommandShell::run() {
 		std::string line;

@@ -4,6 +4,7 @@
 #include<iostream>
 #include"ui/Observable.hpp"
 #include"neuroClient/Application.hpp"
+#include"ui/text/client/ServerJoiner.hpp"
 
 namespace ui {
 namespace text {
@@ -19,6 +20,11 @@ namespace client {
                 * @brief Start the command line interface.
                 */
             void applicationStarted(const neuroClient::Application &);
+
+            /**
+                * @brief Method invoked on request from server.
+                */
+            void requestHandler();
 
 			/**
 				* @brief Create an application watching the given application.

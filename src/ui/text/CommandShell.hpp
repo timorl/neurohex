@@ -30,6 +30,11 @@ namespace text {
 				* @param[in] command The function to execute when the command is invoked.
 				*/
 			void addCommand(std::string name, std::string description, Command command);
+			
+            /**
+				* @brief Write message to output.
+				*/
+			void write(std::string message);
 
 			/**
 				* @brief Run the shell until the user exits.
