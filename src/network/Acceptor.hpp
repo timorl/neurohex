@@ -2,18 +2,13 @@
 #define NETWORK_ACCEPTOR_HPP
 
 #include<string>
-#include"network/Connection.hpp"
-#include <boost/asio.hpp>
-#include <boost/bind.hpp>
-//#include <boost/asio/ip/tcp.hpp>
+#include<network/Connection.hpp>
+#include<boost/asio.hpp>
 #include<atomic>
 #include<queue>
-#include<set>
 #include<mutex>
 #include<condition_variable>
 #include <memory>
-#include <boost/thread.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
 
 
 using boost::asio::ip::tcp;

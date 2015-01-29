@@ -4,11 +4,11 @@
 #include<string>
 #include<functional>
 #include<boost/asio.hpp>
-#include<boost/bind.hpp>
 #include<memory>
 #include<mutex>
 #include<string>
 #include<thread>
+#include<condition_variable>
 
 using boost::asio::ip::tcp;
 
@@ -77,16 +77,15 @@ namespace network {
 			static std::shared_ptr<Connection> connectTo(std::string address, std::string portNumber);
 			static void runAll();
 		private:
-			static void runIO_service();
-			static void handle_resolve(const boost::system::error_code& err, tcp::resolver::iterator endpoint_iterator, SocketP sockPointer);
-			static void handle_connect(const boost::system::error_code& err, tcp::resolver::iterator endpoint_iterator, SocketP sockPointer);
+			static void runIOservice();
 			static boost::asio::io_service::work work;
 			static std::shared_ptr<std::thread> netThread;
-			void handle_send(const boost::system::error_code& err, std::size_t bytes_transferred);
+			void sendHandler(const boost::system::error_code& err, std::size_t bytes_transferred, ResponseHandler handler);
 			void execResponseHandler(const boost::system::error_code& err, std::size_t bytes_transferred);
 			SocketP sockPointer;
 			ResponseHandler	curHandler;
-			std::mutex mutex;
+			std::mutex mtx;
+			std::condition_variable cv;
 
 			static const int BUF_SIZE = 2048;
 			char buffer[BUF_SIZE];

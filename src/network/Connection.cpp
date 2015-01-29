@@ -18,35 +18,39 @@ namespace network {
 	}
 
 	bool Connection::setResponseHandler(ResponseHandler handler) {
-		if(mutex.try_lock()){
-			curHandler = handler;
-			sockPointer->async_receive(boost::asio::buffer(buffer, BUF_SIZE), std::bind(&Connection::execResponseHandler, this,  std::placeholders::_1, std::placeholders::_2));
-			return true;
-		}
-		else return false;
+		std::unique_lock<std::mutex> lk(mtx);
+		if (!curHandler) return false;
+
+		curHandler = handler;
+		sockPointer->async_receive(boost::asio::buffer(buffer, BUF_SIZE), std::bind(&Connection::execResponseHandler, this,  std::placeholders::_1, std::placeholders::_2));
+		return true;
 	}
 
 	bool Connection::sendMessage(std:: string message, ResponseHandler handler) {
-		if(mutex.try_lock()){
-			curHandler = handler;
-			sockPointer->async_send(boost::asio::buffer(message), std::bind(&Connection::handle_send, this,  std::placeholders::_1, std::placeholders::_2));
-			return true;
-		}
-		else return false;
+		std::unique_lock<std::mutex> lk(mtx);
+		if (!curHandler) return false;
+
+		curHandler = handler;
+		sockPointer->async_send(boost::asio::buffer(message), std::bind(&Connection::sendHandler, this,  std::placeholders::_1, std::placeholders::_2, handler));
+		return true;
 	}
 
-	void Connection::handle_send(const boost::system::error_code& err, std::size_t bytes_transferred){
+	void Connection::sendHandler(const boost::system::error_code& err, std::size_t bytes_transferred, ResponseHandler handler){
+		std::unique_lock<std::mutex> lk(mtx);
 		if (!err){
+			if(handler){
+				sockPointer->async_receive(boost::asio::buffer(buffer, BUF_SIZE), std::bind(&Connection::execResponseHandler, this,  std::placeholders::_1, std::placeholders::_2));
+			}
 		}
 		else {
 			curHandler("");
+			curHandler = ResponseHandler();
+			cv.notify_one();
 		}
-
-		curHandler = ResponseHandler();
-		mutex.unlock();
 	}
 
 	void Connection::execResponseHandler(const boost::system::error_code& err, std::size_t bytes_transferred) {
+		std::unique_lock<std::mutex> lk(mtx);
 		if (!err){
 			curHandler(std::string(buffer));
 		}
@@ -55,12 +59,15 @@ namespace network {
 		}
 
 		curHandler = ResponseHandler();
-		mutex.unlock();
+		cv.notify_one();
 	}
 
 	void Connection::wait() {
-		//mutex.lock();
-		//mutex.unlock();
+		std::unique_lock<std::mutex> lk(mtx);
+		if (!curHandler) return;
+
+		cv.wait(lk, [this]()->bool{return !curHandler;});
+		return;
 	}
 
 	void Connection::close() {
@@ -77,7 +84,7 @@ namespace network {
 		return std::shared_ptr<Connection>(new Connection(sockPointer));
 	}
 
-	void Connection::runIO_service(){
+	void Connection::runIOservice(){
 		try{
 			Connection::io_service.run();
 		}
@@ -88,7 +95,7 @@ namespace network {
 
 	void Connection::runAll(){
 		if ( !netThread ) {
-			netThread.reset(new std::thread(Connection::runIO_service));
+			netThread.reset(new std::thread(Connection::runIOservice));
 		}
 	}
 }
