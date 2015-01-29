@@ -7,7 +7,7 @@ namespace network {
 	boost::asio::io_service::work Connection::work(Connection::io_service);
 	std::shared_ptr<std::thread> Connection::netThread;
 
-	Connection::Connection(SocketP sockPointer) : sockPointer(sockPointer) {}
+	Connection::Connection(SocketP sockPointer) : sockPointer(sockPointer), dreamLevel(0) {}
 
 	Connection::~Connection() {
 		close();
@@ -18,7 +18,7 @@ namespace network {
 	}
 
 	bool Connection::setResponseHandler(ResponseHandler handler) {
-		std::unique_lock<std::mutex> lk(mtx);
+		std::unique_lock<std::recursive_mutex> lk(mtx);
 		if (!curHandler) return false;
 
 		curHandler = handler;
@@ -27,7 +27,7 @@ namespace network {
 	}
 
 	bool Connection::sendMessage(std:: string message, ResponseHandler handler) {
-		std::unique_lock<std::mutex> lk(mtx);
+		std::unique_lock<std::recursive_mutex> lk(mtx);
 		if (!curHandler) return false;
 
 		curHandler = handler;
@@ -36,34 +36,39 @@ namespace network {
 	}
 
 	void Connection::sendHandler(const boost::system::error_code& err, std::size_t bytes_transferred, ResponseHandler handler){
-		std::unique_lock<std::mutex> lk(mtx);
+		std::unique_lock<std::recursive_mutex> lk(mtx);
 		if (!err){
 			if(handler){
-				sockPointer->async_receive(boost::asio::buffer(buffer, BUF_SIZE), std::bind(&Connection::execResponseHandler, this,  std::placeholders::_1, std::placeholders::_2));
+				sockPointer->async_receive(boost::asio::buffer(buffer, BUF_SIZE), std::bind(&Connection::execResponseHandler, this, std::placeholders::_1, std::placeholders::_2));
 			}
 		}
 		else {
-			curHandler("");
+			ResponseHandler handler = curHandler;
 			curHandler = ResponseHandler();
+			handler("");
+
 			cv.notify_one();
 		}
 	}
 
 	void Connection::execResponseHandler(const boost::system::error_code& err, std::size_t bytes_transferred) {
-		std::unique_lock<std::mutex> lk(mtx);
+		std::unique_lock<std::recursive_mutex> lk(mtx);
 		if (!err){
-			curHandler(std::string(buffer));
+			ResponseHandler handler = curHandler;
+			curHandler = ResponseHandler();
+			handler(std::string(buffer));
 		}
 		else {
-			curHandler("");
+			ResponseHandler handler = curHandler;
+			curHandler = ResponseHandler();
+			handler("");
 		}
 
-		curHandler = ResponseHandler();
 		cv.notify_one();
 	}
 
 	void Connection::wait() {
-		std::unique_lock<std::mutex> lk(mtx);
+		std::unique_lock<std::recursive_mutex> lk(mtx);
 		if (!curHandler) return;
 
 		cv.wait(lk, [this]()->bool{return !curHandler;});
