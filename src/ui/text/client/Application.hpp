@@ -18,7 +18,7 @@ namespace client {
             /**
                 * @brief Start the command line interface.
                 */
-            void applicationStarted();
+            void applicationStarted(const neuroClient::Application &);
 
 			/**
 				* @brief Create an application watching the given application.

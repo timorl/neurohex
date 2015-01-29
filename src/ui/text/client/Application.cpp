@@ -6,7 +6,7 @@ namespace client {
 
 	static const std::string helpMessage = "The available commands are:\n\tstart\tStarts a game. Not implemented.\n\texit\tExits this client.\n\thelp\tDisplays this help message.\n";
 
-	void Application::applicationStarted() {
+	void Application::applicationStarted(const neuroClient::Application & app) {
         std::string address, port, username;
 		std::cout << "Welcome to the Neurohex game client!" << std::endl;
 		while (true) {
@@ -25,8 +25,12 @@ namespace client {
                 std::cin >> address;
                 std::cin >> port;
                 std::cin >> username;
-                application.joinServer(address, port, username); //can't
-                //invoke this on const
+                bool tmp = application.joinServer(address, port, username);
+                if ( tmp ) {
+                    std::cout << "Connection successful." << std::endl;
+                } else {
+                    std::cout << "Connection NOT successful!" << std::endl;
+                }
 			} else {
 				std::cout << command << ": no such command." << std::endl;
 				std::cout << helpMessage;
@@ -35,7 +39,7 @@ namespace client {
 	}
 
 	Application::Application(neuroClient::Application & application) : application(application) {
-        std::bind(&Application::applicationStarted, this);
+        application.sigModified.connect(std::bind(&Application::applicationStarted, this, std::placeholders::_1));
 	}
 
 }

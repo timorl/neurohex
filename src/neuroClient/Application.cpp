@@ -12,10 +12,8 @@ namespace neuroClient {
 
     bool Application::joinServer(std::string address,
             std::string portNumber, std::string username) {
-        //lineToServer = (network::Connection::connectTo(address, portNumber));
-        lineToServer = std::shared_ptr< network::Connection >(
-                std::move( network::Connection::connectTo(address, portNumber) )
-            );
+        network::Connection::runAll();
+        lineToServer = network::Connection::connectTo(address, portNumber);
         if( !lineToServer->isClosed() ) {
             lineToServer->sendMessage(username, [](std::string text)->std::string{return text;});
             return true;
