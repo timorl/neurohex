@@ -8,8 +8,12 @@
 namespace neuroClient {
 
     enum requestType {
-        MOVE
-
+        INITIAL_HEALTH,
+        BOARD_CHOICE,
+        ARMY_CHOICE,
+        MOVE,
+        TARGETS,
+        DISCARD,
     };
 
 	/**
@@ -41,12 +45,13 @@ namespace neuroClient {
             bool joinServer(std::string address, std::string portNumber, std::string username);
 
 			/**
-				* @brief Sends and message to server and sets handler to dump
-                * everything got from server on stderr.
-                * @todo Delete in final release.
+				* @brief Handles request from the server.
+                * @todo Fill gamestate from requests.
 				*/
-            bool sendAndDump(std::string message);
-		private:
+            void requestHandler(std::string request);
+
+            std::string options;
+            requestType currentRequest;
             std::shared_ptr< network::Connection > lineToServer;
 	};
 

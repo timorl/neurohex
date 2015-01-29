@@ -1,5 +1,6 @@
 #include"neuroClient/Application.hpp"
-#include<iostream> //delete in finall release
+#include<cassert>
+#include"utility/DFStyleReader.hpp"
 
 namespace neuroClient {
 
@@ -10,12 +11,48 @@ namespace neuroClient {
 		sigModified(*this);
 	}
 
+    void Application::requestHandler(std::string request) {
+		std::istringstream inptStream(request);
+		utility::DFStyleReader reader(inptStream);
+        std::vector< std::string > message = reader.getNextToken();
+
+        assert(message[0] == "REQUEST");
+
+        if ( message[1] == "initialHealth" ) {
+            currentRequest = INITIAL_HEALTH;
+        } else if ( message[1] == "board") {
+            currentRequest = BOARD_CHOICE;
+        } else if ( message[1] == "army") {
+            currentRequest = ARMY_CHOICE;
+        } else if ( message[1] == "move") {
+            currentRequest = MOVE;
+        } else if ( message[1] == "targets") {
+            currentRequest = TARGETS;
+        } else if ( message[1] == "discard") {
+            currentRequest = DISCARD;
+        }
+
+        // This is a stub
+        while(reader.hasNextToken()) {
+            if ( message[0] == "OPTIONSBEGIN" ) {
+            } else if ( message[0] == "PLAYERID" ) {
+            } else if ( message[0] == "GAMEBEGIN" ) {
+            } else if ( message[0] == "ABILITYIDENTIFIERBEGIN" ) {
+            }
+        
+        }
+
+        // Set reposponse handler.
+		sigModified(*this);
+    }
+
+
     bool Application::joinServer(std::string address,
             std::string portNumber, std::string username) {
         network::Connection::runAll();
         lineToServer = network::Connection::connectTo(address, portNumber);
         if( !lineToServer->isClosed() ) {
-            lineToServer->sendMessage(username, [](std::string text)->std::string{return text;});
+            lineToServer->sendMessage(username, std::bind(&Application::requestHandler, this, std::placeholders::_1));
             return true;
         } else {
             // Line, is dead, can't send anything so just return false;
@@ -23,7 +60,4 @@ namespace neuroClient {
         }
     }
 
-    bool Application::sendAndDump(std::string message) {
-        lineToServer->sendMessage(message, [](std::string text)->bool{std::cerr << text << std::endl;});
-    }
 }
