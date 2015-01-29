@@ -1,15 +1,13 @@
 #include"network/Connection.hpp"
-#include<thread>
 
 using boost::asio::ip::tcp;
 
 namespace network {
 	boost::asio::io_service Connection::io_service;
+	boost::asio::io_service::work Connection::work(Connection::io_service);
+	std::shared_ptr<std::thread> Connection::netThread;
 
-	Connection::Connection(SocketP sockPointer){
-		this->sockPointer = sockPointer;
-		this->handlerPointer = NULL;
-	}
+	Connection::Connection(SocketP sockPointer) : sockPointer(sockPointer) {}
 
 	Connection::~Connection() {
 		close();
@@ -21,7 +19,7 @@ namespace network {
 
 	bool Connection::setResponseHandler(ResponseHandler handler) {
 		if(mutex.try_lock()){
-			handlerPointer = HandlerP(&handler);
+			curHandler = handler;
 			//sockPointer->async_receive(boost::asio::buffer(buffer, 1024), boost::bind(&Connection::execResponseHandler, this,  boost::asio::placeholders::error, 1024));
 			return true;
 		}
@@ -30,7 +28,7 @@ namespace network {
 
 	bool Connection::sendMessage(std:: string message, ResponseHandler handler) {
 		if(mutex.try_lock()){
-			handlerPointer = HandlerP(&handler);
+			curHandler = handler;
 			sockPointer->async_send(boost::asio::buffer(message, 1024), boost::bind(&Connection::handle_send, this,  boost::asio::placeholders::error, 1024));
 			return true;
 		}
@@ -41,19 +39,19 @@ namespace network {
 		if (!err){
 		}
 		else {
-			handlerPointer = NULL;
+			curHandler = ResponseHandler();
 			mutex.unlock();
 		}
 	}
 
 	void Connection::execResponseHandler(const boost::system::error_code& err, std::size_t bytes_transferred) {
 		if (!err){
-			(*handlerPointer)(buffer);
+			curHandler(buffer);
 		}
 		else {
 		}
 
-		handlerPointer = NULL;
+		curHandler = ResponseHandler();
 		mutex.unlock();
 	}
 
@@ -112,6 +110,8 @@ namespace network {
 	}
 
 	void Connection::runAll(){
-		std::thread thread(Connection::runIO_service);
+		if ( !netThread ) {
+			netThread.reset(new std::thread(Connection::runIO_service));
+		}
 	}
 }

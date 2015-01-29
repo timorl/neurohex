@@ -8,6 +8,7 @@
 #include<memory>
 #include<mutex>
 #include<string>
+#include<thread>
 
 using boost::asio::ip::tcp;
 
@@ -15,9 +16,6 @@ namespace network {
 
 	using ResponseHandler = std::function<void(std::string)>;
 	using SocketP = std::shared_ptr<tcp::socket>;
-	using HandlerP = std::shared_ptr<ResponseHandler>;
-	using MutexP = std::shared_ptr<std::mutex>;
-	//using ConnectionP = std::shared_ptr<Connection>;
 
 	/**
 		* @brief A representation of a single network connection to which you can write
@@ -82,10 +80,12 @@ namespace network {
 			static void runIO_service();
 			static void handle_resolve(const boost::system::error_code& err, tcp::resolver::iterator endpoint_iterator, SocketP sockPointer);
 			static void handle_connect(const boost::system::error_code& err, tcp::resolver::iterator endpoint_iterator, SocketP sockPointer);
+			static boost::asio::io_service::work work;
+			static std::shared_ptr<std::thread> netThread;
 			void handle_send(const boost::system::error_code& err, std::size_t bytes_transferred);
 			void execResponseHandler(const boost::system::error_code& err, std::size_t bytes_transferred);
 			SocketP sockPointer;
-			HandlerP handlerPointer;
+			ResponseHandler	curHandler;
 			std::mutex mutex;
 			std::string buffer;
 	};
