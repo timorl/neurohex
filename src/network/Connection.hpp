@@ -9,6 +9,7 @@
 #include<string>
 #include<thread>
 #include<condition_variable>
+#include<atomic>
 
 using boost::asio::ip::tcp;
 
@@ -84,8 +85,9 @@ namespace network {
 			void execResponseHandler(const boost::system::error_code& err, std::size_t bytes_transferred);
 			SocketP sockPointer;
 			ResponseHandler	curHandler;
-			std::mutex mtx;
-			std::condition_variable cv;
+			std::recursive_mutex mtx;
+			std::condition_variable_any cv;
+			std::atomic<int> dreamLevel;
 
 			static const int BUF_SIZE = 2048;
 			char buffer[BUF_SIZE];
