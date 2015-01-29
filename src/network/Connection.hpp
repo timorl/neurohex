@@ -17,6 +17,7 @@ namespace network {
 
 	using ResponseHandler = std::function<void(std::string)>;
 	using SocketP = std::shared_ptr<tcp::socket>;
+	using ULock = std::unique_lock<std::recursive_mutex>;
 
 	/**
 		* @brief A representation of a single network connection to which you can write
