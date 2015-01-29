@@ -7,6 +7,11 @@
 
 namespace neuroClient {
 
+    enum requestType {
+        MOVE
+
+    };
+
 	/**
 		* @brief The class to start the whole application.
 		* @todo This is a stub.
@@ -32,7 +37,6 @@ namespace neuroClient {
 
 			/**
 				* @brief Command to join server and send it your username.
-                * @todo Change the handler which this function sets
 				*/
             bool joinServer(std::string address, std::string portNumber, std::string username);
 

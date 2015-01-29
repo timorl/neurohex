@@ -22,11 +22,11 @@ namespace client {
 			} else if ( command == "help" ) {
 				std::cout << helpMessage;
             } else if ( command == "join" ) {
-                std::cout << "Address: " << std::end;
+                std::cout << "Address: " << std::endl;
                 std::cin >> address;
-                std::cout << "Port: " << std::end;
+                std::cout << "Port: " << std::endl;
                 std::cin >> port;
-                std::cout << "Username: " << std::end;
+                std::cout << "Username: " << std::endl;
                 std::cin >> username;
                 bool tmp = application.joinServer(address, port, username);
                 if ( tmp ) {
