@@ -9,6 +9,7 @@ namespace neuroServer {
 	void Server::start() {
 		network::Connection::runAll();
 		network::Acceptor acceptor(port);
+		acceptor.startAccepting(maxConnections);
 		for ( int i = 0; i < maxConnections; i++ ) {
 			contestants.emplace_back(new NetworkContestant(acceptor));
 			NetworkContestantP & cont = contestants[i];

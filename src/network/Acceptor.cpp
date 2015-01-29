@@ -4,7 +4,7 @@ using boost::asio::ip::tcp;
 
 namespace network {
 
-	Acceptor::Acceptor(int portNumber) : portNumber(portNumber), waitingSockets(0) {}
+	Acceptor::Acceptor(int portNumber) : acceptor(Connection::io_service, tcp::endpoint(tcp::v4(), portNumber)), waitingSockets(0) {}
 
 	Acceptor::~Acceptor() {
 	}
@@ -21,13 +21,10 @@ namespace network {
 	}
 
 	void Acceptor::startAccepting(int max) {
-		for(int i=0; i<max; i++){
-			SocketP sockPointer(new tcp::socket(Connection::io_service));
-			tcp::acceptor acceptor(Connection::io_service, tcp::endpoint(tcp::v4(), portNumber));
+		waitingSockets	+= max;
+		SocketP sockPointer(new tcp::socket(Connection::io_service));
 
-			waitingSockets++;
-			acceptor.async_accept(*sockPointer, std::bind(&Acceptor::acceptHandler, this, std::placeholders::_1, sockPointer));
-		}
+		acceptor.async_accept(*sockPointer, std::bind(&Acceptor::acceptHandler, this, std::placeholders::_1, sockPointer));
 	}
 
 	void Acceptor::acceptHandler(const boost::system::error_code& error, SocketP sockPointer){
@@ -41,6 +38,9 @@ namespace network {
 		else{
 			waitingSockets--;
 			startAccepting(1);
+		}
+		if ( waitingSockets > 0 ) {
+			acceptor.async_accept(*sockPointer, std::bind(&Acceptor::acceptHandler, this, std::placeholders::_1, sockPointer));
 		}
 	}
 

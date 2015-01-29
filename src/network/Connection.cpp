@@ -68,36 +68,10 @@ namespace network {
 		tcp::resolver resolver(Connection::io_service);
 		tcp::resolver::query query(address, portNumber);
 		SocketP sockPointer(new tcp::socket(Connection::io_service));
-		resolver.async_resolve(query, boost::bind(Connection::handle_resolve, boost::asio::placeholders::error, boost::asio::placeholders::iterator, sockPointer));
+		auto endpts = resolver.resolve(query);
+		boost::asio::connect(*sockPointer, endpts);
 
 		return std::shared_ptr<Connection>(new Connection(sockPointer));
-	}
-
-	void Connection::handle_resolve(const boost::system::error_code& err, tcp::resolver::iterator endpoint_iterator, SocketP sockPointer){
-		if (!err){
-      			// Attempt a connection to the first endpoint in the list. Each endpoint
-      			// will be tried until we successfully establish a connection.
-      			tcp::endpoint endpoint = *endpoint_iterator;
-			sockPointer->async_connect(endpoint, boost::bind(Connection::handle_connect, boost::asio::placeholders::error, ++endpoint_iterator, sockPointer));
-    		}
-		else{
-		      //std::cout << "Error: " << err.message() << "\n";
-		}
-	}
-
-	void Connection::handle_connect(const boost::system::error_code& err, tcp::resolver::iterator endpoint_iterator, SocketP sockPointer){
-		if (!err){
-			// The connection was successful.
-		}
-		else if (endpoint_iterator != tcp::resolver::iterator()){
-			// The connection failed. Try the next endpoint in the list.
-			sockPointer->close();
-			tcp::endpoint endpoint = *endpoint_iterator;
-			sockPointer->async_connect(endpoint, boost::bind(Connection::handle_connect, boost::asio::placeholders::error, ++endpoint_iterator, sockPointer));
-		}
-		else{
-			//std::cout << "Error: " << err.message() << "\n";
-		}
 	}
 
 	void Connection::runIO_service(){

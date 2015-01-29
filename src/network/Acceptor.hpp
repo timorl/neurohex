@@ -50,7 +50,7 @@ namespace network {
 			void startAccepting(int max);
 
 		private:
-			int portNumber;
+			boost::asio::ip::tcp::acceptor acceptor;
 			std::queue<SocketP> readySockets;
 			std::atomic<int> waitingSockets;
 			std::mutex mtx;
