@@ -60,12 +60,4 @@ namespace neuro {
 		output.endToken();
 	}
 
-    void Army::printArmy() const {
-        std::cout << "The army owner is player with id " << owner << std::endl;
-        for( int tile : tiles ) {
-            std::cout << tile << " ";
-        }
-        std::cout << std::endl;
-    }
-
 }

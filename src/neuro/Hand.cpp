@@ -42,11 +42,4 @@ namespace neuro {
 		output.endToken();
 	}
 
-    void Hand::printHand() const {
-        for ( int tp : tiles ) {
-            std::cout << tp << " ";
-        }
-        std::cout << std::endl;
-    }
-
 }
