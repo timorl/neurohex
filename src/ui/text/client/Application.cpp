@@ -4,7 +4,7 @@ namespace ui {
 namespace text {
 namespace client {
 
-	static const std::string helpMessage = "The available commands are:\n\tstart\tStarts a game. Not implemented.\n\texit\tExits this client.\n\thelp\tDisplays this help message.\n";
+	static const std::string helpMessage = "The available commands are:\n\tjoin\tAsks for necesary data and connects to the server.\n\tstart\tStarts a game. Not implemented.\n\texit\tExits this client.\n\thelp\tDisplays this help message.\n";
 
 	void Application::applicationStarted(const neuroClient::Application & app) {
         std::string address, port, username;
@@ -22,8 +22,11 @@ namespace client {
 			} else if ( command == "help" ) {
 				std::cout << helpMessage;
             } else if ( command == "join" ) {
+                std::cout << "Address: " << std::end;
                 std::cin >> address;
+                std::cout << "Port: " << std::end;
                 std::cin >> port;
+                std::cout << "Username: " << std::end;
                 std::cin >> username;
                 bool tmp = application.joinServer(address, port, username);
                 if ( tmp ) {
