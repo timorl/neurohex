@@ -40,6 +40,11 @@ namespace neuroClient {
 			static std::string localDataDirectory;
 
 			/**
+				* @brief Writes the message to the server.
+				*/
+            bool writeToServer(std::string message);
+
+			/**
 				* @brief Command to join server and send it your username.
 				*/
             bool joinServer(std::string address, std::string portNumber, std::string username);

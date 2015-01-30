@@ -46,6 +46,15 @@ namespace neuroClient {
 		sigModified(*this);
     }
 
+    bool Application::writeToServer(std::string message) {
+        if ( !lineToServer->isClosed() ) {
+            lineToServer->sendMessage(message, std::bind(&Application::requestHandler, this, std::placeholders::_1));
+            return true;
+        } else {
+            // Line, is dead, can't send anything so just return false;
+            return false;
+        }
+    }
 
     bool Application::joinServer(std::string address,
             std::string portNumber, std::string username) {

@@ -99,6 +99,7 @@ set(NEUROCLIENT_HDRS
 	${PROJECT_SOURCE_DIR}/ui/text/client/Application.hpp
 	${PROJECT_SOURCE_DIR}/ui/text/CommandShell.hpp
     ${PROJECT_SOURCE_DIR}/ui/text/client/ServerJoiner.hpp
+    ${PROJECT_SOURCE_DIR}/ui/text/client/GameConfigurer.hpp
 	)
 
 set(NEUROCLIENT_SRCS
@@ -109,6 +110,7 @@ set(NEUROCLIENT_SRCS
 	${PROJECT_SOURCE_DIR}/ui/text/client/Application.cpp
 	${PROJECT_SOURCE_DIR}/ui/text/CommandShell.cpp
     ${PROJECT_SOURCE_DIR}/ui/text/client/ServerJoiner.cpp
+    ${PROJECT_SOURCE_DIR}/ui/text/client/GameConfigurer.cpp
 	)
 
 pkg_search_module(SDL2 REQUIRED sdl2)

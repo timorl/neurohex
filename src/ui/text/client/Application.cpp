@@ -11,9 +11,8 @@ namespace client {
     }
 
 	void Application::applicationStarted(const neuroClient::Application & app) {
-        ServerJoiner a(application); 
-        a.run();
-        while ( 1 ) {} // This is a stub
+        ServerJoiner(application).run();
+        GameConfigurer(application).run();
 	}
 
 	Application::Application(neuroClient::Application & application) : application(application) {

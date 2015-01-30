@@ -5,6 +5,7 @@
 #include"ui/Observable.hpp"
 #include"neuroClient/Application.hpp"
 #include"ui/text/client/ServerJoiner.hpp"
+#include"ui/text/client/GameConfigurer.hpp"
 
 namespace ui {
 namespace text {
