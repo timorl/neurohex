@@ -3,6 +3,7 @@
 using boost::asio::ip::tcp;
 
 namespace network {
+
 	boost::asio::io_service Connection::io_service;
 	boost::asio::io_service::work Connection::work(Connection::io_service);
 	std::shared_ptr<std::thread> Connection::netThread;
@@ -18,7 +19,7 @@ namespace network {
 	}
 
 	bool Connection::setResponseHandler(ResponseHandler handler) {
-		std::unique_lock<std::recursive_mutex> lk(mtx);
+		ULock lk(mtx);
 		if (!curHandler) return false;
 
 		curHandler = handler;
@@ -27,7 +28,7 @@ namespace network {
 	}
 
 	bool Connection::sendMessage(std:: string message, ResponseHandler handler) {
-		std::unique_lock<std::recursive_mutex> lk(mtx);
+		ULock lk(mtx);
 		if (!curHandler) return false;
 
 		curHandler = handler;
@@ -36,7 +37,7 @@ namespace network {
 	}
 
 	void Connection::sendHandler(const boost::system::error_code& err, std::size_t bytes_transferred, ResponseHandler handler){
-		std::unique_lock<std::recursive_mutex> lk(mtx);
+		ULock lk(mtx);
 		if (!err){
 			if(handler){
 				sockPointer->async_receive(boost::asio::buffer(buffer, BUF_SIZE), std::bind(&Connection::execResponseHandler, this, std::placeholders::_1, std::placeholders::_2));
@@ -52,7 +53,7 @@ namespace network {
 	}
 
 	void Connection::execResponseHandler(const boost::system::error_code& err, std::size_t bytes_transferred) {
-		std::unique_lock<std::recursive_mutex> lk(mtx);
+		ULock lk(mtx);
 		if (!err){
 			ResponseHandler handler = curHandler;
 			curHandler = ResponseHandler();
@@ -68,7 +69,7 @@ namespace network {
 	}
 
 	void Connection::wait() {
-		std::unique_lock<std::recursive_mutex> lk(mtx);
+		ULock lk(mtx);
 		if (!curHandler) return;
 
 		cv.wait(lk, [this]()->bool{return !curHandler;});
@@ -83,8 +84,13 @@ namespace network {
 		tcp::resolver resolver(Connection::io_service);
 		tcp::resolver::query query(address, portNumber);
 		SocketP sockPointer(new tcp::socket(Connection::io_service));
-		auto endpts = resolver.resolve(query);
-		boost::asio::connect(*sockPointer, endpts);
+		try{
+			auto endpts = resolver.resolve(query);
+			boost::asio::connect(*sockPointer, endpts);
+		}
+		catch (std::exception& e){
+			//TO DO
+		}
 
 		return std::shared_ptr<Connection>(new Connection(sockPointer));
 	}
@@ -103,4 +109,5 @@ namespace network {
 			netThread.reset(new std::thread(Connection::runIOservice));
 		}
 	}
+
 }

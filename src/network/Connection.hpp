@@ -17,6 +17,7 @@ namespace network {
 
 	using ResponseHandler = std::function<void(std::string)>;
 	using SocketP = std::shared_ptr<tcp::socket>;
+	using ULock = std::unique_lock<std::recursive_mutex>;
 
 	/**
 		* @brief A representation of a single network connection to which you can write
@@ -26,8 +27,6 @@ namespace network {
 		*/
 	class Connection {
 		public:
-			static boost::asio::io_service io_service;
-			Connection(SocketP sockpointer);
 			/**
 				* @brief Destroys the object and closes the connection.
 				*/
@@ -76,22 +75,36 @@ namespace network {
 				* new arguments.
 				*/
 			static std::shared_ptr<Connection> connectTo(std::string address, std::string portNumber);
+
+			/**
+				* @brief Run io_service and start all connections.
+				*/
 			static void runAll();
+
 		private:
-			static void runIOservice();
+			static boost::asio::io_service io_service;
+			static const int BUF_SIZE = 2048;
 			static boost::asio::io_service::work work;
 			static std::shared_ptr<std::thread> netThread;
-			void sendHandler(const boost::system::error_code& err, std::size_t bytes_transferred, ResponseHandler handler);
-			void execResponseHandler(const boost::system::error_code& err, std::size_t bytes_transferred);
+
+			char buffer[BUF_SIZE];
 			SocketP sockPointer;
 			ResponseHandler	curHandler;
 			std::recursive_mutex mtx;
 			std::condition_variable_any cv;
 			std::atomic<int> dreamLevel;
 
-			static const int BUF_SIZE = 2048;
-			char buffer[BUF_SIZE];
+			Connection(SocketP sockpointer);
+
+			static void runIOservice();
+
+			void sendHandler(const boost::system::error_code& err, std::size_t bytes_transferred, ResponseHandler handler);
+			void execResponseHandler(const boost::system::error_code& err, std::size_t bytes_transferred);
+
+
+		friend class Acceptor;
 	};
+
 }
 
 #endif
