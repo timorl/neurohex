@@ -14,9 +14,10 @@ distribution you probably know how to do this.
 To install neccessary data files run the following commands:
 
 `mkdir -p ~/.local/share/neurohex`
+
 `cp -R data/* ~/.local/share/neurohex`
 
-To compile the program run `make all`. Afterwards running bin/NeurohexServer
-runs the server, while bin/NeurohexClient runs the client. They have internal
+To compile the program run `make all`. Afterwards running `bin/NeurohexServer`
+runs the server, while `bin/NeurohexClient` runs the client. They have internal
 documentation, if you need to know any commands available at some point just
 type `help`.
