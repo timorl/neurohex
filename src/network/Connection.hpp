@@ -27,8 +27,16 @@ namespace network {
 		*/
 	class Connection {
 		public:
+			/**
+				* @brief Takes care whole network services.
+				*/
 			static boost::asio::io_service io_service;
+
+			/**
+				* @brief Constructs object from specified socket.
+				*/
 			Connection(SocketP sockpointer);
+
 			/**
 				* @brief Destroys the object and closes the connection.
 				*/
@@ -77,6 +85,10 @@ namespace network {
 				* new arguments.
 				*/
 			static std::shared_ptr<Connection> connectTo(std::string address, std::string portNumber);
+
+			/**
+				* @brief Run io_service and start all connections.
+				*/
 			static void runAll();
 		private:
 			static void runIOservice();
