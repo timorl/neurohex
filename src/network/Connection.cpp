@@ -5,6 +5,7 @@ using boost::asio::ip::tcp;
 
 namespace network {
 
+	const std::string Connection::delimiter("\r\n\r\n");
 	boost::asio::io_service Connection::io_service;
 	boost::asio::io_service::work Connection::work(Connection::io_service);
 	std::shared_ptr<std::thread> Connection::netThread;
@@ -26,7 +27,7 @@ namespace network {
 		}
 
 		curHandler = handler;
-		sockPointer->async_receive(boost::asio::buffer(buffer, BUF_SIZE), std::bind(&Connection::execResponseHandler, this,  std::placeholders::_1, std::placeholders::_2));
+		boost::asio::async_read_until(*sockPointer, buffer, delimiter, std::bind(&Connection::execResponseHandler, this, std::placeholders::_1, std::placeholders::_2));
 		return true;
 	}
 
@@ -36,36 +37,39 @@ namespace network {
 			return false;
 		}
 
+		message += delimiter;
 		curHandler = handler;
 		sockPointer->async_send(boost::asio::buffer(message), std::bind(&Connection::sendHandler, this,  std::placeholders::_1, std::placeholders::_2, handler));
 		return true;
 	}
 
 	void Connection::sendHandler(const boost::system::error_code& err, std::size_t bytes_transferred, ResponseHandler handler){
-		ULock lk(mtx);
-		if (!err){
-			if(handler){
-				sockPointer->async_receive(boost::asio::buffer(buffer, BUF_SIZE), std::bind(&Connection::execResponseHandler, this, std::placeholders::_1, std::placeholders::_2));
+		if(handler){
+			ULock lk(mtx);
+			if (!err){
+				boost::asio::async_read_until(*sockPointer, buffer, delimiter, std::bind(&Connection::execResponseHandler, this, std::placeholders::_1, std::placeholders::_2));
+			}
+			else {
+				ResponseHandler handler = curHandler;
+				curHandler = ResponseHandler();
+				handler("");
+
 			}
 		}
-		else {
-			ResponseHandler handler = curHandler;
-			curHandler = ResponseHandler();
-			handler("");
-
-			cv.notify_one();
-		}
+		cv.notify_one();
 	}
 
 	void Connection::execResponseHandler(const boost::system::error_code& err, std::size_t bytes_transferred) {
 		ULock lk(mtx);
 		if (!err){
-			buffer[bytes_transferred] = 0;
+			std::istream is(&buffer);
+			std::string message;
+			std::getline(is, message);
+			message.pop_back();
 			ResponseHandler handler = curHandler;
 			curHandler = ResponseHandler();
-			handler(std::string(buffer));
-		}
-		else {
+			handler(message);
+		} else {
 			ResponseHandler handler = curHandler;
 			curHandler = ResponseHandler();
 			handler("");
