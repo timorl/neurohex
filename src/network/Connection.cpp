@@ -1,4 +1,5 @@
 #include"network/Connection.hpp"
+#include"iostream"
 
 using boost::asio::ip::tcp;
 
@@ -59,6 +60,7 @@ namespace network {
 	void Connection::execResponseHandler(const boost::system::error_code& err, std::size_t bytes_transferred) {
 		ULock lk(mtx);
 		if (!err){
+			buffer[bytes_transferred] = 0;
 			ResponseHandler handler = curHandler;
 			curHandler = ResponseHandler();
 			handler(std::string(buffer));
@@ -95,6 +97,7 @@ namespace network {
 			boost::asio::connect(*sockPointer, endpts);
 		}
 		catch (std::exception& e){
+			sockPointer->close();
 			//TO DO
 		}
 
