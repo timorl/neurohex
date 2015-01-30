@@ -48,8 +48,6 @@ namespace utility {
 		if ( !fileStream ) {
 			return false;
 		}
-		std::string tmp;
-		std::getline( fileStream, tmp, '[' );
 		return true;
 	}
 
