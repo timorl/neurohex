@@ -20,7 +20,9 @@ namespace network {
 
 	bool Connection::setResponseHandler(ResponseHandler handler) {
 		ULock lk(mtx);
-		if (!curHandler) return false;
+		if (curHandler) {
+			return false;
+		}
 
 		curHandler = handler;
 		sockPointer->async_receive(boost::asio::buffer(buffer, BUF_SIZE), std::bind(&Connection::execResponseHandler, this,  std::placeholders::_1, std::placeholders::_2));
@@ -29,7 +31,9 @@ namespace network {
 
 	bool Connection::sendMessage(std:: string message, ResponseHandler handler) {
 		ULock lk(mtx);
-		if (!curHandler) return false;
+		if (curHandler) {
+			return false;
+		}
 
 		curHandler = handler;
 		sockPointer->async_send(boost::asio::buffer(message), std::bind(&Connection::sendHandler, this,  std::placeholders::_1, std::placeholders::_2, handler));
@@ -70,7 +74,9 @@ namespace network {
 
 	void Connection::wait() {
 		ULock lk(mtx);
-		if (!curHandler) return;
+		if (curHandler) {
+			return;
+		}
 
 		cv.wait(lk, [this]()->bool{return !curHandler;});
 		return;
