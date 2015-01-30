@@ -55,7 +55,6 @@ namespace neuroClient {
 				*/
 			void requestHandler(std::string request);
 
-<<<<<<< HEAD
             // This is a temporary variable for testing.
             std::string some_text;
 
@@ -66,15 +65,6 @@ namespace neuroClient {
             requestType currentRequest;
         private:
             std::shared_ptr< network::Connection > lineToServer;
-||||||| merged common ancestors
-            std::string options;
-            requestType currentRequest;
-            std::shared_ptr< network::Connection > lineToServer;
-=======
-			std::string options;
-			requestType currentRequest;
-			std::shared_ptr< network::Connection > lineToServer;
->>>>>>> dfb4d8b03d2b0be3f0130bac2020cb09ab38ca1f
 	};
 
 }
