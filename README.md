@@ -4,10 +4,7 @@ Neurohex
 A web game based on the great board game Neuroshima Hex.
 
 Installation instructions
-=========================
-
-Requirements
-------------
+-------------------------
 
 This program requires a linux distribution with the boost library at version at
 least 1.54 installed. If you are using Ubuntu or some similar system `sudo
