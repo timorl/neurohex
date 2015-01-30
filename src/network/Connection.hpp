@@ -28,16 +28,6 @@ namespace network {
 	class Connection {
 		public:
 			/**
-				* @brief Takes care whole network services.
-				*/
-			static boost::asio::io_service io_service;
-
-			/**
-				* @brief Constructs object from specified socket.
-				*/
-			Connection(SocketP sockpointer);
-
-			/**
 				* @brief Destroys the object and closes the connection.
 				*/
 			~Connection();
@@ -90,21 +80,38 @@ namespace network {
 				* @brief Run io_service and start all connections.
 				*/
 			static void runAll();
+
 		private:
-			static void runIOservice();
+			/**
+				* @brief Takes care whole network services.
+				*/
+			static boost::asio::io_service io_service;
+
+			static const int BUF_SIZE = 2048;
 			static boost::asio::io_service::work work;
 			static std::shared_ptr<std::thread> netThread;
-			void sendHandler(const boost::system::error_code& err, std::size_t bytes_transferred, ResponseHandler handler);
-			void execResponseHandler(const boost::system::error_code& err, std::size_t bytes_transferred);
+
+			char buffer[BUF_SIZE];
 			SocketP sockPointer;
 			ResponseHandler	curHandler;
 			std::recursive_mutex mtx;
 			std::condition_variable_any cv;
 			std::atomic<int> dreamLevel;
 
-			static const int BUF_SIZE = 2048;
-			char buffer[BUF_SIZE];
+			/**
+				* @brief Constructs object from specified socket.
+				*/
+			Connection(SocketP sockpointer);
+
+			static void runIOservice();
+
+			void sendHandler(const boost::system::error_code& err, std::size_t bytes_transferred, ResponseHandler handler);
+			void execResponseHandler(const boost::system::error_code& err, std::size_t bytes_transferred);
+
+
+		friend class Acceptor;
 	};
+
 }
 
 #endif

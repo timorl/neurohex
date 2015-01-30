@@ -3,6 +3,7 @@
 using boost::asio::ip::tcp;
 
 namespace network {
+
 	boost::asio::io_service Connection::io_service;
 	boost::asio::io_service::work Connection::work(Connection::io_service);
 	std::shared_ptr<std::thread> Connection::netThread;
@@ -108,4 +109,5 @@ namespace network {
 			netThread.reset(new std::thread(Connection::runIOservice));
 		}
 	}
+
 }
