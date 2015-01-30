@@ -83,11 +83,11 @@ namespace network {
 
 		private:
 			static boost::asio::io_service io_service;
-			static const int BUF_SIZE = 2048;
+			static const std::string delimiter;
 			static boost::asio::io_service::work work;
 			static std::shared_ptr<std::thread> netThread;
 
-			char buffer[BUF_SIZE];
+			boost::asio::streambuf buffer;
 			SocketP sockPointer;
 			ResponseHandler	curHandler;
 			std::recursive_mutex mtx;

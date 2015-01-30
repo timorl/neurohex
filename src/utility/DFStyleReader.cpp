@@ -2,6 +2,11 @@
 
 namespace utility {
 
+	DFStyleReader::DFStyleReader( std::istream & inputStream ) : inputStream(inputStream) {
+		std::string tmp;
+		std::getline( inputStream, tmp, '[' );
+	}
+
 	std::vector< std::string > DFStyleReader::explode( const std::string & toExplode, char delim ) {
 		std::vector< std::string > result;
 		std::istringstream iss( toExplode );

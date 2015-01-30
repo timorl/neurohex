@@ -17,7 +17,7 @@ namespace utility {
 				* @brief Construct a reader for the given stream.
 				* @param[in] inputStream The stream outputting data to parse.
 				*/
-			DFStyleReader( std::istream & inputStream ) : inputStream(inputStream) {}
+			DFStyleReader( std::istream & inputStream );
 
 			/**
 				* @brief Returns whether there is a next token in the stream.
