@@ -12,9 +12,10 @@ namespace neuroClient {
 	}
 
     void Application::requestHandler(std::string request) {
+        some_text = request;
 		std::istringstream inptStream(request);
 		utility::DFStyleReader reader(inptStream);
-        std::vector< std::string > message = reader.getNextToken();
+        std::vector< std::string > message = reader.getNextToken(); 
 
         assert(message[0] == "REQUEST");
 

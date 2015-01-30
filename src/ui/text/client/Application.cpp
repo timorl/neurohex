@@ -8,10 +8,13 @@ namespace client {
     
     void Application::requestHandler() {
         // This is a stub, should handle the request though
+        std::cout << application.some_text << std::endl;
     }
 
 	void Application::applicationStarted(const neuroClient::Application & app) {
+        application.sigModified.disconnect_all_slots();
         ServerJoiner(application).run();
+        application.sigModified.connect(std::bind(&Application::requestHandler, this));
         GameConfigurer(application).run();
 	}
 

@@ -55,8 +55,15 @@ namespace neuroClient {
 				*/
             void requestHandler(std::string request);
 
-            std::string options;
+            // This is a temporary variable for testing.
+            std::string some_text;
+
+			/**
+				* @brief Information about the type of the last request
+                * received from the server.
+				*/
             requestType currentRequest;
+        private:
             std::shared_ptr< network::Connection > lineToServer;
 	};
 
