@@ -42,22 +42,22 @@ namespace neuroClient {
 			/**
 				* @brief Writes the message to the server.
 				*/
-            bool writeToServer(std::string message);
+			bool writeToServer(std::string message);
 
 			/**
 				* @brief Command to join server and send it your username.
 				*/
-            bool joinServer(std::string address, std::string portNumber, std::string username);
+			bool joinServer(std::string address, std::string portNumber, std::string username);
 
 			/**
 				* @brief Handles request from the server.
-                * @todo Fill gamestate from requests.
+				* @todo Fill gamestate from requests.
 				*/
-            void requestHandler(std::string request);
+			void requestHandler(std::string request);
 
-            std::string options;
-            requestType currentRequest;
-            std::shared_ptr< network::Connection > lineToServer;
+			std::string options;
+			requestType currentRequest;
+			std::shared_ptr< network::Connection > lineToServer;
 	};
 
 }
