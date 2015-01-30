@@ -10,6 +10,9 @@ namespace text {
 
     using Arguments = std::vector<std::string>;
 
+    /**
+        * @brief A simple shell for game configuration purposes.
+        */
     class GameConfigurer {
         public:
 			/**

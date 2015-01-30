@@ -10,6 +10,9 @@ namespace text {
 	
     using Arguments = std::vector<std::string>;
 
+    /**
+        * @brief Simple shell to connect to server.
+        */
     class ServerJoiner {
         public:
 			/**
