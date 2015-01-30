@@ -82,11 +82,7 @@ namespace network {
 			static void runAll();
 
 		private:
-			/**
-				* @brief Takes care whole network services.
-				*/
 			static boost::asio::io_service io_service;
-
 			static const int BUF_SIZE = 2048;
 			static boost::asio::io_service::work work;
 			static std::shared_ptr<std::thread> netThread;
@@ -98,9 +94,6 @@ namespace network {
 			std::condition_variable_any cv;
 			std::atomic<int> dreamLevel;
 
-			/**
-				* @brief Constructs object from specified socket.
-				*/
 			Connection(SocketP sockpointer);
 
 			static void runIOservice();
