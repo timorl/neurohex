@@ -1,4 +1,5 @@
 #include"ui/text/client/GameConfigurer.hpp"
+#include<string>
 
 namespace ui {
 namespace text {
@@ -14,8 +15,12 @@ namespace text {
     }
 
     bool GameConfigurer::writeToServer(Arguments args) {
-        assert(args.size() == 2);
-        if ( application.writeToServer(args[1]) ) {
+
+        std::string message;
+        for ( int i = 1; i < args.size(); i++)
+            message += args[i];
+
+        if ( application.writeToServer(message) ) {
             shell.write("Message successfully sent to server.");
         } else {
             shell.write("WARNING: Connection to server lost.");
