@@ -75,7 +75,7 @@ namespace network {
 			curHandler = ResponseHandler();
 			handler("");
 		}
-
+		lk.unlock();
 		cv.notify_one();
 	}
 
