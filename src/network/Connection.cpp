@@ -63,9 +63,10 @@ namespace network {
 		ULock lk(mtx);
 		if (!err){
 			std::istream is(&buffer);
-			std::string message;
-			std::getline(is, message);
-			message.pop_back();
+			std::string message, grbg;
+			std::getline(is, message, '\r');
+			std::getline(is, grbg);
+			std::getline(is, grbg);
 			ResponseHandler handler = curHandler;
 			curHandler = ResponseHandler();
 			handler(message);
