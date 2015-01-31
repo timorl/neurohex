@@ -1,5 +1,6 @@
 #include"ui/text/client/GameConfigurer.hpp"
 #include<string>
+#include<iostream>
 
 namespace ui {
 namespace text {
@@ -16,9 +17,11 @@ namespace text {
 
     bool GameConfigurer::writeToServer(Arguments args) {
 
-        std::string message;
-        for ( int i = 1; i < args.size(); i++)
+        std::string message(args[1]);
+        for ( int i = 2; i < args.size(); i++)
             message += " " + args[i];
+
+        std::cout << message << std::endl;
 
         if ( application.writeToServer(message) ) {
             shell.write("Message successfully sent to server.");
