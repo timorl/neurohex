@@ -11,12 +11,12 @@ namespace neuroClient {
 		sigModified(*this);
 	}
 
-    void Application::requestHandler(std::string request) {
-        some_text = request;
+	void Application::requestHandler(std::string request) {
+		some_text = request;
 
 		std::istringstream inptStream(request);
 		utility::DFStyleReader reader(inptStream);
-        std::vector< std::string > message = reader.getNextToken();
+		std::vector< std::string > message = reader.getNextToken();
 
 		assert(message[0] == "REQUEST");
 
@@ -36,6 +36,7 @@ namespace neuroClient {
 
 		// This is a stub
 		while(reader.hasNextToken()) {
+			message = reader.getNextToken();
 			if ( message[0] == "OPTIONSBEGIN" ) {
 			} else if ( message[0] == "PLAYERID" ) {
 			} else if ( message[0] == "GAMEBEGIN" ) {

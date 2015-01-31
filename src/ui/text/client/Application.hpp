@@ -17,15 +17,15 @@ namespace client {
 		*/
 	class Application {
 		public:
-            /**
-                * @brief Start the command line interface.
-                */
-            void applicationStarted(const neuroClient::Application &);
+			/**
+				* @brief Start the command line interface.
+				*/
+			void applicationStarted(const neuroClient::Application &);
 
-            /**
-                * @brief Method invoked on request from server.
-                */
-            void requestHandler();
+			/**
+				* @brief Method invoked on request from server.
+				*/
+			void requestHandler(const neuroClient::Application & app);
 
 			/**
 				* @brief Create an application watching the given application.

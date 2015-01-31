@@ -7,14 +7,14 @@
 
 namespace neuroClient {
 
-    enum requestType {
-        INITIAL_HEALTH,
-        BOARD_CHOICE,
-        ARMY_CHOICE,
-        MOVE,
-        TARGETS,
-        DISCARD,
-    };
+	enum requestType {
+		INITIAL_HEALTH,
+		BOARD_CHOICE,
+		ARMY_CHOICE,
+		MOVE,
+		TARGETS,
+		DISCARD,
+	};
 
 	/**
 		* @brief The class to start the whole application.
@@ -55,16 +55,16 @@ namespace neuroClient {
 				*/
 			void requestHandler(std::string request);
 
-            // This is a temporary variable for testing.
-            std::string some_text;
+			// This is a temporary variable for testing.
+			std::string some_text;
 
 			/**
 				* @brief Information about the type of the last request
-                * received from the server.
+				* received from the server.
 				*/
-            requestType currentRequest;
-        private:
-            std::shared_ptr< network::Connection > lineToServer;
+			requestType currentRequest;
+		private:
+			std::shared_ptr< network::Connection > lineToServer;
 	};
 
 }
