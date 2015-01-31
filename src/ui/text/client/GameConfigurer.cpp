@@ -18,7 +18,7 @@ namespace text {
 
         std::string message;
         for ( int i = 1; i < args.size(); i++)
-            message += args[i];
+            message += " " + args[i];
 
         if ( application.writeToServer(message) ) {
             shell.write("Message successfully sent to server.");
