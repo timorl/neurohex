@@ -69,10 +69,8 @@ namespace network {
 
 			/**
 				* @brief Create a connection to the specified address.
-				* @param[in] address The address to which to connect.
-				* @todo Either specify properly the format of the address string or change
-				* the arguments for this function and then specify it anyway, but for the
-				* new arguments.
+				* @param[in] address The IP address to which to connect.
+				* @param[in] portNumber The port to which to connect.
 				*/
 			static std::shared_ptr<Connection> connectTo(std::string address, std::string portNumber);
 
@@ -100,7 +98,6 @@ namespace network {
 
 			void sendHandler(const boost::system::error_code& err, std::size_t bytes_transferred, ResponseHandler handler);
 			void execResponseHandler(const boost::system::error_code& err, std::size_t bytes_transferred);
-
 
 		friend class Acceptor;
 	};
