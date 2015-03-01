@@ -34,6 +34,7 @@ set(COMMON_HDRS
 	${PROJECT_SOURCE_DIR}/neuro/Army.hpp
 	${PROJECT_SOURCE_DIR}/neuro/Hand.hpp
 	${PROJECT_SOURCE_DIR}/neuro/Player.hpp
+	${PROJECT_SOURCE_DIR}/neuro/Game.hpp
 	${PROJECT_SOURCE_DIR}/utility/DFStyleReader.hpp
 	${PROJECT_SOURCE_DIR}/utility/DFStyleCreator.hpp
 	${PROJECT_SOURCE_DIR}/utility/DFDirectoryReader.hpp
@@ -45,6 +46,7 @@ set(COMMON_SRCS
 	${PROJECT_SOURCE_DIR}/neuro/Army.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Hand.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Player.cpp
+	${PROJECT_SOURCE_DIR}/neuro/Game.cpp
 	${PROJECT_SOURCE_DIR}/utility/DFStyleReader.cpp
 	${PROJECT_SOURCE_DIR}/utility/DFStyleCreator.cpp
 	${PROJECT_SOURCE_DIR}/utility/DFDirectoryReader.cpp
@@ -75,7 +77,6 @@ set(NEUROSERVER_SRCS
 	${COMMON_SRCS}
 	${PROJECT_SOURCE_DIR}/network/Connection.cpp
 	${PROJECT_SOURCE_DIR}/network/Acceptor.cpp
-	${PROJECT_SOURCE_DIR}/neuroServer/Contestant.cpp
 	${PROJECT_SOURCE_DIR}/neuroServer/NetworkContestant.cpp
 	${PROJECT_SOURCE_DIR}/neuroServer/Arbiter.cpp
 	${PROJECT_SOURCE_DIR}/neuroServer/Game.cpp
@@ -95,7 +96,6 @@ set(NEUROCLIENT_HDRS
 	${COMMON_HDRS}
 	${PROJECT_SOURCE_DIR}/network/Connection.hpp
 	${PROJECT_SOURCE_DIR}/neuroClient/Application.hpp
-	${PROJECT_SOURCE_DIR}/neuroClient/Game.hpp
 	${PROJECT_SOURCE_DIR}/ui/text/client/Application.hpp
 	${PROJECT_SOURCE_DIR}/ui/text/CommandShell.hpp
     ${PROJECT_SOURCE_DIR}/ui/text/client/ServerJoiner.hpp
@@ -106,7 +106,6 @@ set(NEUROCLIENT_SRCS
 	${COMMON_SRCS}
 	${PROJECT_SOURCE_DIR}/network/Connection.cpp
 	${PROJECT_SOURCE_DIR}/neuroClient/Application.cpp
-	${PROJECT_SOURCE_DIR}/neuroClient/Game.cpp
 	${PROJECT_SOURCE_DIR}/ui/text/client/Application.cpp
 	${PROJECT_SOURCE_DIR}/ui/text/CommandShell.cpp
     ${PROJECT_SOURCE_DIR}/ui/text/client/ServerJoiner.cpp

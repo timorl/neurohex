@@ -58,6 +58,11 @@ namespace neuro {
 			int getHealth() const { return health; }
 
 			/**
+				* @brief Whether the player is alive.
+				*/
+			bool isAlive() const { return (health > 0); }
+
+			/**
 				* @brief Returns the number of tiles in the players hand.
 				*/
 			int getNumberOfTilesInHand() const { return hand.getNumberOfTiles(); }

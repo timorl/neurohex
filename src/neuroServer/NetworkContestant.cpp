@@ -173,7 +173,7 @@ namespace neuroServer {
 		moveRequested	= RequestState::DONE;
 	}
 
-	void NetworkContestant::requestMove(int playerId, const Game & game) {
+	void NetworkContestant::requestMove(int playerId, const neuro::Game & game) {
 		if ( moveRequested == RequestState::DONE || moveRequested == RequestState::IN_PROGRESS ) {
 			return;
 		}
@@ -199,7 +199,7 @@ namespace neuroServer {
 		}
 	}
 
-	Move NetworkContestant::getMove(int playerId, const Game & game) {
+	neuro::Move NetworkContestant::getMove(int playerId, const neuro::Game & game) {
 		requestMove(playerId, game);
 		while ( moveRequested == RequestState::IN_PROGRESS ) {
 			contestant->wait();
@@ -219,7 +219,7 @@ namespace neuroServer {
 		targetsRequested	= RequestState::DONE;
 	}
 
-	void NetworkContestant::requestTargets(int playerId, const Game & game, std::vector<neuro::AbilityIdentifier> abilities) {
+	void NetworkContestant::requestTargets(int playerId, const neuro::Game & game, std::vector<neuro::AbilityIdentifier> abilities) {
 		if ( targetsRequested == RequestState::DONE || targetsRequested == RequestState::IN_PROGRESS ) {
 			return;
 		}
@@ -252,7 +252,7 @@ namespace neuroServer {
 		}
 	}
 
-	Targets NetworkContestant::getTargets(int playerId, const Game & game, std::vector<neuro::AbilityIdentifier> abilities) {
+	neuro::Targets NetworkContestant::getTargets(int playerId, const neuro::Game & game, std::vector<neuro::AbilityIdentifier> abilities) {
 		requestTargets(playerId, game, abilities);
 		while ( targetsRequested == RequestState::IN_PROGRESS ) {
 			contestant->wait();
@@ -266,7 +266,7 @@ namespace neuroServer {
 		discardRequested	= RequestState::DONE;
 	}
 
-	void NetworkContestant::requestDiscard(int playerId, const Game & game) {
+	void NetworkContestant::requestDiscard(int playerId, const neuro::Game & game) {
 		if ( discardRequested == RequestState::DONE || discardRequested == RequestState::IN_PROGRESS ) {
 			return;
 		}
@@ -292,7 +292,7 @@ namespace neuroServer {
 		}
 	}
 
-	int NetworkContestant::getDiscard(int playerId, const Game & game) {
+	int NetworkContestant::getDiscard(int playerId, const neuro::Game & game) {
 		requestDiscard(playerId, game);
 		while ( discardRequested == RequestState::IN_PROGRESS ) {
 			contestant->wait();

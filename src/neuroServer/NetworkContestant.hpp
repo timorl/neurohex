@@ -3,10 +3,10 @@
 
 #include<memory>
 #include<vector>
+#include"neuro/Game.hpp"
 #include"utility/DFStyleReader.hpp"
 #include"utility/DFStyleCreator.hpp"
 #include"neuroServer/Contestant.hpp"
-#include"neuroServer/Game.hpp"
 #include"network/Acceptor.hpp"
 
 namespace neuroServer {
@@ -79,7 +79,7 @@ namespace neuroServer {
 				* @param[in] playerId The id of the contestant.
 				* @param[in] game A reference to the game.
 				*/
-			void requestMove(int playerId, const Game & game);
+			void requestMove(int playerId, const neuro::Game & game);
 
 			/**
 				* @brief Get a move from the contestant. Blocks if no move is available
@@ -88,7 +88,7 @@ namespace neuroServer {
 				* @param[in] game A reference to the game.
 				* @return A nonvalidated move send by the contestant.
 				*/
-			Move getMove(int playerId, const Game & game);
+			neuro::Move getMove(int playerId, const neuro::Game & game);
 
 			/**
 				* @brief Request a list of targets for a number of specific abilities from the contestant. Nonblocking.
@@ -96,7 +96,7 @@ namespace neuroServer {
 				* @param[in] game A reference to the game.
 				* @param[in] abilities A vector of abilities we need targets for.
 				*/
-			void requestTargets(int playerId, const Game & game, std::vector<neuro::AbilityIdentifier> abilities);
+			void requestTargets(int playerId, const neuro::Game & game, std::vector<neuro::AbilityIdentifier> abilities);
 
 			/**
 				* @brief Get a list of targets for a specific ability from the contestant. Blocks if no choice is available yet and requests one if it hasn't been requested yet.
@@ -108,7 +108,7 @@ namespace neuroServer {
 				* @return A nonvalidated set of targets. The behaviour is undefined if the
 				* id is out of bounds.
 				*/
-			Targets getTargets(int playerId, const Game & game, std::vector<neuro::AbilityIdentifier> abilities);
+			neuro::Targets getTargets(int playerId, const neuro::Game & game, std::vector<neuro::AbilityIdentifier> abilities);
 
 			/**
 				* @brief Request the contestant to choose a tile to discard. Nonblocking.
@@ -116,7 +116,7 @@ namespace neuroServer {
 				* @param[in] game A reference to the game.
 				* @return A nonvalidated number referencing the tile in the hand to discard.
 				*/
-			void requestDiscard(int playerId, const Game & game);
+			void requestDiscard(int playerId, const neuro::Game & game);
 
 			/**
 				* @brief Get a the id of the tile to discard from the contestant. Blocks if no choice is available yet and requests one if it hasn't been requested yet.
@@ -124,7 +124,7 @@ namespace neuroServer {
 				* @param[in] game A reference to the game.
 				* @return A nonvalidated number referencing the tile in the hand to discard.
 				*/
-			int getDiscard(int playerId, const Game & game);
+			int getDiscard(int playerId, const neuro::Game & game);
 		private:
 			network::Acceptor & acceptor;
 
@@ -151,11 +151,11 @@ namespace neuroServer {
 
 			void moveRequestResponseHandler(std::string resp);
 			RequestState	moveRequested;
-			Move move;
+			neuro::Move move;
 
 			void targetsRequestResponseHandler(std::string resp);
 			RequestState	targetsRequested;
-			Targets targets;
+			neuro::Targets targets;
 
 			void discardRequestResponseHandler(std::string resp);
 			RequestState	discardRequested;

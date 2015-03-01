@@ -137,7 +137,7 @@ namespace neuro {
 
 			/**
 				* @brief Get any activated tile on the board.
-				* @return The global if of an activated tile on the board or -1 if
+				* @return The global id of an activated tile on the board or -1 if
 				* no tile is activated.
 				*/
 			int getActivatedTile();
