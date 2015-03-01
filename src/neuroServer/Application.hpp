@@ -3,6 +3,7 @@
 
 #include<memory>
 #include"ui/Observable.hpp"
+#include"utility/Environment.hpp"
 #include"neuroServer/BoardLoader.hpp"
 #include"neuroServer/ArmyLoader.hpp"
 #include"neuroServer/Server.hpp"
@@ -38,17 +39,6 @@ namespace neuroServer {
 				* @brief Returns a reference to the game server pointer.
 				*/
 			Server & getServer() { return server; }
-
-			/**
-				* @brief The global directory containing all the application data.
-				*/
-			static std::string globalDataDirectory;
-
-			/**
-				* @brief The local directory containing the application data changed by the
-				* user.
-				*/
-			static std::string localDataDirectory;
 		private:
 			BoardLoader boardLoader;
 			ArmyLoader armyLoader;

@@ -35,6 +35,7 @@ set(COMMON_HDRS
 	${PROJECT_SOURCE_DIR}/neuro/Hand.hpp
 	${PROJECT_SOURCE_DIR}/neuro/Player.hpp
 	${PROJECT_SOURCE_DIR}/neuro/Game.hpp
+	${PROJECT_SOURCE_DIR}/utility/Environment.hpp
 	${PROJECT_SOURCE_DIR}/utility/DFStyleReader.hpp
 	${PROJECT_SOURCE_DIR}/utility/DFStyleCreator.hpp
 	${PROJECT_SOURCE_DIR}/utility/DFDirectoryReader.hpp
@@ -47,6 +48,7 @@ set(COMMON_SRCS
 	${PROJECT_SOURCE_DIR}/neuro/Hand.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Player.cpp
 	${PROJECT_SOURCE_DIR}/neuro/Game.cpp
+	${PROJECT_SOURCE_DIR}/utility/Environment.cpp
 	${PROJECT_SOURCE_DIR}/utility/DFStyleReader.cpp
 	${PROJECT_SOURCE_DIR}/utility/DFStyleCreator.cpp
 	${PROJECT_SOURCE_DIR}/utility/DFDirectoryReader.cpp

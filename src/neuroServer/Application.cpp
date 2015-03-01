@@ -2,16 +2,13 @@
 
 namespace neuroServer {
 
-	std::string Application::globalDataDirectory = "";
-	std::string Application::localDataDirectory = "";
-
 	void Application::start() {
-		std::string boardSubdirectory("/boards");
-		boardLoader.loadBoards(globalDataDirectory + boardSubdirectory);
-		boardLoader.loadBoards(localDataDirectory + boardSubdirectory);
-		std::string armySubdirectory("/armies");
-		armyLoader.loadArmies(globalDataDirectory + armySubdirectory);
-		armyLoader.loadArmies(localDataDirectory + armySubdirectory);
+		std::string boardSubdirectory("boards");
+		boardLoader.loadBoards(utility::Environment::getGlobalResourcePath() + boardSubdirectory);
+		boardLoader.loadBoards(utility::Environment::getPreferencesPath() + boardSubdirectory);
+		std::string armySubdirectory("armies");
+		armyLoader.loadArmies(utility::Environment::getGlobalResourcePath() + armySubdirectory);
+		armyLoader.loadArmies(utility::Environment::getPreferencesPath() + armySubdirectory);
 		sigModified(*this);
 		server.beginConfiguration();
 		sigModified(*this);
